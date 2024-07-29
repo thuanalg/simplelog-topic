@@ -5,9 +5,9 @@
 // Date:														
 //		<2024-July-14>
 // The lasted modified date:									
-//		<2024-July-17>
+//		<2024-July-28>
 // Decription:													
-//		The (only) main header file to export 3 APIs: [spl_init_log, spllog, spl_finish_log].
+//		The (only) main header file to export 3 APIs: [spl_init_log, spllog, spllogtopic, spl_finish_log].
 //===============================================================================================================
 */
 #ifndef ___SIMPLE_LOG__
@@ -21,11 +21,13 @@ extern "C" {
 
 #define LLU				unsigned long long
 
-#define					SPL_LOG_DEBUG					0
-#define					SPL_LOG_INFO					70
-#define					SPL_LOG_WARNING					80
-#define					SPL_LOG_ERROR					90
-#define					SPL_LOG_FATAL					100
+#define					SPL_LOG_BASE					0
+#define					SPL_LOG_DEBUG					1
+#define					SPL_LOG_INFO					2
+#define					SPL_LOG_WARNING					3
+#define					SPL_LOG_ERROR					4
+#define					SPL_LOG_FATAL					5
+#define					SPL_LOG_PEAK					6
 
 #ifndef  UNIX_LINUX
 	#ifndef __SIMPLE_STATIC_LOG__
@@ -41,20 +43,6 @@ extern "C" {
 	#define DLL_API_SIMPLE_LOG
 #endif /*! UNIX_LINUX */ 
 
-/*
-#ifndef __SIMPLE_LOG_PLATFORM__
-	#ifndef  UNIX_LINUX
-		#define				__SIMPLE_LOG_PLATFORM__							"[WIN32_MSVC]"
-	#else
-		#define				__SIMPLE_LOG_PLATFORM__							"[GNU-GCC]"
-	#endif
-	
-#endif 
-
-#ifndef __FILE_LINE_SIMPLELOG__
-	#define				__FILE_LINE_SIMPLELOG__								"[%s:%d] [thid: %llu]"
-#endif 
-*/
 
 	typedef enum __SPL_LOG_ERR_CODE__ {
 		SPL_NO_ERROR = 0,
@@ -73,6 +61,8 @@ extern "C" {
 		SPL_LOG_CLOSE_FILE_ERROR,
 		SPL_LOG_SEM_NULL_ERROR,
 		SPL_LOG_ROT_SIZE_ERROR,
+		SPL_LOG_TOPIC_EMPTY,
+		SPL_LOG_TOPIC_NULL,
 		SPL_LOG_MEM_FILE_MALLOC_ERROR,
 		SPL_LOG_CHECK_FOLDER_ERROR,
 		SPL_LOG_CHECK_FOLDER_YEAR_ERROR,
@@ -84,6 +74,11 @@ extern "C" {
 		SPL_LOG_TIME_NANO_NULL_ERROR, 
 		SPL_LOG_STAT_FOLDER_ERROR,
 		SPL_LOG_PRINTF_ERROR,
+		SPL_LOG_TOPIC_ZERO,
+		SPL_LOG_TOPIC_MEMORY,
+		SPL_LOG_TOPIC_FOPEN,
+		SPL_LOG_TOPIC_FLUSH,
+		SPL_LOG_TOPIC_BUFF_MEM,
 
 
 		SPL_END_ERROR,
@@ -109,7 +104,20 @@ spl_mutex_unlock(__mtx__); spl_rel_sem(spl_get_sem_rwfile());}
 
 
 
+#define __spl_log_buf_topic__(__tpic, ___fmttt___, ...)	{int *__ppl = 0; char tnow[40]; int range=0; char* __p = 0; void *__mtx__ =  spl_get_mtx(); LLU thrid = spl_get_threadid();\
+int len = 0; spl_fmt_now(tnow, 40);\
+spl_mutex_lock(__mtx__);\
+__p = spl_get_buf_topic(&range, &__ppl, (__tpic)); if (__p && __ppl) { len = snprintf((__p + (*__ppl)), range, \
+"[%s] [tid: %llu] [%s:%d] "___fmttt___"\n\n", \
+tnow, thrid, __FUNCTION__, __LINE__, ##__VA_ARGS__); \
+if(len > 0) (*__ppl) += (len -1);}\
+spl_mutex_unlock(__mtx__); spl_rel_sem(spl_get_sem_rwfile());}
+
+
 #define spllog(__lv__, __fmtt__, ...) { if(spl_get_log_levwel() <= (__lv__) ) {__spl_log_buf__("[%s] -->> "__fmtt__, spl_get_text(__lv__), ##__VA_ARGS__);};}
+
+#define spllogtopic(__lv__, __tpic, __fmtt__, ...) \
+{ if(spl_get_log_levwel() <= (__lv__) ) {__spl_log_buf_topic__((__tpic), "[%s] -->> "__fmtt__, spl_get_text(__lv__), ##__VA_ARGS__);};}
 
 	
 DLL_API_SIMPLE_LOG int									
@@ -144,13 +152,16 @@ DLL_API_SIMPLE_LOG const char*
 	spl_get_text(int lev);
 DLL_API_SIMPLE_LOG char *								
 	spl_get_buf(int* n, int** ppl);
+DLL_API_SIMPLE_LOG char*
+	spl_get_buf_topic(int* n, int** ppl, int );
 DLL_API_SIMPLE_LOG 
 	void* spl_mutex_create();
 DLL_API_SIMPLE_LOG
 	void spl_sleep(unsigned  int);
 DLL_API_SIMPLE_LOG
 	int spl_standardize_path(char* fname);
-
+DLL_API_SIMPLE_LOG
+	LLU spl_milli_now();
 #ifdef __cplusplus
 }
 #endif

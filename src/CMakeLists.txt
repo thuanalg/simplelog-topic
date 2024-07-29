@@ -1,5 +1,5 @@
 # Add main.cpp file of the project root directory as a source file
-project(simplelog_project)
+project(simplelog_topic_project)
 set(SOURCE_LIB_FILES simplelog.c simplelog.h simplelog_config.h)
 set(SOURCE_BIN_FILES c_test/main.c)
 set(SOURCE_BINCPP_FILES cpp_test/main.cpp)

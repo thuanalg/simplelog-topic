@@ -60,13 +60,13 @@ int main(int argc, char* argv[]) {
 		exit(1);
 	}
 	spl_fmt_now(nowfmt, 64);
-	spllog(SPL_LOG_INFO, "%s", "\n<<-->>\n");
+	spllog(SPL_LOG_INFO, "%s", "<<-->> Wait for loop.");
 	n = 0;
 	dotest();
 	while (1) {
 		FILE* fp = 0;
 		spl_sleep(10);
-		spllog(SPL_LOG_DEBUG, "%s", "\n<<-->>\n");
+		spllog(SPL_LOG_INFO, "%s", "<<-->> Wait for loop.");
 		fp = fopen("trigger.txt", "r");
 		if (fp) {
 			fclose(fp);
@@ -74,11 +74,13 @@ int main(int argc, char* argv[]) {
 		}
 
 	}
-	spllog(SPL_LOG_INFO, "%s", "\n<<--->>\n");
+	spllog(SPL_LOG_INFO, "%s", "<<-->> End of loop.");
 	set_off_process(1);
 	spl_sleep(1);
-	spl_console_log("--Main close--\n");
+	spl_console_log("--Main close--");
 	spl_finish_log();
+	//spl_sleep(1000);
+	spl_console_log("--Main close--");
 	return EXIT_SUCCESS;
 }
 void dotest() {
@@ -106,12 +108,16 @@ void* posix_thread_routine(void* lpParam)
 #endif // !UNIX_LINUX
 {
 	int k = 0;
+	int tpic = 0;
 	while (1) {
 		k = get_off_process();
 		if (k) {
 			break;
 		}
 		spllog(SPL_LOG_INFO, "test log: %llu", (LLU)time(0));
+		tpic = (spl_milli_now() % 3);
+		//spl_console_log("tpic: %d.", tpic);
+		spllogtopic(SPL_LOG_INFO, tpic, "test log: %llu", (LLU)time(0));
 		spl_sleep(1);
 	}
 	return 0;
