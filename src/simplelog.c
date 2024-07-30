@@ -100,6 +100,9 @@
 #define				SPL_TEXT_WARN					"W"
 #define				SPL_TEXT_ERROR					"E"
 #define				SPL_TEXT_FATAL					"F"
+
+
+#define				SPL_MEMO_PADDING				2
 /*===========================================================================================================================*/
 
 typedef 
@@ -1501,7 +1504,7 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 			break;
 		}
 		tmpBuff = (generic_dta_st*)buffer;
-		tmpBuff->total = t->buff_size - 1;
+		tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
 		t->buf = tmpBuff;
 
 		if (!t->arr_topic) {
@@ -1528,7 +1531,7 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 				}
 
 				tmpBuff = (generic_dta_st*)(buffer + (( i + 1) * t->buff_size));
-				tmpBuff->total = t->buff_size - 1;
+				tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
 				t->arr_topic[i].buf = tmpBuff;
 
 				//spl_malloc((__simple_log_static__.buff_size), t->arr_topic[i].buf, generic_dta_st);
