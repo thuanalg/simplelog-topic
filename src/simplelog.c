@@ -398,13 +398,13 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 				break;
 			}
 			__simple_log_static__.buff_size = n;
-			spl_malloc(n, p, char);
-			if (!p) {
-				ret = SPL_LOG_MEM_MALLOC_ERROR;
-				break;
-			}
-			__simple_log_static__.buf = (generic_dta_st *) p;
-			__simple_log_static__.buf->total = n -1;
+			//spl_malloc(n, p, char);
+			//if (!p) {
+			//	ret = SPL_LOG_MEM_MALLOC_ERROR;
+			//	break;
+			//}
+			//__simple_log_static__.buf = (generic_dta_st *) p;
+			//__simple_log_static__.buf->total = n -1;
 			break;
 		}
 		if (strcmp(key, SPLOG_ROT_SIZE) == 0) {
@@ -788,17 +788,17 @@ void* spl_written_thread_routine(void* lpParam)
 				}
 			spl_mutex_unlock(t->mtx);
 		}
-		spl_mutex_lock(t->mtx);
-			for (i = 0; i < t->n_topic; ++i) {
-				int werr = 0;
-				if (t->arr_topic[i].fp) {
-					FFCLOSE(t->arr_topic[i].fp, werr);
-				}
-				if (t->arr_topic[i].buf) {
-					spl_free(t->arr_topic[i].buf);
-				}
-			}
-		spl_mutex_unlock(t->mtx);
+		//spl_mutex_lock(t->mtx);
+		//	for (i = 0; i < t->n_topic; ++i) {
+		//		int werr = 0;
+		//		if (t->arr_topic[i].fp) {
+		//			FFCLOSE(t->arr_topic[i].fp, werr);
+		//		}
+		//		if (t->arr_topic[i].buf) {
+		//			spl_free(t->arr_topic[i].buf);
+		//		}
+		//	}
+		//spl_mutex_unlock(t->mtx);
 		spl_free(buffer);
 	} while (0);
 	
@@ -1490,8 +1490,20 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 	char fmt_file_name[64];
 	//int ferr = 0;
 	char yearmonth[16];
-
+	char* buffer = 0;
+	int total_buf_sz = 0;
+	generic_dta_st* tmpBuff = 0;
+	total_buf_sz = t->buff_size * (1 + t->n_topic);
+	spl_malloc(total_buf_sz, buffer, char);
 	do {
+		if (!buffer) {
+			ret = SPL_LOG_TOPIC_BUFF_MEM;
+			break;
+		}
+		tmpBuff = (generic_dta_st*)buffer;
+		tmpBuff->total = t->buff_size - 1;
+		t->buf = tmpBuff;
+
 		if (!t->arr_topic) {
 			char* p0 = t->topics;
 			int sz = sizeof(SIMPLE_LOG_TOPIC_ST) * t->n_topic;
@@ -1514,12 +1526,17 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 					p1++;
 					p0 = p1;
 				}
-				spl_malloc((__simple_log_static__.buff_size), t->arr_topic[i].buf, generic_dta_st);
-				if (!t->arr_topic[i].buf) {
-					ret = SPL_LOG_TOPIC_BUFF_MEM;
-					break;
-				}
-				t->arr_topic[i].buf->total = __simple_log_static__.buff_size - 1;
+
+				tmpBuff = (generic_dta_st*)(buffer + (( i + 1) * t->buff_size));
+				tmpBuff->total = t->buff_size - 1;
+				t->arr_topic[i].buf = tmpBuff;
+
+				//spl_malloc((__simple_log_static__.buff_size), t->arr_topic[i].buf, generic_dta_st);
+				//if (!t->arr_topic[i].buf) {
+				//	ret = SPL_LOG_TOPIC_BUFF_MEM;
+				//	break;
+				//}
+				//t->arr_topic[i].buf->total = __simple_log_static__.buff_size - 1;
 			}
 			if (ret) {
 				break;
