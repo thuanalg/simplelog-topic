@@ -782,26 +782,23 @@ void* spl_written_thread_routine(void* lpParam)
 		if (t->fp) {
 			int werr = 0;
 			FFCLOSE(t->fp, werr);
-			//if (t->lc_time) {
-			//	spl_free(t->lc_time);
-			//}
+			for (i = 0; i < t->n_topic; ++i) {
+				if (t->arr_topic[i].fp) {
+					FFCLOSE(t->arr_topic[i].fp, werr);
+				}
+			}
 			spl_mutex_lock(t->mtx);
 				if (t->buf) {
 					spl_free(t->buf);
 				}
+				for (i = 0; i < t->n_topic; ++i) {
+					if (t->arr_topic[i].buf) {
+						t->arr_topic[i].buf = 0;
+					}
+				}
 			spl_mutex_unlock(t->mtx);
 		}
-		//spl_mutex_lock(t->mtx);
-		//	for (i = 0; i < t->n_topic; ++i) {
-		//		int werr = 0;
-		//		if (t->arr_topic[i].fp) {
-		//			FFCLOSE(t->arr_topic[i].fp, werr);
-		//		}
-		//		if (t->arr_topic[i].buf) {
-		//			spl_free(t->arr_topic[i].buf);
-		//		}
-		//	}
-		//spl_mutex_unlock(t->mtx);
+
 		spl_free(buffer);
 	} while (0);
 	
