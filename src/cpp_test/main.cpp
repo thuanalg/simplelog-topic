@@ -99,6 +99,12 @@ void dotest() {
 #endif
 }
 
+//topic=sys,lib,exe,nayax,sksgn
+#define spllogsys(__level__, __fmt__, ...)					spllogtopic(__level__, 0, __fmt__, ##__VA_ARGS__);
+#define splloglib(__level__, __fmt__, ...)					spllogtopic(__level__, 1, __fmt__, ##__VA_ARGS__);
+#define spllogexe(__level__, __fmt__, ...)					spllogtopic(__level__, 2, __fmt__, ##__VA_ARGS__);
+#define spllognaxyax(__level__, __fmt__, ...)				spllogtopic(__level__, 3, __fmt__, ##__VA_ARGS__);
+#define spllogsksgn(__level__, __fmt__, ...)				spllogtopic(__level__, 4, __fmt__, ##__VA_ARGS__);
 
 #ifndef UNIX_LINUX
 DWORD WINAPI win32_thread_routine(LPVOID lpParam) {
@@ -106,13 +112,20 @@ DWORD WINAPI win32_thread_routine(LPVOID lpParam) {
 void* posix_thread_routine(void* lpParam) {
 #endif // !UNIX_LINUX
 	int k = 0;
+	int tpic = 0;
 	while (1) {
 		k = get_off_process();
 		if (k) {
 			break;
 		}
 		spllog(SPL_LOG_INFO, "test log: %llu", (LLU)time(0));
-		spl_sleep(1);
+		tpic = (spl_milli_now() % 3);
+		spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+		splloglib(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+		spllogexe(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+		spllognaxyax(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+		spllogsksgn(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+		//spl_sleep(1);
 	}
 	return 0;
 }

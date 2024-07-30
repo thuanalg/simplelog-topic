@@ -397,8 +397,8 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 				ret = SPL_LOG_BUFF_SIZE_ERROR;
 				break;
 			}
-			__simple_log_static__.buff_size = n;
-			spl_malloc(n + 2, p, char);
+			__simple_log_static__.buff_size = n - 1;
+			spl_malloc(n, p, char);
 			if (!p) {
 				ret = SPL_LOG_MEM_MALLOC_ERROR;
 				break;
@@ -683,9 +683,20 @@ DWORD WINAPI spl_written_thread_routine(LPVOID lpParam)
 void* spl_written_thread_routine(void* lpParam)
 #endif
 {	
+	int k = 0;
 	SIMPLE_LOG_ST* t = (SIMPLE_LOG_ST*)lpParam;
 	int ret = 0, off = 0, sz = 0, i = 0, err = 0;
-	do {		
+	char* buffer = 0;
+	int total_buf_sz = 0;
+	generic_dta_st* tmpBuff = 0;
+	total_buf_sz = t->buff_size * (1 + t->n_topic);
+	spl_malloc(total_buf_sz, buffer, char);
+	
+	do {	
+		if (!buffer) {
+			ret = SPL_LOG_TOPIC_BUFF_MEM;
+			break;
+		}
 		if (!t) {
 			exit(1);
 		}
@@ -698,7 +709,7 @@ void* spl_written_thread_routine(void* lpParam)
 		}
 		spl_console_log("Mutex: 0x%p.\n", t->mtx);
 		while (1) {
-			int k = 0;
+			
 #ifndef UNIX_LINUX
 			WaitForSingleObject(t->sem_rwfile, INFINITE);
 #else
@@ -723,20 +734,25 @@ void* spl_written_thread_routine(void* lpParam)
 				
 				if (t->buf->pl > t->buf->pc) {
 					
-					k = (int)fwrite(t->buf->data, 1, t->buf->pl, t->fp);
-					sz += k;
+					memcpy(buffer, t->buf, sizeof(generic_dta_st) + t->buf->pl + 1);
+					//k = (int)fwrite(t->buf->data, 1, t->buf->pl, t->fp);
+					//sz += k;
 					t->buf->pl = t->buf->pc = 0;
 				}
 				for (i = 0; i < t->n_topic; ++i) {
 					//TO-TEST
 					if (t->arr_topic[i].buf->pl > t->arr_topic[i].buf->pc) {
-						k = (int)fwrite(t->arr_topic[i].buf->data, 1, t->arr_topic[i].buf->pl, (FILE*)(t->arr_topic[i].fp));
-						t->arr_topic[i].fizize += k;
+						//k = (int)fwrite(t->arr_topic[i].buf->data, 1, t->arr_topic[i].buf->pl, (FILE*)(t->arr_topic[i].fp));
+						//t->arr_topic[i].fizize += k;
+						memcpy(buffer + (t->buff_size * (i + 1)), t->arr_topic[i].buf, sizeof(generic_dta_st) + t->arr_topic[i].buf->pl + 1);
 						t->arr_topic[i].buf->pl = t->arr_topic[i].buf->pc = 0;
 					}
 				}
 			} while (0);
 			spl_mutex_unlock(t->mtx);
+			tmpBuff = (generic_dta_st*) buffer;
+			k = (int)fwrite(tmpBuff->data, 1, tmpBuff->pl, t->fp);
+			sz += k;
 			err = fflush((FILE *)(t->fp));
 			if (err) {
 				//TO-TEST
@@ -746,6 +762,9 @@ void* spl_written_thread_routine(void* lpParam)
 			}
 			for (i = 0; i < t->n_topic; ++i) {
 				//TO-TEST
+				tmpBuff = (generic_dta_st*)(buffer + (t->buff_size * (i + 1)));
+				k = (int)fwrite(tmpBuff->data, 1, tmpBuff->pl, (FILE*)(t->arr_topic[i].fp));
+				t->arr_topic[i].fizize += k;
 				err = fflush((FILE *)(t->arr_topic[i].fp));
 				if (err) {
 					spl_console_log("--fflush, ret: %d --\n", err);
@@ -780,6 +799,7 @@ void* spl_written_thread_routine(void* lpParam)
 				}
 			}
 		spl_mutex_unlock(t->mtx);
+		spl_free(buffer);
 	} while (0);
 	
 	/*Send a signal to the waiting thread.*/
@@ -1494,12 +1514,12 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 					p1++;
 					p0 = p1;
 				}
-				spl_malloc((__simple_log_static__.buff_size + 2), t->arr_topic[i].buf, generic_dta_st);
+				spl_malloc((__simple_log_static__.buff_size), t->arr_topic[i].buf, generic_dta_st);
 				if (!t->arr_topic[i].buf) {
 					ret = SPL_LOG_TOPIC_BUFF_MEM;
 					break;
 				}
-				t->arr_topic[i].buf->total = __simple_log_static__.buff_size;
+				t->arr_topic[i].buf->total = __simple_log_static__.buff_size - 1;
 			}
 			if (ret) {
 				break;

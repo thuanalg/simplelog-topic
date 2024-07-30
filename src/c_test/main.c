@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
 	dotest();
 	while (1) {
 		FILE* fp = 0;
-		spl_sleep(10);
+		spl_sleep(20);
 		spllog(SPL_LOG_INFO, "%s", "<<-->> Wait for loop.");
 		fp = fopen("trigger.txt", "r");
 		if (fp) {
@@ -100,6 +100,12 @@ void dotest() {
 #endif
 }
 
+//topic=sys,lib,exe,nayax,sksgn
+#define spllogsys(__level__, __fmt__, ...)					spllogtopic(__level__, 0, __fmt__, ##__VA_ARGS__);
+#define splloglib(__level__, __fmt__, ...)					spllogtopic(__level__, 1, __fmt__, ##__VA_ARGS__);
+#define spllogexe(__level__, __fmt__, ...)					spllogtopic(__level__, 2, __fmt__, ##__VA_ARGS__);
+#define spllognaxyax(__level__, __fmt__, ...)				spllogtopic(__level__, 3, __fmt__, ##__VA_ARGS__);
+#define spllogsksgn(__level__, __fmt__, ...)				spllogtopic(__level__, 4, __fmt__, ##__VA_ARGS__);
 
 #ifndef UNIX_LINUX
 DWORD WINAPI win32_thread_routine(LPVOID lpParam)
@@ -116,9 +122,12 @@ void* posix_thread_routine(void* lpParam)
 		}
 		spllog(SPL_LOG_INFO, "test log: %llu", (LLU)time(0));
 		tpic = (spl_milli_now() % 3);
-		//spl_console_log("tpic: %d.", tpic);
-		spllogtopic(SPL_LOG_INFO, tpic, "test log: %llu", (LLU)time(0));
-		spl_sleep(1);
+		spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+		splloglib(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+		spllogexe(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+		spllognaxyax(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+		spllogsksgn(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+		//spl_sleep(1);
 	}
 	return 0;
 }
