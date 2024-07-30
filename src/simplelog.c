@@ -397,14 +397,14 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 				ret = SPL_LOG_BUFF_SIZE_ERROR;
 				break;
 			}
-			__simple_log_static__.buff_size = n - 1;
+			__simple_log_static__.buff_size = n;
 			spl_malloc(n, p, char);
 			if (!p) {
 				ret = SPL_LOG_MEM_MALLOC_ERROR;
 				break;
 			}
 			__simple_log_static__.buf = (generic_dta_st *) p;
-			__simple_log_static__.buf->total = n;
+			__simple_log_static__.buf->total = n -1;
 			break;
 		}
 		if (strcmp(key, SPLOG_ROT_SIZE) == 0) {
