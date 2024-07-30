@@ -424,7 +424,7 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 			char* p = 0;
 			n = (int)strlen(buff);
 			if (n < 1) {
-				ret = SPL_LOG_TOPIC_EMPTY;
+				//ret = SPL_LOG_TOPIC_EMPTY;
 				break;
 			}
 			ret = spl_stdz_topics(buff, &n, &count, &p);
@@ -1338,7 +1338,7 @@ spl_gen_topics(SIMPLE_LOG_ST* t) {
 	do {
 		int i = 0;
 		if (t->n_topic < 1) {
-			ret = SPL_LOG_TOPIC_ZERO;
+			//ret = SPL_LOG_TOPIC_ZERO;
 			break;
 		}
 		for (i = 0; i < t->n_topic; ++i) 
