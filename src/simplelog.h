@@ -81,6 +81,9 @@ extern "C" {
 		SPL_LOG_TOPIC_BUFF_MEM,
 		SPL_LOG_SHM_OUT_NULL,
 		SPL_LOG_SHM_MEM_ERROR,
+		SPL_LOG_SHM_KEY_NULL,
+		SPL_LOG_SHM_MAPPING_NULL,
+		SPL_LOG_SHM_MAP_VIEW_NULL,
 
 
 		SPL_END_ERROR,
@@ -127,7 +130,7 @@ DLL_API_SIMPLE_LOG int
 DLL_API_SIMPLE_LOG int									
 	spl_get_log_levwel();
 DLL_API_SIMPLE_LOG int									
-	spl_init_log(char *path);
+	spl_init_log(char *path, int creating);
 DLL_API_SIMPLE_LOG int									
 	spl_finish_log();
 DLL_API_SIMPLE_LOG int									

@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
 			pathcfg[i] = '/';
 		}
 	}
-	ret = spl_init_log(pathcfg);
+	ret = spl_init_log(pathcfg, 1);
 	if (ret) {
 		spl_console_log("spl_init_log ret: %d", ret);
 		exit(1);

@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	// Init log with "pathcfg" path of file, after starting well, ready to use.
-	ret = spl_init_log(pathcfg);
+	ret = spl_init_log(pathcfg, 1);
 	if (ret) {
 		spl_console_log("spl_init_log ret: %d", ret);
 		exit(1);

@@ -82,6 +82,8 @@
 	"end_configuring="
 #define	SPLOG_PROCESS_MODE \
 	"process_mode="
+#define	SPLOG_SHARED_KEY \
+	"shared_key="
 
 #define SPL_FILE_NAME_FMT \
 	"%s\\%s\\%s_%.8d.log"
@@ -162,9 +164,16 @@ struct __SIMPLE_LOG_ST__ {
 	int	
 		llevel;
 		/*llevel is from [0 - 6].*/
+
 	int
 		process_mode;
 		/*process_mode is applied for multi-processes.*/
+	char
+		shared_key[128];
+		/*shared_key is applied for multi-processes, if process_mode=1.*/
+	int
+		creating_mode;
+		/*process_mode is applied for multi-processes, apply for creating process..*/
 	int
 		file_limit_size;
 		/*Limitation of each log file. No nead SYNC.*/
@@ -217,6 +226,13 @@ struct __SIMPLE_LOG_ST__ {
 	char
 		path_template[1024];
 		/*In a thread of logger, NO NEED SYNC.*/
+#ifndef UNIX_LINUX
+	void*
+		whMapFile;
+		/*Applied for process mode of Windows.*/
+#else
+
+#endif	
 } SIMPLE_LOG_ST;
 
 typedef enum 
@@ -239,6 +255,7 @@ static const char* __splog_pathfolder[] = {
 		SPLOG_ROT_SIZE, 
 		SPLOG_TOPIC, 
 		SPLOG_PROCESS_MODE,
+		SPLOG_SHARED_KEY,
 		SPLOG_END_CFG,
 		0 
 };
@@ -281,7 +298,7 @@ static int
 #endif
 
 static int
-	spl_shm_region(char** t);
+	spl_shm_region(SIMPLE_LOG_ST* t);
 
 /*===========================================================================================================================*/
 int spl_local_time_now(spl_local_time_st*stt) {
@@ -463,6 +480,17 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 			__simple_log_static__.process_mode = mode;
 			break;
 		}
+		if (strcmp(key, SPLOG_SHARED_KEY) == 0) {
+			int n = 0, mode = 0;
+			char* p = 0;
+			n = (int)strlen(buff);
+			if (n < 1) {
+				//ret = SPL_LOG_TOPIC_EMPTY;
+				break;
+			}
+			snprintf(__simple_log_static__.shared_key, 128, "%s", buff);
+			break;
+		}
 		if (strcmp(key, SPLOG_END_CFG) == 0) {
 			spl_console_log("End configuration.\n");
 			if (isEnd) {
@@ -475,7 +503,7 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 }
 /*===========================================================================================================================*/
 int 
-spl_init_log( char *pathcfg) 
+spl_init_log( char *pathcfg, int creating) 
 {
 	int ret = 0;
 	FILE* fp = 0;
@@ -585,7 +613,13 @@ spl_init_log( char *pathcfg)
 		FFCLOSE(fp,ret);
 	}
 	if (ret == 0) {
-		ret = spl_gen_topic_buff(&__simple_log_static__);
+		__simple_log_static__.creating_mode = creating;
+		if (!__simple_log_static__.process_mode) {
+			ret = spl_gen_topic_buff(&__simple_log_static__);
+		} 
+		else {
+			ret = spl_shm_region(&__simple_log_static__);
+		}
 	}
 	if (ret == 0) {
 		ret = spl_simple_log_thread(&__simple_log_static__);
@@ -813,14 +847,41 @@ void* spl_written_thread_routine(void* lpParam)
 				}
 			}
 			spl_mutex_lock(t->mtx);
-				if (t->buf) {
-					spl_free(t->buf);
-				}
-				for (i = 0; i < t->n_topic; ++i) {
-					if (t->arr_topic[i].buf) {
-						t->arr_topic[i].buf = 0;
+				do {
+					int done = 0;
+					if (!(t->process_mode)) {
+						if (t->buf) {
+							spl_free(t->buf);
+						}
+						for (i = 0; i < t->n_topic; ++i) {
+							if (t->arr_topic[i].buf) {
+								t->arr_topic[i].buf = 0;
+							}
+						}
+						break;
 					}
-				}
+					//int done = 0;
+#ifndef UNIX_LINUX
+					if (t->buf) {
+						done = UnmapViewOfFile(t->buf);
+						if (!done) {
+							spl_console_log("UnmapViewOfFile: err: %d.", (int)GetLastError());
+						}
+					}
+					for (i = 0; i < t->n_topic; ++i) {
+						if (t->arr_topic[i].buf) {
+							t->arr_topic[i].buf = 0;
+						}
+					}
+					if (t->whMapFile) {
+						done = CloseHandle(t->whMapFile);
+						if (!done) {
+							spl_console_log("CloseHandle: err: %d.", (int)GetLastError());
+						}
+					}
+#else
+#endif
+				} while (0);
 			spl_mutex_unlock(t->mtx);
 		}
 
@@ -1556,12 +1617,6 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 				tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
 				t->arr_topic[i].buf = tmpBuff;
 
-				//spl_malloc((__simple_log_static__.buff_size), t->arr_topic[i].buf, generic_dta_st);
-				//if (!t->arr_topic[i].buf) {
-				//	ret = SPL_LOG_TOPIC_BUFF_MEM;
-				//	break;
-				//}
-				//t->arr_topic[i].buf->total = __simple_log_static__.buff_size - 1;
 			}
 			if (ret) {
 				break;
@@ -1574,18 +1629,66 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 	return ret;
 }
 /*===========================================================================================================================*/
-int spl_shm_region(char** pshm) 
+int spl_shm_region(SIMPLE_LOG_ST* t)
 {
-	int ret = 0;
+	int ret = 0, i = 0;
 	char* tmp = 0;
+	char* key_name = 0;
+	generic_dta_st* tmpBuff = 0;
+	char path[1024];
+	int siize = t->buff_size * (1 + t->n_topic);;
+#ifndef UNIX_LINUX
+	HANDLE hMapFile = 0;
+#else
+
+#endif	
 	do 
 	{
-		if (!pshm) {
+		if (! t->shared_key[0]) {
 			ret = SPL_LOG_SHM_OUT_NULL;
 			break;
 		}
+		if (!__simple_log_static__.shared_key[0]) {
+			ret = SPL_LOG_SHM_KEY_NULL;
+			spl_console_log("SPL_LOG_SHM_KEY_NULL");
+			break;
+		}
+		key_name = __simple_log_static__.shared_key;
 #ifndef UNIX_LINUX
-
+		/*
+			- https ://learn.microsoft.com/en-us/windows/win32/memory/creating-named-shared-memory
+		*/
+		if (t->creating_mode) {
+			hMapFile = CreateFileMapping(
+				INVALID_HANDLE_VALUE,    // use paging file
+				NULL,                    // default security
+				PAGE_READWRITE,          // read/write access
+				0,                       // maximum object size (high-order DWORD)
+				siize,                // maximum object size (low-order DWORD)
+				key_name);                 // name of mapping object
+			
+			if (!hMapFile) {
+				ret = SPL_LOG_SHM_MAPPING_NULL;
+				spl_console_log("CreateFileMapping: err: %d.", (int)GetLastError());
+				break;
+			}
+		}
+		else
+		{
+			hMapFile = OpenFileMappingA(
+				FILE_MAP_ALL_ACCESS, 0, key_name);
+			if (!hMapFile) {
+				ret = SPL_LOG_SHM_MAPPING_NULL;
+				spl_console_log("OpenFileMapping: err: %d.", (int)GetLastError());
+				break;
+			}
+		}
+		tmp = (char *)MapViewOfFile(hMapFile,  FILE_MAP_ALL_ACCESS, 0, 0, siize);
+		if (!tmp) {
+			ret = SPL_LOG_SHM_MAP_VIEW_NULL;
+			spl_console_log("MapViewOfFile: err: %d.", (int)GetLastError());
+			break;
+		}
 #else
 
 #endif	
@@ -1593,9 +1696,66 @@ int spl_shm_region(char** pshm)
 			ret = SPL_LOG_SHM_MEM_ERROR;
 			break;
 		}
-		*pshm = tmp;
+		//Just creating process should clean memory
+		if (t->creating_mode) {
+			memset(tmp, 0, siize);
+		}
+
+		t->buf = (generic_dta_st*)tmp;
+		tmpBuff = (generic_dta_st*)tmp;
+		tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
+		t->buf = tmpBuff;
+		if (!t->arr_topic) {
+			char* p0 = t->topics;
+			int sz = sizeof(SIMPLE_LOG_TOPIC_ST) * t->n_topic;
+			spl_malloc(sz, t->arr_topic, SIMPLE_LOG_TOPIC_ST);
+			memset(path, 0, sizeof(path));
+			if (!t->arr_topic) {
+				ret = SPL_LOG_TOPIC_MEMORY;
+				break;
+			}
+			for (i = 0; i < t->n_topic; ++i) {
+				char* p1 = 0;
+
+				p1 = strstr(p0, ",");
+				if (!p1) {
+					snprintf(t->arr_topic[i].topic, SPL_TOPIC_SIZE, "%s", p0);
+				}
+				else {
+					int n = p1 - p0;
+					snprintf(t->arr_topic[i].topic, n + 1, "%s", p0);
+					p1++;
+					p0 = p1;
+				}
+				//tmp += t->buff_size;
+				//tmpBuff = (generic_dta_st*)(tmp);
+				tmpBuff = (generic_dta_st*)(tmp + ((i + 1) * t->buff_size));
+				tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
+				t->arr_topic[i].buf = tmpBuff;
+			}
+		}
+		t->whMapFile = hMapFile;
 	} 
 	while(0);
+	if (ret) {
+		int done = 0;
+#ifndef UNIX_LINUX
+		if (tmp) {
+			done = UnmapViewOfFile(tmp);
+			if (!done) {
+				spl_console_log("UnmapViewOfFile: err: %d.", (int)GetLastError());
+			}
+		}
+		if (hMapFile) {
+			done = CloseHandle(hMapFile);
+			if (!done) {
+				spl_console_log("CloseHandle: err: %d.", (int)GetLastError());
+			}
+		}
+#else
+
+#endif	
+	}
 	return ret;
 }
 /*===========================================================================================================================*/
