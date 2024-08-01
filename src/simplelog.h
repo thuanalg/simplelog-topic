@@ -5,7 +5,7 @@
 // Date:														
 //		<2024-July-14>
 // The lasted modified date:									
-//		<2024-July-28>
+//		<2024-Aug-01>
 // Decription:													
 //		The (only) main header file to export 3 APIs: [spl_init_log, spllog, spllogtopic, spl_finish_log].
 //===============================================================================================================
@@ -93,29 +93,29 @@ extern "C" {
 
 
 #define spl_console_log(___fmttt___, ...)		{char buf[1024];spl_fmmt_now(buf, 1024);\
-fprintf(stdout, "[%s] [%s:%d] [thid: %llu] "___fmttt___"\n" , buf, __FUNCTION__, __LINE__, spl_get_threadid(), ##__VA_ARGS__);}
+fprintf(stdout, "[%s] [%s:%d] [pid: %llu, thid: %llu] "___fmttt___"\n" , buf, __FUNCTION__, __LINE__, spl_process_id(), spl_get_threadid(), ##__VA_ARGS__);}
 
 
 
 
 
 #define __spl_log_buf__(___fmttt___, ...)	{int *__ppl = 0; char tnow[40]; int range=0; char* __p = 0; void *__mtx__ =  spl_get_mtx(); LLU thrid = spl_get_threadid();\
-int len = 0; spl_fmt_now(tnow, 40);\
+int len = 0; LLU prid = spl_process_id(); spl_fmt_now(tnow, 40);\
 spl_mutex_lock(__mtx__);\
 __p = spl_get_buf(&range, &__ppl); if (__p && __ppl) { len = snprintf((__p + (*__ppl)), range, \
-"[%s] [tid: %llu] [%s:%d] "___fmttt___"\n\n", \
-tnow, thrid, __FUNCTION__, __LINE__, ##__VA_ARGS__); \
+"[%s] [pid: %llu, tid: %llu] [%s:%d] "___fmttt___"\n\n", \
+tnow, prid, thrid, __FUNCTION__, __LINE__, ##__VA_ARGS__); \
 if(len > 0) (*__ppl) += (len -1);}\
 spl_mutex_unlock(__mtx__); spl_rel_sem(spl_get_sem_rwfile());}
 
 
 
 #define __spl_log_buf_topic__(__tpic, ___fmttt___, ...)	{int *__ppl = 0; char tnow[40]; int range=0; char* __p = 0; void *__mtx__ =  spl_get_mtx(); LLU thrid = spl_get_threadid();\
-int len = 0; spl_fmt_now(tnow, 40);\
+int len = 0; LLU prid = spl_process_id();;spl_fmt_now(tnow, 40);\
 spl_mutex_lock(__mtx__);\
 __p = spl_get_buf_topic(&range, &__ppl, (__tpic)); if (__p && __ppl) { len = snprintf((__p + (*__ppl)), range, \
-"[%s] [tid: %llu] [%s:%d] "___fmttt___"\n\n", \
-tnow, thrid, __FUNCTION__, __LINE__, ##__VA_ARGS__); \
+"[%s] [pid: %llu, tid: %llu] [%s:%d] "___fmttt___"\n\n", \
+tnow, prid, thrid, __FUNCTION__, __LINE__, ##__VA_ARGS__); \
 if(len > 0) (*__ppl) += (len -1);}\
 spl_mutex_unlock(__mtx__); spl_rel_sem(spl_get_sem_rwfile());}
 
@@ -168,6 +168,8 @@ DLL_API_SIMPLE_LOG
 	int spl_standardize_path(char* fname);
 DLL_API_SIMPLE_LOG
 	LLU spl_milli_now();
+DLL_API_SIMPLE_LOG
+	LLU spl_process_id();
 #ifdef __cplusplus
 }
 #endif
