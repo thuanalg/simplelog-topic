@@ -5,7 +5,7 @@
 * Date:														
 *		<2024-July-14>
 * The lasted modified date:									
-*		<2024-July-27>
+*		<2024-Aug-01>
 * Decription:													
 *		The (only) main file to implement simple log.
 */
@@ -207,6 +207,9 @@ struct __SIMPLE_LOG_ST__ {
 	FILE*
 		fp;						
 		/*fp: Need to close*/
+	LLU*
+		pre_tnow;
+		/*pre_tnow: access by multi-threads, multi-processes. Belong to buffer. Must be sync.*/
 
 	generic_dta_st*
 		buf;
@@ -934,15 +937,18 @@ int spl_simple_log_thread(SIMPLE_LOG_ST* t) {
 int spl_fmt_now(char* fmtt, int len) {
 	int ret = 0;
 	spl_local_time_st stt;
-	static LLU pre_tnow = 0;
+	//static LLU pre_tnow = 0;
 	LLU _tnow = 0;
 	LLU _delta = 0;
 	int n = 0; 
 	char buff[20], buff1[20];
 	memset(buff, 0, 20);
-	memset(buff1, 0, 20);	
+	memset(buff1, 0, 20);
+	SIMPLE_LOG_ST* tp = 0;
+
 
 	time_t t = time(0);
+	tp = &__simple_log_static__;
 	do {
 		memset(&stt, 0, sizeof(stt));
 		ret = spl_local_time_now(&stt);
@@ -960,16 +966,26 @@ int spl_fmt_now(char* fmtt, int len) {
 		do {
 			spl_mutex_lock(__simple_log_static__.mtx_off);
 				do {
-
-					if (!pre_tnow) {
+					//if (!pre_tnow) {
+					//	break;
+					//}
+					//if (_tnow > pre_tnow) {
+					//	_delta = _tnow - pre_tnow;
+					//}
+					//if (!(tp->pre_tnow)) {
+					//	break;
+					//}
+					
+					if (! *(tp->pre_tnow)) {
 						break;
 					}
-					if (_tnow > pre_tnow) {
-						_delta = _tnow - pre_tnow;
-					}
+					if (_tnow > *(tp->pre_tnow)) {
+						_delta = _tnow - *(tp->pre_tnow);
+					}					
 				} while (0);
-				pre_tnow = _tnow;
+				*(tp->pre_tnow) = _tnow;
 			spl_mutex_unlock(__simple_log_static__.mtx_off);
+			
 		} while (0);
 
 		n = snprintf(buff, 20, SPL_FMT_DATE_ADDING, stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day);
@@ -1595,7 +1611,7 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 	char* buffer = 0;
 	int total_buf_sz = 0;
 	generic_dta_st* tmpBuff = 0;
-	total_buf_sz = t->buff_size * (1 + t->n_topic);
+	total_buf_sz = t->buff_size * (1 + t->n_topic) + sizeof(LLU);
 	spl_malloc(total_buf_sz, buffer, char);
 	do {
 		if (!buffer) {
@@ -1638,9 +1654,12 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 				break;
 			}
 		}
+		
 		if (ret) {
 			break;
 		}
+
+		t->pre_tnow = (LLU*)(buffer + (t->buff_size * (1 + t->n_topic)));
 	} while (0);
 	return ret;
 }
@@ -1652,7 +1671,7 @@ int spl_shm_region(SIMPLE_LOG_ST* t)
 	char* key_name = 0;
 	generic_dta_st* tmpBuff = 0;
 	char path[1024];
-	int siize = t->buff_size * (1 + t->n_topic);;
+	int siize = t->buff_size * (1 + t->n_topic) + sizeof(LLU);;
 #ifndef UNIX_LINUX
 	HANDLE hMapFile = 0;
 #else
@@ -1751,6 +1770,8 @@ int spl_shm_region(SIMPLE_LOG_ST* t)
 			}
 		}
 		t->whRWBufferMapFile = hMapFile;
+
+		t->pre_tnow = (LLU*) (tmp + (t->buff_size * (1 + t->n_topic)));
 	} 
 	while(0);
 	if (ret) {
