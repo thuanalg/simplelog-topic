@@ -51,7 +51,7 @@
 
 #ifndef UNIX_LINUX
 	#define SPL_CloseHandle(__obj) \
-		{ int bl = CloseHandle((__obj)); spl_console_log("CloseHandle %s", bl ? "DONE": "ERROR");}
+		{ if (__obj ) { int bl = CloseHandle((__obj)); spl_console_log("CloseHandle %s", bl ? "DONE": "ERROR"); (__obj) = 0;}}
 #else
 	#define SPL_sem_wait(__obj) \
 		sem_wait((sem_t*)(__obj))
@@ -228,7 +228,7 @@ struct __SIMPLE_LOG_ST__ {
 		/*In a thread of logger, NO NEED SYNC.*/
 #ifndef UNIX_LINUX
 	void*
-		whMapFile;
+		whRWBufferMapFile;
 		/*Applied for process mode of Windows.*/
 #else
 
@@ -268,7 +268,7 @@ static	SIMPLE_LOG_ST
 static int	
 	spl_init_log_parse(char* buff, char* key, char *);
 static void*
-	spl_sem_create(int ini);
+	spl_sem_create(int ini, char*);
 static int	
 	spl_verify_folder(char* folder);
 static int	
@@ -299,6 +299,10 @@ static int
 
 static int
 	spl_shm_region(SIMPLE_LOG_ST* t);
+static int
+	spl_create_sync(SIMPLE_LOG_ST* t);
+//void* 
+//	spl_mutex_create(char* name);
 
 /*===========================================================================================================================*/
 int spl_local_time_now(spl_local_time_st*stt) {
@@ -575,33 +579,37 @@ spl_init_log( char *pathcfg, int creating)
 		if (ret) {
 			break;
 		}
-		obj = spl_mutex_create();
-		if (!obj) {
-			ret = SPL_ERROR_CREATE_MUTEX;
+		ret = spl_create_sync(&__simple_log_static__);
+		if(ret) {
 			break;
 		}
-		__simple_log_static__.mtx = obj;
-
-		obj = spl_mutex_create();
-		if (!obj) {
-			ret = SPL_ERROR_CREATE_MUTEX;
-			break;
-		}
-		__simple_log_static__.mtx_off = obj;
-		
-		obj = spl_sem_create(1);
-		if (!obj) {
-			ret = SPL_ERROR_CREATE_SEM;
-			break;
-		}
-		__simple_log_static__.sem_rwfile = obj;
-
-		obj = spl_sem_create(1);
-		if (!obj) {
-			ret = SPL_ERROR_CREATE_SEM;
-			break;
-		}
-		__simple_log_static__.sem_off = obj;
+		//obj = spl_mutex_create();
+		//if (!obj) {
+		//	ret = SPL_ERROR_CREATE_MUTEX;
+		//	break;
+		//}
+		//__simple_log_static__.mtx = obj;
+		//
+		//obj = spl_mutex_create();
+		//if (!obj) {
+		//	ret = SPL_ERROR_CREATE_MUTEX;
+		//	break;
+		//}
+		//__simple_log_static__.mtx_off = obj;
+		//
+		//obj = spl_sem_create(1);
+		//if (!obj) {
+		//	ret = SPL_ERROR_CREATE_SEM;
+		//	break;
+		//}
+		//__simple_log_static__.sem_rwfile = obj;
+		//
+		//obj = spl_sem_create(1);
+		//if (!obj) {
+		//	ret = SPL_ERROR_CREATE_SEM;
+		//	break;
+		//}
+		//__simple_log_static__.sem_off = obj;
 
 		char* folder = __simple_log_static__.folder;
 		ret = spl_verify_folder(folder);
@@ -622,17 +630,24 @@ spl_init_log( char *pathcfg, int creating)
 		}
 	}
 	if (ret == 0) {
-		ret = spl_simple_log_thread(&__simple_log_static__);
+		if (__simple_log_static__.process_mode) {
+			if (__simple_log_static__.creating_mode) {
+				ret = spl_simple_log_thread(&__simple_log_static__);
+			}
+		}
+		else {
+			ret = spl_simple_log_thread(&__simple_log_static__);
+		}
 	}
 
 	return ret;
 }
 /*===========================================================================================================================*/
-void* spl_mutex_create() {
+void* spl_mutex_create(char* name) {
 	void *ret = 0;
 	do {
 #ifndef UNIX_LINUX
-		ret = CreateMutexA(0, 0, 0);
+		ret = CreateMutexA(0, 0, name);
 #else
 	/*https://linux.die.net/man/3/pthread_mutex_init*/
 		ret = malloc(sizeof(pthread_mutex_t));
@@ -646,10 +661,10 @@ void* spl_mutex_create() {
 	return ret;
 }
 /*===========================================================================================================================*/
-void* spl_sem_create(int ini) {
+void* spl_sem_create(int ini, char* name) {
 	void* ret = 0;
 #ifndef UNIX_LINUX
-	ret = CreateSemaphoreA(0, 0, ini, 0);
+	ret = CreateSemaphoreA(0, 0, ini, name);
 #else
 	ret = malloc(sizeof(sem_t));
 	memset(ret, 0, sizeof(sem_t));
@@ -867,17 +882,15 @@ void* spl_written_thread_routine(void* lpParam)
 						if (!done) {
 							spl_console_log("UnmapViewOfFile: err: %d.", (int)GetLastError());
 						}
+						t->buf = 0;
 					}
 					for (i = 0; i < t->n_topic; ++i) {
 						if (t->arr_topic[i].buf) {
 							t->arr_topic[i].buf = 0;
 						}
 					}
-					if (t->whMapFile) {
-						done = CloseHandle(t->whMapFile);
-						if (!done) {
-							spl_console_log("CloseHandle: err: %d.", (int)GetLastError());
-						}
+					if (t->whRWBufferMapFile) {
+						SPL_CloseHandle(t->whRWBufferMapFile);
 					}
 #else
 #endif
@@ -1203,6 +1216,9 @@ int spl_finish_log() {
 	int ret = 0, err = 0; 
 	spl_set_off(1);
 #ifndef UNIX_LINUX
+
+	SPL_CloseHandle(__simple_log_static__.whRWBufferMapFile);
+
 	SPL_CloseHandle(__simple_log_static__.mtx);
 	SPL_CloseHandle(__simple_log_static__.mtx_off);
 	SPL_CloseHandle(__simple_log_static__.sem_rwfile);
@@ -1734,7 +1750,7 @@ int spl_shm_region(SIMPLE_LOG_ST* t)
 				t->arr_topic[i].buf = tmpBuff;
 			}
 		}
-		t->whMapFile = hMapFile;
+		t->whRWBufferMapFile = hMapFile;
 	} 
 	while(0);
 	if (ret) {
@@ -1759,8 +1775,77 @@ int spl_shm_region(SIMPLE_LOG_ST* t)
 	return ret;
 }
 /*===========================================================================================================================*/
+#define SPL_SEM_NAME_RW				"_SEM_RW"
+#define SPL_SEM_NAME_OFF			"_SEM_OFF"
+
+#define SPL_MTX_NAME_RW				"_MTX_RW"
+#define SPL_MTX_NAME_OFF			"_MTX_OFF"
+
+int
+spl_create_sync(SIMPLE_LOG_ST* t) {
+	int ret = 0;
+	void* obj = 0;
+	char semName[128];
+	do {
+		if (!__simple_log_static__.process_mode) {
+			obj = spl_mutex_create(0);
+		}
+		else {
+			memset(semName, 0, sizeof(semName));
+			snprintf(semName, 128, "%s%s", SPL_MTX_NAME_RW, __simple_log_static__.shared_key);
+			obj = spl_mutex_create(semName);
+		}
+		if (!obj) {
+			ret = SPL_ERROR_CREATE_MUTEX;
+			break;
+		}
+		__simple_log_static__.mtx = obj;
+
+		if (!__simple_log_static__.process_mode) {
+			obj = spl_mutex_create(0);
+		}
+		else {
+			memset(semName, 0, sizeof(semName));
+			snprintf(semName, 128, "%s%s", SPL_MTX_NAME_OFF, __simple_log_static__.shared_key);
+			obj = spl_mutex_create(semName);
+		}
+		if (!obj) {
+			ret = SPL_ERROR_CREATE_MUTEX;
+			break;
+		}
+		__simple_log_static__.mtx_off = obj;
+		if (!__simple_log_static__.process_mode) {
+			obj = spl_sem_create(1, 0);
+		}
+		else {
+			memset(semName, 0, sizeof(semName));
+			snprintf(semName, 128, "%s%s", SPL_SEM_NAME_OFF, __simple_log_static__.shared_key);
+			obj = spl_sem_create(1, semName);
+		}
+		if (!obj) {
+			ret = SPL_ERROR_CREATE_SEM;
+			break;
+		}
+		__simple_log_static__.sem_rwfile = obj;
+		if (!__simple_log_static__.process_mode) {
+			obj = spl_sem_create(1, 0);
+		}
+		else {
+			memset(semName, 0, sizeof(semName));
+			snprintf(semName, 128, "%s%s", SPL_SEM_NAME_RW, __simple_log_static__.shared_key);
+			obj = spl_sem_create(1, semName);
+		}
+		if (!obj) {
+			ret = SPL_ERROR_CREATE_SEM;
+			break;
+		}
+		__simple_log_static__.sem_off = obj;
+	} while (0);
+
+	return ret;
+}
+/*===========================================================================================================================*/
 /*
-	- lc_time_now
 	- delta
 	- Mutex, and Semaphore
 */

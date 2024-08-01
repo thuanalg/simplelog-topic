@@ -39,7 +39,7 @@ int get_off_process() {
 int number = 2;
 int main(int argc, char* argv[]) {
 	int n = 0, ret = 0, i = 0;
-	main_mtx = spl_mutex_create();
+	main_mtx = spl_mutex_create(0);
 	if (argc > 1) {
 		n = sscanf(argv[1], "%d", &number);
 	}

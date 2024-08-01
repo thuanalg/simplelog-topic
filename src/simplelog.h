@@ -160,7 +160,7 @@ DLL_API_SIMPLE_LOG char *
 DLL_API_SIMPLE_LOG char*
 	spl_get_buf_topic(int* n, int** ppl, int );
 DLL_API_SIMPLE_LOG 
-	void* spl_mutex_create();
+	void* spl_mutex_create(char *);
 DLL_API_SIMPLE_LOG
 	void spl_sleep(unsigned  int);
 DLL_API_SIMPLE_LOG

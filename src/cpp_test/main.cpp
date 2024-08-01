@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 	if (argc > 1) {
 		n = sscanf(argv[1], "%d", &number);
 	}
-	main_mtx = spl_mutex_create();
+	main_mtx = spl_mutex_create(0);
 	spl_console_log("Main thread.\n");
 
 	snprintf(pathcfg, 1024, path);
