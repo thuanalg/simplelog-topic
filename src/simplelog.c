@@ -498,8 +498,13 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 				//ret = SPL_LOG_TOPIC_EMPTY;
 				break;
 			}
-			ret = spl_stdz_topics(buff, &n, &mode, &p);
-			if (ret) {
+			//ret = spl_stdz_topics(buff, &n, &mode, &p);
+			//if (ret) {
+			//	break;
+			//}
+			n = sscanf(buff, "%d", &mode);
+			if (n < 1) {
+				ret = SPL_LOG_SHM_MODE;
 				break;
 			}
 			__simple_log_static__.process_mode = mode;
