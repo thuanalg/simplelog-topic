@@ -80,6 +80,8 @@
 	"topic="
 #define	SPLOG_END_CFG \
 	"end_configuring="
+#define	SPLOG_PROCESS_MODE \
+	"process_mode="
 
 #define SPL_FILE_NAME_FMT \
 	"%s\\%s\\%s_%.8d.log"
@@ -159,6 +161,10 @@ typedef
 struct __SIMPLE_LOG_ST__ {
 	int	
 		llevel;
+		/*llevel is from [0 - 6].*/
+	int
+		process_mode;
+		/*process_mode is applied for multi-processes.*/
 	int
 		file_limit_size;
 		/*Limitation of each log file. No nead SYNC.*/
@@ -232,6 +238,7 @@ static const char* __splog_pathfolder[] = {
 		SPLOG_BUFF_SIZE, 
 		SPLOG_ROT_SIZE, 
 		SPLOG_TOPIC, 
+		SPLOG_PROCESS_MODE,
 		SPLOG_END_CFG,
 		0 
 };
@@ -272,6 +279,9 @@ static int
 	static void*
 		spl_written_thread_routine(void*);
 #endif
+
+static int
+	spl_shm_region(char** t);
 
 /*===========================================================================================================================*/
 int spl_local_time_now(spl_local_time_st*stt) {
@@ -436,6 +446,21 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 			}
 			__simple_log_static__.n_topic = count;
 			__simple_log_static__.topics = p;
+			break;
+		}
+		if (strcmp(key, SPLOG_PROCESS_MODE) == 0) {
+			int n = 0, mode = 0;
+			char* p = 0;
+			n = (int)strlen(buff);
+			if (n < 1) {
+				//ret = SPL_LOG_TOPIC_EMPTY;
+				break;
+			}
+			ret = spl_stdz_topics(buff, &n, &mode, &p);
+			if (ret) {
+				break;
+			}
+			__simple_log_static__.process_mode = mode;
 			break;
 		}
 		if (strcmp(key, SPLOG_END_CFG) == 0) {
@@ -1546,6 +1571,31 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 			break;
 		}
 	} while (0);
+	return ret;
+}
+/*===========================================================================================================================*/
+int spl_shm_region(char** pshm) 
+{
+	int ret = 0;
+	char* tmp = 0;
+	do 
+	{
+		if (!pshm) {
+			ret = SPL_LOG_SHM_OUT_NULL;
+			break;
+		}
+#ifndef UNIX_LINUX
+
+#else
+
+#endif	
+		if (!tmp) {
+			ret = SPL_LOG_SHM_MEM_ERROR;
+			break;
+		}
+		*pshm = tmp;
+	} 
+	while(0);
 	return ret;
 }
 /*===========================================================================================================================*/
