@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
 			pathcfg[i] = '/';
 		}
 	}
-	ret = spl_init_log(pathcfg);
+	ret = spl_init_log("C:/Users/DEll/Desktop/logoutput/simplelog.cfg");
 	if (ret) {
 		spl_console_log("spl_init_log ret: %d", ret);
 		exit(1);
@@ -127,7 +127,7 @@ void* posix_thread_routine(void* lpParam)
 		spllogexe(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
 		spllognaxyax(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
 		spllogsksgn(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
-		//spl_sleep(1);
+		spl_sleep(1);
 	}
 	return 0;
 }

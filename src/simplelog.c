@@ -41,7 +41,7 @@
 	{ spl_console_log("Free: 0x:%p.\n", (__obj__)); free(__obj__); ; (__obj__) = 0;} 
 
 #define FFCLOSE(fp, __n) \
-	{ (__n) = fclose((FILE*)fp) ;spl_console_log("Close FILE 0x%p, error code: %d, %s.\n", (fp), (__n), (__n) ? "FAILED": "DONE"); if(!__n) { (fp) = 0;}}
+	{ if((FILE*)fp){ (__n) = fclose((FILE*)fp) ;spl_console_log("Close FILE 0x%p, error code: %d, %s.\n", (fp), (__n), (__n) ? "FAILED": "DONE"); if(!__n) { (fp) = 0;}}}
 
 #define FFOPEN(__fp, __path, __mode) \
 	{ (__fp) = fopen((__path), (__mode));spl_console_log("Open FILE error code: 0x%p, %s.\n", (__fp), (__fp) ? "DONE": "FAILED"); }
@@ -738,15 +738,10 @@ void* spl_written_thread_routine(void* lpParam)
 				if (t->buf->pl > t->buf->pc) {
 					
 					memcpy(buffer, t->buf, sizeof(generic_dta_st) + t->buf->pl + 1);
-					//k = (int)fwrite(t->buf->data, 1, t->buf->pl, t->fp);
-					//sz += k;
 					t->buf->pl = t->buf->pc = 0;
 				}
 				for (i = 0; i < t->n_topic; ++i) {
-					//TO-TEST
 					if (t->arr_topic[i].buf->pl > t->arr_topic[i].buf->pc) {
-						//k = (int)fwrite(t->arr_topic[i].buf->data, 1, t->arr_topic[i].buf->pl, (FILE*)(t->arr_topic[i].fp));
-						//t->arr_topic[i].fizize += k;
 						memcpy(buffer + (t->buff_size * (i + 1)), t->arr_topic[i].buf, sizeof(generic_dta_st) + t->arr_topic[i].buf->pl + 1);
 						t->arr_topic[i].buf->pl = t->arr_topic[i].buf->pc = 0;
 					}
@@ -935,14 +930,7 @@ int spl_gen_file(SIMPLE_LOG_ST* t, int *sz, int limit, int *index) {
 			spl_console_log("spl_local_time_now: ret: %d.\n", ret);
 			break;
 		}
-		//if (!(t->lc_time)) {
-		//	spl_malloc(sizeof(spl_local_time_st), t->lc_time, spl_local_time_st);
-		//	if (!t->lc_time) {
-		//		ret = SPL_LOG_MEM_GEN_FILE_ERROR;
-		//		break;
-		//	}
-		//	memcpy(t->lc_time, &lt, sizeof(spl_local_time_st));
-		//}
+
 		memcpy(&(t->lc_time_now), &lt, sizeof(spl_local_time_st));
 		plt = &(t->lc_time_now);
 		if (!t->fp) {
@@ -971,6 +959,7 @@ int spl_gen_file(SIMPLE_LOG_ST* t, int *sz, int limit, int *index) {
 				FFSEEK(t->fp, 0, SEEK_END);
 				cszize = FFTELL(t->fp);
 				if (cszize < limit) {
+					*sz = cszize;
 					break;
 				}
 				FFCLOSE(t->fp, err);
@@ -1358,6 +1347,7 @@ spl_gen_topics(SIMPLE_LOG_ST* t) {
 				FFSEEK(t->arr_topic[i].fp, 0, SEEK_END);
 				cszize = (LLU)FFTELL(t->arr_topic[i].fp);
 				if (cszize < t->file_limit_size) {
+					t->arr_topic[i].fizize = (int)cszize;
 					break;
 				}
 				t->arr_topic[i].fizize = (int)cszize;
@@ -1382,6 +1372,11 @@ spl_gen_topics(SIMPLE_LOG_ST* t) {
 			for (i = 0; i < t->n_topic; ++i) {
 				do {
 					int err = 0;
+					FFCLOSE(t->arr_topic[i].fp, err);
+					if (err) {
+						ret = SPL_LOG_CLOSE_FILE_ERROR;
+						break;
+					}
 					t->arr_topic[i].index = 0;
 					t->arr_topic[i].fizize = 0;
 					snprintf(path, 1024, "%s-%s-%.7d.log", t->path_template, t->arr_topic[i].topic, t->arr_topic[i].index);
@@ -1406,7 +1401,13 @@ spl_gen_topics(SIMPLE_LOG_ST* t) {
 			}
 			do {
 				int err = 0;
-				//FILE* fp = (FILE*)t->arr_topic[i].fp;
+
+				FFCLOSE(t->arr_topic[i].fp, err);
+				if (err) {
+					ret = SPL_LOG_CLOSE_FILE_ERROR;
+					break;
+				}
+
 				t->arr_topic[i].fizize = 0;
 				
 				snprintf(path, 1024, "%s-%s-%.7d.log", t->path_template, t->arr_topic[i].topic, t->arr_topic[i].index);
