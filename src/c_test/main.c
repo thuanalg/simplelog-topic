@@ -6,10 +6,12 @@
 #ifndef UNIX_LINUX
 	#include <Windows.h>
 	DWORD WINAPI win32_thread_routine(LPVOID lpParam);
+	#define FOLDER_PATH				"C:/Users/DEll/Desktop/logoutput/"
 #else
 #	include <unistd.h>
 	#include <pthread.h>
 	void * posix_thread_routine(void* lpParam);
+	#define FOLDER_PATH				""
 #endif // !UNIX_LINUX
 
 
@@ -54,7 +56,7 @@ int main(int argc, char* argv[]) {
 			pathcfg[i] = '/';
 		}
 	}
-	ret = spl_init_log("C:/Users/DEll/Desktop/logoutput/simplelog.cfg");
+	ret = spl_init_log(FOLDER_PATH"simplelog.cfg");
 	if (ret) {
 		spl_console_log("spl_init_log ret: %d", ret);
 		exit(1);
@@ -65,9 +67,9 @@ int main(int argc, char* argv[]) {
 	dotest();
 	while (1) {
 		FILE* fp = 0;
-		spl_sleep(20);
+		spl_sleep(30);
 		spllog(SPL_LOG_INFO, "%s", "<<-->> Wait for loop.");
-		fp = fopen("trigger.txt", "r");
+		fp = fopen(FOLDER_PATH"trigger.txt", "r");
 		if (fp) {
 			fclose(fp);
 			break;

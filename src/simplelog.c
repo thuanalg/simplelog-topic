@@ -576,9 +576,10 @@ void* spl_mutex_create() {
 		ret = CreateMutexA(0, 0, 0);
 #else
 	/*https://linux.die.net/man/3/pthread_mutex_init*/
-		ret = malloc(sizeof(pthread_mutex_t));
+		spl_malloc(sizeof(pthread_mutex_t), ret, void);
+		//ret = malloc(sizeof(pthread_mutex_t));
 		if (!ret) {
-			break;
+			return ret;
 		}
 		memset(ret, 0, sizeof(pthread_mutex_t));
 		pthread_mutex_init((pthread_mutex_t*)ret, 0);
@@ -592,7 +593,11 @@ void* spl_sem_create(int ini) {
 #ifndef UNIX_LINUX
 	ret = CreateSemaphoreA(0, 0, ini, 0);
 #else
-	ret = malloc(sizeof(sem_t));
+	//ret = malloc(sizeof(sem_t));
+	spl_malloc(sizeof(sem_t), ret, void);
+	if(!ret) {
+		return ret;
+	}
 	memset(ret, 0, sizeof(sem_t));
 	sem_init((sem_t*)ret, 0, 0);
 #endif 
@@ -1103,7 +1108,7 @@ const char* spl_get_text(int lev) {
 }
 /*===========================================================================================================================*/
 int spl_finish_log() {
-	int ret = 0, err = 0; 
+	int ret = 0; 
 	spl_set_off(1);
 #ifndef UNIX_LINUX
 	SPL_CloseHandle(__simple_log_static__.mtx);
@@ -1111,12 +1116,17 @@ int spl_finish_log() {
 	SPL_CloseHandle(__simple_log_static__.sem_rwfile);
 	SPL_CloseHandle(__simple_log_static__.sem_off);
 #else
+	int err = 0;
 /*https://linux.die.net/man/3/SPL_sem_destroy
 //https://linux.die.net/man/3/pthread_mutex_init*/
 	SPL_pthread_mutex_destroy(__simple_log_static__.mtx, err);
+	spl_free(__simple_log_static__.mtx);
 	SPL_pthread_mutex_destroy(__simple_log_static__.mtx_off, err);
+	spl_free(__simple_log_static__.mtx_off);
 	SPL_sem_destroy(__simple_log_static__.sem_rwfile, err);
+	spl_free(__simple_log_static__.sem_rwfile);
 	SPL_sem_destroy(__simple_log_static__.sem_off, err);
+	spl_free(__simple_log_static__.sem_off);
 #endif
 	memset(&__simple_log_static__, 0, sizeof(__simple_log_static__));
 	return ret;
