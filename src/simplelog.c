@@ -579,7 +579,7 @@ void* spl_mutex_create() {
 		spl_malloc(sizeof(pthread_mutex_t), ret, void);
 		//ret = malloc(sizeof(pthread_mutex_t));
 		if (!ret) {
-			return ret;
+			break;
 		}
 		memset(ret, 0, sizeof(pthread_mutex_t));
 		pthread_mutex_init((pthread_mutex_t*)ret, 0);
@@ -590,17 +590,19 @@ void* spl_mutex_create() {
 /*===========================================================================================================================*/
 void* spl_sem_create(int ini) {
 	void* ret = 0;
+	do {
 #ifndef UNIX_LINUX
-	ret = CreateSemaphoreA(0, 0, ini, 0);
+		ret = CreateSemaphoreA(0, 0, ini, 0);
 #else
-	//ret = malloc(sizeof(sem_t));
-	spl_malloc(sizeof(sem_t), ret, void);
-	if(!ret) {
-		return ret;
-	}
-	memset(ret, 0, sizeof(sem_t));
-	sem_init((sem_t*)ret, 0, 0);
+		//ret = malloc(sizeof(sem_t));
+		spl_malloc(sizeof(sem_t), ret, void);
+		if (!ret) {
+			break;
+		}
+		memset(ret, 0, sizeof(sem_t));
+		sem_init((sem_t*)ret, 0, 0);
 #endif 
+	} while (0);
 	return ret;
 }
 /*===========================================================================================================================*/
