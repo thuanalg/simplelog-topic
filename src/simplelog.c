@@ -759,6 +759,7 @@ void* spl_written_thread_routine(void* lpParam)
 			k = (int)fwrite(tmpBuff->data, 1, tmpBuff->pl, t->fp);
 			sz += k;
 			err = fflush((FILE *)(t->fp));
+			tmpBuff->pl = 0;
 			if (err) {
 				//TO-TEST
 				ret = SPL_LOG_TOPIC_FLUSH;
@@ -771,6 +772,7 @@ void* spl_written_thread_routine(void* lpParam)
 				k = (int)fwrite(tmpBuff->data, 1, tmpBuff->pl, (FILE*)(t->arr_topic[i].fp));
 				t->arr_topic[i].fizize += k;
 				err = fflush((FILE *)(t->arr_topic[i].fp));
+				tmpBuff->pl = 0;
 				if (err) {
 					spl_console_log("--fflush, ret: %d --\n", err);
 					ret = SPL_LOG_TOPIC_FLUSH;
