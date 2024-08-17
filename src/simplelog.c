@@ -41,10 +41,10 @@
 #define spl_free(__obj__) \
 	{ spl_console_log("Free: 0x:%p.\n", (__obj__)); free(__obj__); ; (__obj__) = 0;} 
 
-#define FFCLOSE(fp, __n) { if((FILE*)fp){ (__n) = fclose((FILE*)fp) ; if(__n) { spl_fclose_err(__n); } \
-	else { spl_console_log("Close FILE 0x%p DONE.", (fp));;(fp) = 0;;}}}
+#define SPL_FCLOSE(__fp__, __n) { if(__fp__){ (__n) = fclose((FILE*)(__fp__)) ; if(__n) { spl_fclose_err(__n, __fp__); } \
+	else { spl_console_log("Close FILE 0x%p DONE.", (__fp__));;(__fp__) = 0;;}}}
 
-#define FFLUSH(fp, __n) { if((FILE*)fp){ (__n) = fflush((FILE*)fp) ; if(__n) { spl_fflush_err(__n); }}}
+#define SPL_FFLUSH(__fp__, __n) { if(__fp__){ (__n) = fflush((FILE*)(__fp__)) ; if(__n) { spl_fflush_err(__n, __fp__); }}}
 
 #define FFOPEN(__fp, __path, __mode) \
 	{ (__fp) = fopen((__path), (__mode));spl_console_log("Open FILE error code: 0x%p, %s.\n", (__fp), (__fp) ? "DONE": "FAILED"); }
@@ -277,9 +277,9 @@ static int
 #endif
 
 static int 
-	spl_fclose_err(int t);
+	spl_fclose_err(int t, void *fpp);
 static int
-	spl_fflush_err(int t);
+	spl_fflush_err(int t, void *fpp);
 
 /*===========================================================================================================================*/
 int spl_local_time_now(spl_local_time_st*stt) {
@@ -565,7 +565,7 @@ spl_init_log( char *pathcfg)
 		}
 	} while (0);
 	if (fp) {
-		FFCLOSE(fp,ret);
+		SPL_FCLOSE(fp,ret);
 	}
 	if (ret == 0) {
 		ret = spl_gen_topic_buff(&__simple_log_static__);
@@ -767,9 +767,9 @@ void* spl_written_thread_routine(void* lpParam)
 			k = (int)fwrite(tmpBuff->data, 1, tmpBuff->pl, t->fp);
 			sz += k;
 
-			//err = fflush((FILE *)(t->fp));
+			//err = SPL_FFLUSH((FILE *)(t->fp));
 
-			FFLUSH((t->fp), err);
+			SPL_FFLUSH((t->fp), err);
 
 			tmpBuff->pl = 0;
 			if (err) {
@@ -784,8 +784,8 @@ void* spl_written_thread_routine(void* lpParam)
 				k = (int)fwrite(tmpBuff->data, 1, tmpBuff->pl, (FILE*)(t->arr_topic[i].fp));
 				t->arr_topic[i].fizize += k;
 
-				//err = fflush((FILE *)(t->arr_topic[i].fp));
-				FFLUSH((t->arr_topic[i].fp), err);
+				//err = SPL_FFLUSH((FILE *)(t->arr_topic[i].fp));
+				SPL_FFLUSH((t->arr_topic[i].fp), err);
 
 				tmpBuff->pl = 0;
 				if (err) {
@@ -800,10 +800,10 @@ void* spl_written_thread_routine(void* lpParam)
 		}
 		if (t->fp) {
 			int werr = 0;
-			FFCLOSE(t->fp, werr);
+			SPL_FCLOSE(t->fp, werr);
 			for (i = 0; i < t->n_topic; ++i) {
 				if (t->arr_topic[i].fp) {
-					FFCLOSE(t->arr_topic[i].fp, werr);
+					SPL_FCLOSE(t->arr_topic[i].fp, werr);
 				}
 			}
 			spl_mutex_lock(t->mtx);
@@ -986,7 +986,7 @@ int spl_gen_file(SIMPLE_LOG_ST* t, int *sz, int limit, int *index) {
 					*sz = cszize;
 					break;
 				}
-				FFCLOSE(t->fp, err);
+				SPL_FCLOSE(t->fp, err);
 				if(err) {
 					ret = SPL_LOG_CLOSE_FILE_ERROR;
 				}
@@ -1037,7 +1037,7 @@ int spl_gen_file(SIMPLE_LOG_ST* t, int *sz, int limit, int *index) {
 		snprintf(path, 1024, SPL_FILE_NAME_FMT, t->folder, yearmonth, fmt_file_name, *index);
 		snprintf(t->path_template, 1024, SPL_FILE_NAME_FMT_TOPIC, t->folder, yearmonth, fmt_file_name);
 
-		FFCLOSE(t->fp, ferr);
+		SPL_FCLOSE(t->fp, ferr);
 		if (ferr) {
 			ret = SPL_LOG_CLOSE_FILE_ERROR;
 			break;
@@ -1384,7 +1384,7 @@ spl_gen_topics(SIMPLE_LOG_ST* t) {
 					break;
 				}
 				t->arr_topic[i].fizize = (int)cszize;
-				FFCLOSE(t->arr_topic[i].fp, err);
+				SPL_FCLOSE(t->arr_topic[i].fp, err);
 				if (err) {
 					ret = SPL_LOG_CLOSE_FILE_ERROR;
 					break;
@@ -1405,7 +1405,7 @@ spl_gen_topics(SIMPLE_LOG_ST* t) {
 			for (i = 0; i < t->n_topic; ++i) {
 				do {
 					int err = 0;
-					FFCLOSE(t->arr_topic[i].fp, err);
+					SPL_FCLOSE(t->arr_topic[i].fp, err);
 					if (err) {
 						ret = SPL_LOG_CLOSE_FILE_ERROR;
 						break;
@@ -1435,7 +1435,7 @@ spl_gen_topics(SIMPLE_LOG_ST* t) {
 			do {
 				int err = 0;
 
-				FFCLOSE(t->arr_topic[i].fp, err);
+				SPL_FCLOSE(t->arr_topic[i].fp, err);
 				if (err) {
 					ret = SPL_LOG_CLOSE_FILE_ERROR;
 					break;
@@ -1455,7 +1455,7 @@ spl_gen_topics(SIMPLE_LOG_ST* t) {
 				if (cszize < t->file_limit_size) {
 					break;
 				}
-				FFCLOSE(t->arr_topic[i].fp, err);
+				SPL_FCLOSE(t->arr_topic[i].fp, err);
 				if (err) {
 					ret = SPL_LOG_CLOSE_FILE_ERROR;
 					break;
@@ -1577,31 +1577,35 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 }
 /*===========================================================================================================================*/
 int
-spl_fclose_err(int terr)
+spl_fclose_err(int terr, void* ffp)
 {
 	int ret = 0;
 	do {
 #ifndef UNIX_LINUX
-		spl_console_log("terr: %d, GetLastError: 0x%x,", terr, (int)GetLastError());
+		spl_console_log("ffp: %p, terr: %d, GetLastError: 0x%x,", ffp, terr, (int)GetLastError());
 #else
 		char buf[64];
+		/* https://linux.die.net/man/3/strerror_r , */
+		/* - The strerror_r() function is similar to strerror(), but is thread safe */
 		strerror_r(errno, buf, 64);
-		spl_console_log("terr: %d, errno: %d, strerror_r: %s", (int)errno, buf);
+		spl_console_log("ffp: %p,terr: %d, errno: %d, strerror_r: %s", ffp, (int)errno, buf);
 #endif
 	} while(0);
 	return ret;
 }
 /*===========================================================================================================================*/
 int
-spl_fflush_err(int terr) {
+spl_fflush_err(int terr, void* ffp) {
 	int ret = 0;
 	do {
 #ifndef UNIX_LINUX
-		spl_console_log("terr: %d, GetLastError: 0x%x,", terr, (int)GetLastError());
+		spl_console_log("ffp: %p, terr: %d, GetLastError: 0x%x,", ffp, terr, (int)GetLastError());
 #else
 		char buf[64];
+		/* https://linux.die.net/man/3/strerror_r , */
+		/* - The strerror_r() function is similar to strerror(), but is thread safe */
 		strerror_r(errno, buf, 64);
-		spl_console_log("terr: %d, errno: %d, strerror_r: %s", (int)errno, buf);
+		spl_console_log("ffp: %p,terr: %d, errno: %d, strerror_r: %s", ffp, (int)errno, buf);
 #endif
 	} while (0);
 	return ret;
