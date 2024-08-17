@@ -402,7 +402,7 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 		if (strcmp(key, SPLOG_BUFF_SIZE) == 0) {
 			int n = 0;
 			int sz = 0;
-			char* p = 0;
+			//char* p = 0;
 			sz = sscanf(buff, "%d", &n);
 			if (n < 1 || sz < 1) {
 				ret = SPL_LOG_BUFF_SIZE_ERROR;
@@ -1355,7 +1355,7 @@ int
 spl_gen_topics(SIMPLE_LOG_ST* t) {
 	int ret = 0;
 	char path[1024];
-	int renew = 0;
+	//int renew = 0;
 	LLU cszize = 0;
 	do {
 		int i = 0;
@@ -1519,11 +1519,11 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 	int ret = 0;
 	char path[1024];
 	int i = 0;
-	LLU cszize = 0;
-	spl_local_time_st lt, * plt = 0;;
-	char fmt_file_name[64];
+	//LLU cszize = 0;
+	//spl_local_time_st lt, * plt = 0;;
+	//char fmt_file_name[64];
 	//int ferr = 0;
-	char yearmonth[16];
+	//char yearmonth[16];
 	char* buffer = 0;
 	int total_buf_sz = 0;
 	generic_dta_st* tmpBuff = 0;
