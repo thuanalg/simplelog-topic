@@ -5,7 +5,7 @@
 * Date:														
 *		<2024-July-14>
 * The lasted modified date:									
-*		<2024-July-14>
+*		<2024-July-17>
 * Decription:													
 *		The configured file, if you choose "UNIX_LINUX", it is applied for Unix-Like (32/64) ....
 *		If you do not choose "UNIX_LINUX", it is applied Windows 32/64

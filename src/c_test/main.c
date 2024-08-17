@@ -83,6 +83,11 @@ int main(int argc, char* argv[]) {
 	spl_finish_log();
 	//spl_sleep(1000);
 	spl_console_log("--Main close--");
+	/*
+//	SPL_pthread_mutex_destroy(__simple_log_static__.mtx, err);// n
+//	spl_free(__simple_log_static__.mtx);
+//Linux need to be careful here.
+*/
 	return EXIT_SUCCESS;
 }
 void dotest() {

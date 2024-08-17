@@ -5,7 +5,7 @@
 * Date:														
 *		<2024-July-14>
 * The lasted modified date:									
-*		<2024-August-12>
+*		<2024-August-17>
 * Decription:													
 *		The (only) main file to implement simple log.
 */
@@ -26,6 +26,7 @@
 	#include <pthread.h>
 	#include <semaphore.h>
 	#include <unistd.h>
+	#include <errno.h>
 
 	#define YEAR_PADDING				1900
 	#define MONTH_PADDING				1
@@ -40,8 +41,10 @@
 #define spl_free(__obj__) \
 	{ spl_console_log("Free: 0x:%p.\n", (__obj__)); free(__obj__); ; (__obj__) = 0;} 
 
-#define FFCLOSE(fp, __n) \
-	{ if((FILE*)fp){ (__n) = fclose((FILE*)fp) ;spl_console_log("Close FILE 0x%p, error code: %d, %s.\n", (fp), (__n), (__n) ? "FAILED": "DONE"); if(!__n) { (fp) = 0;}}}
+#define FFCLOSE(fp, __n) { if((FILE*)fp){ (__n) = fclose((FILE*)fp) ; if(__n) { spl_fclose_err(__n); } \
+	else { spl_console_log("Close FILE 0x%p DONE.", (fp));;(fp) = 0;;}}}
+
+#define FFLUSH(fp, __n) { if((FILE*)fp){ (__n) = fflush((FILE*)fp) ; if(__n) { spl_fflush_err(__n); }}}
 
 #define FFOPEN(__fp, __path, __mode) \
 	{ (__fp) = fopen((__path), (__mode));spl_console_log("Open FILE error code: 0x%p, %s.\n", (__fp), (__fp) ? "DONE": "FAILED"); }
@@ -272,6 +275,11 @@ static int
 	static void*
 		spl_written_thread_routine(void*);
 #endif
+
+static int 
+	spl_fclose_err(int t);
+static int
+	spl_fflush_err(int t);
 
 /*===========================================================================================================================*/
 int spl_local_time_now(spl_local_time_st*stt) {
@@ -717,7 +725,7 @@ void* spl_written_thread_routine(void* lpParam)
 		if (!t->mtx) {
 			exit(1);
 		}
-		spl_console_log("Mutex: 0x%p.\n", t->mtx);
+		//spl_console_log("Mutex: 0x%p.\n", t->mtx);
 		while (1) {
 			
 #ifndef UNIX_LINUX
@@ -758,7 +766,11 @@ void* spl_written_thread_routine(void* lpParam)
 			tmpBuff = (generic_dta_st*) buffer;
 			k = (int)fwrite(tmpBuff->data, 1, tmpBuff->pl, t->fp);
 			sz += k;
-			err = fflush((FILE *)(t->fp));
+
+			//err = fflush((FILE *)(t->fp));
+
+			FFLUSH((t->fp), err);
+
 			tmpBuff->pl = 0;
 			if (err) {
 				//TO-TEST
@@ -771,7 +783,10 @@ void* spl_written_thread_routine(void* lpParam)
 				tmpBuff = (generic_dta_st*)(buffer + (t->buff_size * (i + 1)));
 				k = (int)fwrite(tmpBuff->data, 1, tmpBuff->pl, (FILE*)(t->arr_topic[i].fp));
 				t->arr_topic[i].fizize += k;
-				err = fflush((FILE *)(t->arr_topic[i].fp));
+
+				//err = fflush((FILE *)(t->arr_topic[i].fp));
+				FFLUSH((t->arr_topic[i].fp), err);
+
 				tmpBuff->pl = 0;
 				if (err) {
 					spl_console_log("--fflush, ret: %d --\n", err);
@@ -1132,6 +1147,10 @@ int spl_finish_log() {
 	SPL_sem_destroy(__simple_log_static__.sem_off, err);
 	spl_free(__simple_log_static__.sem_off);
 #endif
+
+	spl_free(__simple_log_static__.topics);
+	spl_free(__simple_log_static__.arr_topic);
+
 	memset(&__simple_log_static__, 0, sizeof(__simple_log_static__));
 	return ret;
 }
@@ -1545,13 +1564,6 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 				tmpBuff = (generic_dta_st*)(buffer + (( i + 1) * t->buff_size));
 				tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
 				t->arr_topic[i].buf = tmpBuff;
-
-				//spl_malloc((__simple_log_static__.buff_size), t->arr_topic[i].buf, generic_dta_st);
-				//if (!t->arr_topic[i].buf) {
-				//	ret = SPL_LOG_TOPIC_BUFF_MEM;
-				//	break;
-				//}
-				//t->arr_topic[i].buf->total = __simple_log_static__.buff_size - 1;
 			}
 			if (ret) {
 				break;
@@ -1563,4 +1575,43 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 	} while (0);
 	return ret;
 }
+/*===========================================================================================================================*/
+int
+spl_fclose_err(int terr)
+{
+	int ret = 0;
+	do {
+#ifndef UNIX_LINUX
+		spl_console_log("terr: %d, GetLastError: 0x%x,", terr, (int)GetLastError());
+#else
+		char buf[64];
+		strerror_r(errno, buf, 64);
+		spl_console_log("terr: %d, errno: %d, strerror_r: %s", (int)errno, buf);
+#endif
+	} while(0);
+	return ret;
+}
+/*===========================================================================================================================*/
+int
+spl_fflush_err(int terr) {
+	int ret = 0;
+	do {
+#ifndef UNIX_LINUX
+		spl_console_log("terr: %d, GetLastError: 0x%x,", terr, (int)GetLastError());
+#else
+		char buf[64];
+		strerror_r(errno, buf, 64);
+		spl_console_log("terr: %d, errno: %d, strerror_r: %s", (int)errno, buf);
+#endif
+	} while (0);
+	return ret;
+}
+/*===========================================================================================================================*/
+/*===========================================================================================================================*/
+#ifndef UNIX_LINUX
+#else
+#endif
+/*===========================================================================================================================*/
+/*===========================================================================================================================*/
+/*===========================================================================================================================*/
 /*===========================================================================================================================*/
