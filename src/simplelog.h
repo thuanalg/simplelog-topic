@@ -1,15 +1,18 @@
-/*
-//================================================================================================================
-// Email:														
-//		<nguyenthaithuanalg@gmail.com> - Nguyễn Thái Thuận
-// Date:														
-//		<2024-July-14>
-// The lasted modified date:									
-//		<2024-July-28>
-// Decription:													
-//		The (only) main header file to export 3 APIs: [spl_init_log, spllog, spllogtopic, spl_finish_log].
-//===============================================================================================================
+/*===============================================================================================================*/
+/* Email:
+*		<nguyenthaithuanalg@gmail.com> - Nguyễn Thái Thuận
+* Mobile:
+*		<+084.799.324.179>
+* Skype:
+*		<nguyenthaithuanalg>
+* Date:
+*		<2024-July-14>
+* The lasted modified date:
+*		<2024-August-17>
+* Decription:
+*		The (only) main file to implement simple log.
 */
+/*===============================================================================================================*/
 #ifndef ___SIMPLE_LOG__
 #define ___SIMPLE_LOG__
 #include <stdio.h>

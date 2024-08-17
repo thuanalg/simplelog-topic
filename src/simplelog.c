@@ -2,6 +2,10 @@
 /*===============================================================================================================*/
 /* Email:														
 *		<nguyenthaithuanalg@gmail.com> - Nguyễn Thái Thuận
+* Mobile: 
+*		<+084.799.324.179>
+* Skype:
+*		<nguyenthaithuanalg>
 * Date:														
 *		<2024-July-14>
 * The lasted modified date:									

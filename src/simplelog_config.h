@@ -1,14 +1,16 @@
-/*================================================================================================================*/
-/*													
-* Email:														
-*		<nguyenthaithuanalg@gmail.com>
-* Date:														
+﻿/*===============================================================================================================*/
+/* Email:
+*		<nguyenthaithuanalg@gmail.com> - Nguyễn Thái Thuận
+* Mobile:
+*		<+084.799.324.179>
+* Skype:
+*		<nguyenthaithuanalg>
+* Date:
 *		<2024-July-14>
-* The lasted modified date:									
-*		<2024-July-17>
-* Decription:													
-*		The configured file, if you choose "UNIX_LINUX", it is applied for Unix-Like (32/64) ....
-*		If you do not choose "UNIX_LINUX", it is applied Windows 32/64
+* The lasted modified date:
+*		<2024-August-17>
+* Decription:
+*		The (only) main file to implement simple log.
 */
 /*===============================================================================================================*/
 #ifndef ___SIMPLE_LOG_CONFIG__
