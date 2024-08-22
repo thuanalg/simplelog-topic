@@ -8,7 +8,7 @@
 * Date:
 *		<2024-July-14>
 * The lasted modified date:
-*		<2024-August-17>
+*		<2024-August-22>
 * Decription:
 *		The (only) main file to implement simple log.
 */
@@ -105,23 +105,47 @@ tnow, thrid, __FUNCTION__, __LINE__, ##__VA_ARGS__); \
 if(len > 0) (*__ppl) += (len -1);}\
 spl_mutex_unlock(__mtx__); spl_rel_sem(spl_get_sem_rwfile());}
 
+#define __spl_log_buf_level__(__lv__, ___fmttt___, ...)	{if(spl_get_log_levwel() <= (__lv__) )\
+{int *__ppl = 0; char tnow[40]; int range=0; char* __p = 0; void *__mtx__ =  spl_get_mtx(); LLU thrid = spl_get_threadid();\
+int len = 0; const char *lv_text = spl_get_text(__lv__);spl_fmt_now(tnow, 40);\
+spl_mutex_lock(__mtx__);\
+__p = spl_get_buf(&range, &__ppl); if (__p && __ppl) { len = snprintf((__p + (*__ppl)), range, \
+"[%s] [%s] [tid:\t%llu]\t[%s:%d]\t"___fmttt___"\n\n", \
+tnow, lv_text, thrid, __FUNCTION__, __LINE__, ##__VA_ARGS__); \
+if(len > 0) (*__ppl) += (len -1);}\
+spl_mutex_unlock(__mtx__); spl_rel_sem(spl_get_sem_rwfile());}\
+}
+
 
 
 #define __spl_log_buf_topic__(__tpic, ___fmttt___, ...)	{int *__ppl = 0; char tnow[40]; int range=0; char* __p = 0; void *__mtx__ =  spl_get_mtx(); LLU thrid = spl_get_threadid();\
 int len = 0; spl_fmt_now(tnow, 40);\
 spl_mutex_lock(__mtx__);\
 __p = spl_get_buf_topic(&range, &__ppl, (__tpic)); if (__p && __ppl) { len = snprintf((__p + (*__ppl)), range, \
-"[%s] [tid: %llu] [%s:%d] "___fmttt___"\n\n", \
+"[%s] [tid:\t%llu]\t[%s:%d] "___fmttt___"\n\n", \
 tnow, thrid, __FUNCTION__, __LINE__, ##__VA_ARGS__); \
 if(len > 0) (*__ppl) += (len -1);}\
 spl_mutex_unlock(__mtx__); spl_rel_sem(spl_get_sem_rwfile());}
 
+#define __spl_log_buf_topic_level__(__lv__, __tpic, ___fmttt___, ...)	{ if(spl_get_log_levwel() <= (__lv__) ) \
+{int *__ppl = 0; char tnow[40]; int range=0; char* __p = 0; void *__mtx__ =  spl_get_mtx(); LLU thrid = spl_get_threadid();\
+int len = 0; const char *lv_text = spl_get_text(__lv__);spl_fmt_now(tnow, 40);\
+spl_mutex_lock(__mtx__);\
+__p = spl_get_buf_topic(&range, &__ppl, (__tpic)); if (__p && __ppl) { len = snprintf((__p + (*__ppl)), range, \
+"[%s] [%s] [tid:\t%llu]\t[%s:%d]\t"___fmttt___"\n\n", \
+tnow, lv_text, thrid, __FUNCTION__, __LINE__, ##__VA_ARGS__); \
+if(len > 0) (*__ppl) += (len -1);}\
+spl_mutex_unlock(__mtx__); spl_rel_sem(spl_get_sem_rwfile());}\
+}
 
-#define spllog(__lv__, __fmtt__, ...) { if(spl_get_log_levwel() <= (__lv__) ) {__spl_log_buf__("[%s] -->> "__fmtt__, spl_get_text(__lv__), ##__VA_ARGS__);};}
 
-#define spllogtopic(__lv__, __tpic, __fmtt__, ...) \
-{ if(spl_get_log_levwel() <= (__lv__) ) {__spl_log_buf_topic__((__tpic), "[%s] -->> "__fmtt__, spl_get_text(__lv__), ##__VA_ARGS__);};}
+//#define spllog(__lv__, __fmtt__, ...) { if(spl_get_log_levwel() <= (__lv__) ) {__spl_log_buf__("[%s] -->> "__fmtt__, spl_get_text(__lv__), ##__VA_ARGS__);};}
+#define spllog __spl_log_buf_level__
 
+//#define spllogtopic(__lv__, __tpic, __fmtt__, ...) \
+//{ if(spl_get_log_levwel() <= (__lv__) ) {__spl_log_buf_topic__((__tpic), "[%s] -->> "__fmtt__, spl_get_text(__lv__), ##__VA_ARGS__);};}
+
+#define spllogtopic __spl_log_buf_topic_level__
 	
 DLL_API_SIMPLE_LOG int									
 	spl_set_log_levwel(int val);
