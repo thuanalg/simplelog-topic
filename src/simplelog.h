@@ -8,9 +8,9 @@
 * Date:
 *		<2024-July-14>
 * The lasted modified date:
-*		<2024-August-22>
+*		<2024-Sep-03>
 * Decription:
-*		The (only) main file to implement simple log.
+*		The (only) main header file to export 3 APIs: [spl_init_log, spllog, spllogtopic, spl_finish_log].
 */
 /*===============================================================================================================*/
 #ifndef ___SIMPLE_LOG__
@@ -139,22 +139,31 @@ spl_mutex_unlock(__mtx__); spl_rel_sem(spl_get_sem_rwfile());}\
 }
 
 
-//#define spllog(__lv__, __fmtt__, ...) { if(spl_get_log_levwel() <= (__lv__) ) {__spl_log_buf__("[%s] -->> "__fmtt__, spl_get_text(__lv__), ##__VA_ARGS__);};}
-#define spllog __spl_log_buf_level__
+/* 
+* Export name:	spllog
+* Sample:		spllog(SPL_LOG_INFO, "Hello spllog: %llu", time(0));
+*/
+#define spllog					__spl_log_buf_level__
 
-//#define spllogtopic(__lv__, __tpic, __fmtt__, ...) \
-//{ if(spl_get_log_levwel() <= (__lv__) ) {__spl_log_buf_topic__((__tpic), "[%s] -->> "__fmtt__, spl_get_text(__lv__), ##__VA_ARGS__);};}
+/*
+* Export name:	spllogtopic
+* Sample:		spllogtopic(SPL_LOG_INFO, 0, "Hello spllog: %llu", time(0));
+*/
+#define spllogtopic				__spl_log_buf_topic_level__
 
-#define spllogtopic __spl_log_buf_topic_level__
-	
+/* Please demo with spl_init_log */
+DLL_API_SIMPLE_LOG int
+	spl_init_log(char* path);
+
+/* Please demo with spl_finish_log */
+DLL_API_SIMPLE_LOG int
+	spl_finish_log();
+
+/*--------------------------------------------------------------------*/
 DLL_API_SIMPLE_LOG int									
 	spl_set_log_levwel(int val);
 DLL_API_SIMPLE_LOG int									
 	spl_get_log_levwel();
-DLL_API_SIMPLE_LOG int									
-	spl_init_log(char *path);
-DLL_API_SIMPLE_LOG int									
-	spl_finish_log();
 DLL_API_SIMPLE_LOG int									
 	spl_fmt_now(char* fmtt, int len);
 DLL_API_SIMPLE_LOG int									
@@ -189,6 +198,8 @@ DLL_API_SIMPLE_LOG
 	int spl_standardize_path(char* fname);
 DLL_API_SIMPLE_LOG
 	LLU spl_milli_now();
+/*--------------------------------------------------------------------*/
+
 #ifdef __cplusplus
 }
 #endif
