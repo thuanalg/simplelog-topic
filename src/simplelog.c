@@ -1106,7 +1106,7 @@ int spl_rel_sem(void *sem) {
 const char* spl_get_text(int lev) {
 	const char* val = SPL_TEXT_UNKNOWN;
 	static const char* spl_text_label[SPL_LOG_PEAK] = {
-		"U",
+		"A",
 		"D",
 		"I",
 		"W",
