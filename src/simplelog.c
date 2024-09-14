@@ -495,7 +495,15 @@ spl_init_log( char *pathcfg)
 						break;
 					}
 					pp = strstr(buf, node);
-					if (pp)
+					if (!pp) {
+						++j;
+						continue;
+					}
+					if (pp != buf) {
+						++j;
+						continue;
+					}
+					//if (pp)
 					{
 						char* p = 0;
 						size_t k = 0; 
