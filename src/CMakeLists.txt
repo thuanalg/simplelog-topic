@@ -25,11 +25,21 @@ target_compile_definitions(simple_c_example PUBLIC _CRT_SECURE_NO_WARNINGS=1)
 include_directories(./)
 add_executable(simple_cpp_example ${SOURCE_BINCPP_FILES})
 target_compile_definitions(simple_cpp_example PUBLIC _CRT_SECURE_NO_WARNINGS=1)
+if(DEFINED UNIX_LINUX)
+	target_compile_definitions(simple_cpp_example PUBLIC __UNIX_LINUX_CPP11_AND_NEWERS__=1)
+else()
+	target_compile_definitions(simple_cpp_example PUBLIC _HAS_STD_BYTE=0)
+endif()
 
 include_directories(./)
 add_executable(simple_cpp_example_direct ${SOURCE_BINCPP_FILES_DIRECT})
 target_compile_definitions(simple_cpp_example_direct PUBLIC _CRT_SECURE_NO_WARNINGS=1)
 target_compile_definitions(simple_cpp_example_direct PRIVATE __SIMPLE_STATIC_LOG__=1)
+if(DEFINED UNIX_LINUX)
+	target_compile_definitions(simple_cpp_example_direct PUBLIC __UNIX_LINUX_CPP11_AND_NEWERS__=1)
+else()
+	target_compile_definitions(simple_cpp_example_direct PUBLIC _HAS_STD_BYTE=0)
+endif()
 
 target_link_libraries(simple_c_example 
 	simpleloglib

@@ -9,7 +9,7 @@
 * Date:														
 *		<2024-July-14>
 * The lasted modified date:									
-*		<2024-August-17>
+*		<2024-Sep-12>
 * Decription:													
 *		The (only) main file to implement simple log.
 */
@@ -495,7 +495,15 @@ spl_init_log( char *pathcfg)
 						break;
 					}
 					pp = strstr(buf, node);
-					if (pp)
+					if (!pp) {
+						++j;
+						continue;
+					}
+					if (pp != buf) {
+						++j;
+						continue;
+					}
+					//if (pp)
 					{
 						char* p = 0;
 						size_t k = 0; 
@@ -1105,27 +1113,42 @@ int spl_rel_sem(void *sem) {
 
 const char* spl_get_text(int lev) {
 	const char* val = SPL_TEXT_UNKNOWN;
+	static const char* spl_text_label[SPL_LOG_PEAK] = {
+		"A",
+		"D",
+		"I",
+		"W",
+		"E",
+		"F",
+	};
 	do {
-		if (lev == SPL_LOG_DEBUG) {
-			val = SPL_TEXT_DEBUG;
+		if (lev < SPL_LOG_BASE) {
 			break;
 		}
-		if (lev == SPL_LOG_INFO) {
-			val = SPL_TEXT_INFO;
+		if (lev > SPL_LOG_FATAL) {
 			break;
 		}
-		if (lev == SPL_LOG_WARNING) {
-			val = SPL_TEXT_WARN;
-			break;
-		}
-		if (lev == SPL_LOG_ERROR) {
-			val = SPL_TEXT_ERROR;
-			break;
-		}
-		if (lev == SPL_LOG_FATAL) {
-			val = SPL_TEXT_FATAL;
-			break;
-		}
+		val = spl_text_label[lev];
+		//if (lev == SPL_LOG_DEBUG) {
+		//	val = SPL_TEXT_DEBUG;
+		//	break;
+		//}
+		//if (lev == SPL_LOG_INFO) {
+		//	val = SPL_TEXT_INFO;
+		//	break;
+		//}
+		//if (lev == SPL_LOG_WARNING) {
+		//	val = SPL_TEXT_WARN;
+		//	break;
+		//}
+		//if (lev == SPL_LOG_ERROR) {
+		//	val = SPL_TEXT_ERROR;
+		//	break;
+		//}
+		//if (lev == SPL_LOG_FATAL) {
+		//	val = SPL_TEXT_FATAL;
+		//	break;
+		//}
 	} while(0);
 	return val;
 }
@@ -1206,7 +1229,7 @@ int spl_folder_sup(char* folder, spl_local_time_st* lctime, char* year_month) {
 				break;
 			}
 		}
-		snprintf(path, 1024, "%s/%0.4u", folder, lctime->year + YEAR_PADDING);
+		snprintf(path, 1024, "%s/%.4u", folder, lctime->year + YEAR_PADDING);
 		result = CreateDirectoryA(path, 0);
 		if (!result) {
 			DWORD xerr = GetLastError();
@@ -1215,7 +1238,7 @@ int spl_folder_sup(char* folder, spl_local_time_st* lctime, char* year_month) {
 				break;
 			}
 		}
-		snprintf(path, 1024, "%s/%0.4d/%0.2d", folder, (int)lctime->year + YEAR_PADDING, (int) lctime->month + MONTH_PADDING);
+		snprintf(path, 1024, "%s/%.4d/%.2d", folder, (int)lctime->year + YEAR_PADDING, (int) lctime->month + MONTH_PADDING);
 		result = CreateDirectoryA(path, 0);
 		if (!result) {
 			DWORD xerr = GetLastError();
