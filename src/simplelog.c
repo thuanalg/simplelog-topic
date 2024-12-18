@@ -1202,7 +1202,7 @@ char* spl_get_buf(int* n, int** ppl) {
 	//char* ret = 0;
 	//if (t->buf) {
 		//if (n && ppl) {
-			*n = (STSPLOGBUF->total > sizeof(generic_dta_st) + STSPLOGBUF->pl) ? (STSPLOGBUF->total - sizeof(generic_dta_st) - STSPLOGBUF->pl) : 0;
+			(*n) = (STSPLOGBUF->total > sizeof(generic_dta_st) + STSPLOGBUF->pl) ? (STSPLOGBUF->total - (sizeof(generic_dta_st) + STSPLOGBUF->pl)) : 0;
 			//ret = t->buf->data;
 			(*ppl) = &(STSPLOGBUF->pl);
 			return STSPLOGBUF->data;
@@ -1514,26 +1514,28 @@ spl_gen_topics(SIMPLE_LOG_ST* t) {
 	return ret;
 }
 /*===========================================================================================================================*/
+#define STSPLOGBUFTOPIC(__i__)				(&(STSPLOG->arr_topic[i]))->buf
 char*
-spl_get_buf_topic(int* n, int** ppl, int index) {
-	SIMPLE_LOG_ST* tg = &__simple_log_static__;
-	char* ret = 0;
-	do {
-		
-		if (index < 0 || ((index + 1) > tg->n_topic)) {
-			ret = spl_get_buf(n, ppl);
-			break;
+spl_get_buf_topic(int* n, int** ppl, int i) {
+	//SIMPLE_LOG_ST* tg = &__simple_log_static__;
+	//char* ret = 0;
+	//do {
+		if (i < 0 || ((i + 1) > STSPLOG->n_topic)) {
+			return spl_get_buf(n, ppl);
+			//break;
 		}
-		if (tg->arr_topic) {
-			SIMPLE_LOG_TOPIC_ST* obj = &(tg->arr_topic[index]);
-			if (n && ppl) {
-				*n = (obj->buf->total > sizeof(generic_dta_st) + obj->buf->pl) ? (obj->buf->total - sizeof(generic_dta_st) - obj->buf->pl) : 0;
-				ret = obj->buf->data;
-				(*ppl) = &(obj->buf->pl);
-			}
+		if (STSPLOG->arr_topic) {
+			//SIMPLE_LOG_TOPIC_ST* obj = &(STSPLOG->arr_topic[i]);
+			//if (n && ppl) {
+				*n = (STSPLOGBUFTOPIC(i)->total > sizeof(generic_dta_st) + STSPLOGBUFTOPIC(i)->pl) ? 
+					(STSPLOGBUFTOPIC(i)->total - (sizeof(generic_dta_st) + STSPLOGBUFTOPIC(i)->pl)) : 0;
+				//ret = obj->buf->data;
+				(*ppl) = &(STSPLOGBUFTOPIC(i)->pl);
+				return STSPLOGBUFTOPIC(i)->data;
+			//}
 		}
-	} while (0);
-	return ret;
+	//} while (0);
+	return 0;
 }
 /*===========================================================================================================================*/
 LLU
