@@ -654,11 +654,15 @@ int spl_mutex_lock(void* obj) {
 			break;
 		}
 #ifndef UNIX_LINUX
+	#ifndef SPL_USING_SPIN_LOCK
 		err = WaitForSingleObject(obj, INFINITE);
 		if (err != WAIT_OBJECT_0) {
 			ret = 1;
 			break;
 		}
+	#else
+		SplLockSpinlock(obj);
+	#endif
 #else
 		SPL_pthread_mutex_lock((pthread_mutex_t*)obj, ret);
 #endif
@@ -678,11 +682,15 @@ int spl_mutex_unlock(void* obj) {
 			break;
 		}
 #ifndef UNIX_LINUX
+	#ifndef SPL_USING_SPIN_LOCK
 		done = ReleaseMutex(obj);
 		if (!done) {
 			ret = 1;
 			break;
 		}
+	#else
+		SplUnLockSpinlock(obj);
+	#endif
 #else
 		SPL_pthread_mutex_unlock((pthread_mutex_t*)obj, ret);
 #endif
@@ -1211,6 +1219,9 @@ char* spl_get_buf(int* n, int** ppl) {
 	//char* ret = 0;
 	//if (t->buf) {
 		//if (n && ppl) {
+	if (STSPLOG->off) {
+		return 0;
+	}
 			(*n) = (STSPLOGBUF->total > sizeof(generic_dta_st) + STSPLOGBUF->pl) ? (STSPLOGBUF->total - (sizeof(generic_dta_st) + STSPLOGBUF->pl)) : 0;
 			//ret = t->buf->data;
 			(*ppl) = &(STSPLOGBUF->pl);
@@ -1529,6 +1540,9 @@ spl_get_buf_topic(int* n, int** ppl, int i) {
 	//SIMPLE_LOG_ST* tg = &__simple_log_static__;
 	//char* ret = 0;
 	//do {
+		if (STSPLOG->off) {
+			return 0;
+		}
 		if (i < 0 || ((i + 1) > STSPLOG->n_topic)) {
 			return spl_get_buf(n, ppl);
 			//break;
