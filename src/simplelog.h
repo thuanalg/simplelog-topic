@@ -17,7 +17,7 @@
 #define ___SIMPLE_LOG__
 #include <stdio.h>
 #include <string.h>
-#include "simplelog_config.h"
+//#include "simplelog_config.h"
 /*strrchr*/
 #ifndef __UNIX_LINUX_CPP11_AND_NEWERS__
 #else
