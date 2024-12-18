@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
 	while (1) {
 		FILE* fp = 0;
 		
-		spl_sleep(10);
+		spl_sleep(60 * 2);
 		
 		spllog(SPL_LOG_DEBUG, "%s", "Looping for waiting trigger.\n");
 		fp = fopen("trigger.txt", "r");
@@ -118,14 +118,21 @@ void* posix_thread_routine(void* lpParam) {
 		if (k) {
 			break;
 		}
-		spllog(SPL_LOG_INFO, "test log: %llu", (LLU)time(0));
-		tpic = (spl_milli_now() % 3);
-		spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
-		splloglib(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
-		spllogexe(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
-		spllognaxyax(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
-		spllogsksgn(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
-		//spl_sleep(1);
+		int count = 0;
+		spl_console_log("Main close: Start.\n");
+		while (count < 100000) {
+			spllog(SPL_LOG_INFO, "test log");
+			//tpic = (spl_milli_now() % 3);
+			//spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+			//splloglib(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+			//spllogexe(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+			//spllognaxyax(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+			//spllogsksgn(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+			//spl_sleep(1);
+			++count;
+		}
+		spl_console_log("Main close: End.\n");
+		break;
 	}
 	return 0;
 }

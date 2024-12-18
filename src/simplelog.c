@@ -113,15 +113,17 @@
 #define				SPL_MEMO_PADDING				2
 /*===========================================================================================================================*/
 #ifndef UNIX_LINUX
+//DLL_API_SIMPLE_LOG
+static	void splLockSpinlock(volatile long* p);
+//DLL_API_SIMPLE_LOG
+static	void splUnlockSpinlock(volatile long* p);
 #define SplLockSpinlock(__p__)				splLockSpinlock((volatile long*)(__p__))
 #define SplUnlockSpinlock(__p__)			splUnlockSpinlock((volatile long*)(__p__))
-static 
-	void splLockSpinlock(volatile long* p);
-static 
-	void splUnlockSpinlock(volatile long* p);
+
 static
 	volatile long spl_rw_spin = 0;
 #else
+
 #endif
 /*===========================================================================================================================*/
 
@@ -609,7 +611,11 @@ void* spl_mutex_create() {
 	void *ret = 0;
 	do {
 #ifndef UNIX_LINUX
+	#ifndef SPL_USING_SPIN_LOCK
 		ret = CreateMutexA(0, 0, 0);
+	#else
+		ret = &spl_rw_spin;
+	#endif
 #else
 	/*https://linux.die.net/man/3/pthread_mutex_init*/
 		spl_malloc(sizeof(pthread_mutex_t), ret, void);
@@ -661,6 +667,7 @@ int spl_mutex_lock(void* obj) {
 			break;
 		}
 	#else
+		//splLockSpinlock(obj);
 		SplLockSpinlock(obj);
 	#endif
 #else
@@ -689,7 +696,8 @@ int spl_mutex_unlock(void* obj) {
 			break;
 		}
 	#else
-		SplUnLockSpinlock(obj);
+		//splUnlockSpinlock(obj);
+		SplUnlockSpinlock(obj);
 	#endif
 #else
 		SPL_pthread_mutex_unlock((pthread_mutex_t*)obj, ret);
@@ -1219,9 +1227,9 @@ char* spl_get_buf(int* n, int** ppl) {
 	//char* ret = 0;
 	//if (t->buf) {
 		//if (n && ppl) {
-	if (STSPLOG->off) {
-		return 0;
-	}
+	//if (STSPLOG->off) {
+	//	return 0;
+	//}
 			(*n) = (STSPLOGBUF->total > sizeof(generic_dta_st) + STSPLOGBUF->pl) ? (STSPLOGBUF->total - (sizeof(generic_dta_st) + STSPLOGBUF->pl)) : 0;
 			//ret = t->buf->data;
 			(*ppl) = &(STSPLOGBUF->pl);
@@ -1540,13 +1548,13 @@ spl_get_buf_topic(int* n, int** ppl, int i) {
 	//SIMPLE_LOG_ST* tg = &__simple_log_static__;
 	//char* ret = 0;
 	//do {
-		if (STSPLOG->off) {
-			return 0;
-		}
-		if (i < 0 || ((i + 1) > STSPLOG->n_topic)) {
-			return spl_get_buf(n, ppl);
-			//break;
-		}
+		//if (STSPLOG->off) {
+		//	return 0;
+		//}
+		//if (i < 0 || ((i + 1) > STSPLOG->n_topic)) {
+		//	return spl_get_buf(n, ppl);
+		//	//break;
+		//}
 		if (STSPLOG->arr_topic) {
 			//SIMPLE_LOG_TOPIC_ST* obj = &(STSPLOG->arr_topic[i]);
 			//if (n && ppl) {

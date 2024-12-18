@@ -20,6 +20,13 @@
 #include <string.h>
 //#include "simplelog_config.h"
 /*strrchr*/
+
+#ifndef SPL_USING_SPIN_LOCK
+	#define SPL_USING_SPIN_LOCK
+#endif // !SPL_USING_SPIN_LOCK
+
+
+
 #ifndef __UNIX_LINUX_CPP11_AND_NEWERS__
 #else
 #include <string>
@@ -208,7 +215,7 @@ spl_mutex_unlock(__mtx__); spl_rel_sem(spl_get_sem_rwfile());}\
 
 /* Please demo with spl_init_log */
 DLL_API_SIMPLE_LOG int
-spl_init_log(char* path);
+	spl_init_log(char* path);
 
 /* 
 * Export name:	spllog
@@ -266,6 +273,10 @@ DLL_API_SIMPLE_LOG
 	int spl_standardize_path(char* fname);
 DLL_API_SIMPLE_LOG
 	LLU spl_milli_now();
+//DLL_API_SIMPLE_LOG
+//	void splLockSpinlock(volatile long* p);
+//DLL_API_SIMPLE_LOG
+//	void splUnlockSpinlock(volatile long* p);
 /*--------------------------------------------------------------------*/
 
 #ifdef __cplusplus
