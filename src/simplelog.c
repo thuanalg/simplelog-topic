@@ -111,6 +111,18 @@
 
 #define				SPL_MEMO_PADDING				2
 /*===========================================================================================================================*/
+#ifndef UNIX_LINUX
+#define SplLockSpinlock(__p__)				splLockSpinlock((volatile long*)(__p__))
+#define SplUnlockSpinlock(__p__)			splUnlockSpinlock((volatile long*)(__p__))
+static 
+	void splLockSpinlock(volatile long* p);
+static 
+	void splUnlockSpinlock(volatile long* p);
+static
+	volatile long spl_rw_spin = 0;
+#else
+#endif
+/*===========================================================================================================================*/
 
 typedef 
 struct __GENERIC_DATA__ {
@@ -1638,6 +1650,21 @@ spl_fflush_err(int terr, void* ffp) {
 	return ret;
 }
 /*===========================================================================================================================*/
+#ifndef UNIX_LINUX
+// Hàm để lấy khóa Spinlock
+void splLockSpinlock(volatile long* p) {
+	while (InterlockedCompareExchange(p, 1, 0) != 0) {
+		// Vòng lặp chờ (busy wait)
+		// Đợi cho đến khi spinlock được giải phóng (giá trị spinlock = 0)
+	}
+}
+
+// Hàm để giải phóng Spinlock
+void splUnlockSpinlock(volatile long* p) {
+	InterlockedExchange(p, 0); // Giải phóng Spinlock
+}
+#else
+#endif
 /*===========================================================================================================================*/
 #ifndef UNIX_LINUX
 #else
