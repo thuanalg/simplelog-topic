@@ -204,6 +204,12 @@ spl_mutex_unlock(__mtx__); spl_rel_sem(spl_get_sem_rwfile());}\
 }
 #endif
 
+/*--------------------------------------------------------------------*/
+
+/* Please demo with spl_init_log */
+DLL_API_SIMPLE_LOG int
+spl_init_log(char* path);
+
 /* 
 * Export name:	spllog
 * Sample:		spllog(SPL_LOG_INFO, "Hello spllog: %llu", time(0));
@@ -216,9 +222,6 @@ spl_mutex_unlock(__mtx__); spl_rel_sem(spl_get_sem_rwfile());}\
 */
 #define spllogtopic				__spl_log_buf_topic_level__
 
-/* Please demo with spl_init_log */
-DLL_API_SIMPLE_LOG int
-	spl_init_log(char* path);
 
 /* Please demo with spl_finish_log */
 DLL_API_SIMPLE_LOG int
