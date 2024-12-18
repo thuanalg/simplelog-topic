@@ -1227,9 +1227,9 @@ char* spl_get_buf(int* n, int** ppl) {
 	//char* ret = 0;
 	//if (t->buf) {
 		//if (n && ppl) {
-	//if (STSPLOG->off) {
-	//	return 0;
-	//}
+	if (STSPLOG->off) {
+		return 0;
+	}
 			(*n) = (STSPLOGBUF->total > sizeof(generic_dta_st) + STSPLOGBUF->pl) ? (STSPLOGBUF->total - (sizeof(generic_dta_st) + STSPLOGBUF->pl)) : 0;
 			//ret = t->buf->data;
 			(*ppl) = &(STSPLOGBUF->pl);
@@ -1548,13 +1548,13 @@ spl_get_buf_topic(int* n, int** ppl, int i) {
 	//SIMPLE_LOG_ST* tg = &__simple_log_static__;
 	//char* ret = 0;
 	//do {
-		//if (STSPLOG->off) {
-		//	return 0;
-		//}
-		//if (i < 0 || ((i + 1) > STSPLOG->n_topic)) {
-		//	return spl_get_buf(n, ppl);
-		//	//break;
-		//}
+		if (STSPLOG->off) {
+			return 0;
+		}
+		if (i < 0 || ((i + 1) > STSPLOG->n_topic)) {
+			return spl_get_buf(n, ppl);
+			//break;
+		}
 		if (STSPLOG->arr_topic) {
 			//SIMPLE_LOG_TOPIC_ST* obj = &(STSPLOG->arr_topic[i]);
 			//if (n && ppl) {
