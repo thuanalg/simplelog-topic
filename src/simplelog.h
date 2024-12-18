@@ -242,8 +242,8 @@ DLL_API_SIMPLE_LOG int
 	spl_mutex_unlock(void* mtx);
 DLL_API_SIMPLE_LOG int									
 	spl_set_off(int );
-DLL_API_SIMPLE_LOG int									
-	spl_get_off();
+//DLL_API_SIMPLE_LOG int									
+//	spl_get_off();
 DLL_API_SIMPLE_LOG void*								
 	spl_get_mtx();
 DLL_API_SIMPLE_LOG void*								

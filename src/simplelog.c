@@ -195,11 +195,11 @@ struct __SIMPLE_LOG_ST__ {
 		off;					
 		/*Must be sync*/
 	void*
-		mtx;					
+		mtx_rw;					
 		/*mtx: Need to close handle*/
-	void*
-		mtx_off;				
-		/*mtx_off: Need to close handle*/
+//	void*
+//		mtx_off;				
+//		/*mtx_off: Need to close handle*/
 	void*
 		sem_rwfile;				
 		/*sem_rwfile: Need to close handle*/
@@ -363,11 +363,11 @@ int spl_get_log_levwel() {
 /*===========================================================================================================================*/
 int spl_set_off(int isoff) {
 	int ret = 0;
-	spl_mutex_lock(__simple_log_static__.mtx_off);
+	spl_mutex_lock(__simple_log_static__.mtx_rw);
 	do {
 		__simple_log_static__.off = isoff;
 	} while (0);
-	spl_mutex_unlock(__simple_log_static__.mtx_off);
+	spl_mutex_unlock(__simple_log_static__.mtx_rw);
 	
 	if (isoff) {
 		int errCode = 0;
@@ -383,15 +383,15 @@ int spl_set_off(int isoff) {
 	return ret;
 }
 /*===========================================================================================================================*/
-int spl_get_off() {
-	int ret = 0;
-	spl_mutex_lock(__simple_log_static__.mtx_off);
-	do {
-		ret = __simple_log_static__.off;
-	} while (0);
-	spl_mutex_unlock(__simple_log_static__.mtx_off);
-	return ret;
-}
+//int spl_get_off() {
+//	int ret = 0;
+//	spl_mutex_lock(__simple_log_static__.mtx_off);
+//	do {
+//		ret = __simple_log_static__.off;
+//	} while (0);
+//	spl_mutex_unlock(__simple_log_static__.mtx_off);
+//	return ret;
+//}
 /*===========================================================================================================================*/
 
 int spl_init_log_parse(char* buff, char *key, char *isEnd) {
@@ -560,14 +560,14 @@ spl_init_log( char *pathcfg)
 			ret = SPL_ERROR_CREATE_MUTEX;
 			break;
 		}
-		__simple_log_static__.mtx = obj;
+		__simple_log_static__.mtx_rw = obj;
 
-		obj = spl_mutex_create();
-		if (!obj) {
-			ret = SPL_ERROR_CREATE_MUTEX;
-			break;
-		}
-		__simple_log_static__.mtx_off = obj;
+		//obj = spl_mutex_create();
+		//if (!obj) {
+		//	ret = SPL_ERROR_CREATE_MUTEX;
+		//	break;
+		//}
+		//__simple_log_static__.mtx_off = obj;
 		
 		obj = spl_sem_create(1);
 		if (!obj) {
@@ -728,13 +728,14 @@ void* spl_written_thread_routine(void* lpParam)
 {	
 	int k = 0;
 	SIMPLE_LOG_ST* t = (SIMPLE_LOG_ST*)lpParam;
-	int ret = 0, off = 0, sz = 0, i = 0, err = 0;
+	int ret = 0, sz = 0, err = 0;
 	char* buffer = 0;
 	int total_buf_sz = 0;
 	generic_dta_st* tmpBuff = 0;
 	total_buf_sz = t->buff_size * (1 + t->n_topic);
 	spl_malloc(total_buf_sz, buffer, char);
-	
+	register char is_off = 0;
+	register int i = 0;
 	do {	
 		if (!buffer) {
 			ret = SPL_LOG_TOPIC_BUFF_MEM;
@@ -747,80 +748,84 @@ void* spl_written_thread_routine(void* lpParam)
 			exit(1);
 		}
 		spl_console_log("Semaphore: 0x%p.\n", t->sem_rwfile);
-		if (!t->mtx) {
+		if (!t->mtx_rw) {
 			exit(1);
 		}
 		//spl_console_log("Mutex: 0x%p.\n", t->mtx);
 		while (1) {
-			
+			if (is_off) {
+				break;
+			}
 #ifndef UNIX_LINUX
 			WaitForSingleObject(t->sem_rwfile, INFINITE);
 #else
 			SPL_sem_wait(t->sem_rwfile);
 #endif
-			off = spl_get_off();
-			if (off) {
-				break;
-			}
-			ret = spl_gen_file(t, &sz, t->file_limit_size, &(t->index));
-			if (ret) {
-				spl_console_log("--spl_gen_file, ret: %d --\n", ret);
-				continue;
-			}
-			ret = spl_gen_topics(t);
-			if (ret) {
-				spl_console_log("--spl_gen_topics, ret: %d --\n", ret);
-				continue;
-			}
-			spl_mutex_lock(t->mtx);
-			do {
-				
-				if (t->buf->pl > t->buf->pc) {
-					
-					memcpy(buffer, t->buf, sizeof(generic_dta_st) + t->buf->pl + 1);
-					t->buf->pl = t->buf->pc = 0;
+			while (1) {
+				//off = spl_get_off();
+				if (is_off) {
+					break;
 				}
-				for (i = 0; i < t->n_topic; ++i) {
-					if (t->arr_topic[i].buf->pl > t->arr_topic[i].buf->pc) {
-						memcpy(buffer + (t->buff_size * (i + 1)), t->arr_topic[i].buf, sizeof(generic_dta_st) + t->arr_topic[i].buf->pl + 1);
-						t->arr_topic[i].buf->pl = t->arr_topic[i].buf->pc = 0;
+				ret = spl_gen_file(t, &sz, t->file_limit_size, &(t->index));
+				if (ret) {
+					spl_console_log("--spl_gen_file, ret: %d --\n", ret);
+					continue;
+				}
+				ret = spl_gen_topics(t);
+				if (ret) {
+					spl_console_log("--spl_gen_topics, ret: %d --\n", ret);
+					continue;
+				}
+				spl_mutex_lock(t->mtx_rw);
+				do {
+					is_off = t->off;
+					if (t->buf->pl > t->buf->pc) {
+
+						memcpy(buffer, t->buf, sizeof(generic_dta_st) + t->buf->pl + 1);
+						t->buf->pl = t->buf->pc = 0;
 					}
-				}
-			} while (0);
-			spl_mutex_unlock(t->mtx);
-			tmpBuff = (generic_dta_st*) buffer;
-			k = (int)fwrite(tmpBuff->data, 1, tmpBuff->pl, t->fp);
-			sz += k;
+					for (i = 0; i < t->n_topic; ++i) {
+						if (t->arr_topic[i].buf->pl > t->arr_topic[i].buf->pc) {
+							memcpy(buffer + (t->buff_size * (i + 1)), t->arr_topic[i].buf, sizeof(generic_dta_st) + t->arr_topic[i].buf->pl + 1);
+							t->arr_topic[i].buf->pl = t->arr_topic[i].buf->pc = 0;
+						}
+					}
+				} while (0);
+				spl_mutex_unlock(t->mtx_rw);
+				tmpBuff = (generic_dta_st*)buffer;
+				k = (int)fwrite(tmpBuff->data, 1, tmpBuff->pl, t->fp);
+				sz += k;
 
-			//err = SPL_FFLUSH((FILE *)(t->fp));
+				//err = SPL_FFLUSH((FILE *)(t->fp));
 
-			SPL_FFLUSH((t->fp), err);
-
-			tmpBuff->pl = 0;
-			if (err) {
-				//TO-TEST
-				ret = SPL_LOG_TOPIC_FLUSH;
-				spl_console_log("--fflush, ret: %d --\n", err);
-				break;
-			}
-			for (i = 0; i < t->n_topic; ++i) {
-				//TO-TEST
-				tmpBuff = (generic_dta_st*)(buffer + (t->buff_size * (i + 1)));
-				k = (int)fwrite(tmpBuff->data, 1, tmpBuff->pl, (FILE*)(t->arr_topic[i].fp));
-				t->arr_topic[i].fizize += k;
-
-				//err = SPL_FFLUSH((FILE *)(t->arr_topic[i].fp));
-				SPL_FFLUSH((t->arr_topic[i].fp), err);
+				SPL_FFLUSH((t->fp), err);
 
 				tmpBuff->pl = 0;
 				if (err) {
-					spl_console_log("--fflush, ret: %d --\n", err);
+					//TO-TEST
 					ret = SPL_LOG_TOPIC_FLUSH;
+					spl_console_log("--fflush, ret: %d --\n", err);
 					break;
 				}
-			}
-			if (ret) {
-				break;
+				for (i = 0; i < t->n_topic; ++i) {
+					//TO-TEST
+					tmpBuff = (generic_dta_st*)(buffer + (t->buff_size * (i + 1)));
+					k = (int)fwrite(tmpBuff->data, 1, tmpBuff->pl, (FILE*)(t->arr_topic[i].fp));
+					t->arr_topic[i].fizize += k;
+
+					//err = SPL_FFLUSH((FILE *)(t->arr_topic[i].fp));
+					SPL_FFLUSH((t->arr_topic[i].fp), err);
+
+					tmpBuff->pl = 0;
+					if (err) {
+						spl_console_log("--fflush, ret: %d --\n", err);
+						ret = SPL_LOG_TOPIC_FLUSH;
+						break;
+					}
+				}
+				if (ret) {
+					break;
+				}
 			}
 		}
 		if (t->fp) {
@@ -831,7 +836,7 @@ void* spl_written_thread_routine(void* lpParam)
 					SPL_FCLOSE(t->arr_topic[i].fp, werr);
 				}
 			}
-			spl_mutex_lock(t->mtx);
+			spl_mutex_lock(t->mtx_rw);
 				if (t->buf) {
 					spl_free(t->buf);
 				}
@@ -840,13 +845,14 @@ void* spl_written_thread_routine(void* lpParam)
 						t->arr_topic[i].buf = 0;
 					}
 				}
-			spl_mutex_unlock(t->mtx);
+			spl_mutex_unlock(t->mtx_rw);
 		}
 
 		spl_free(buffer);
 	} while (0);
 	
 	/*Send a signal to the waiting thread.*/
+	spl_rel_sem(__simple_log_static__.sem_rwfile);
 	spl_rel_sem(__simple_log_static__.sem_off);
 	return 0;
 }
@@ -902,20 +908,20 @@ int spl_fmt_now(char* fmtt, int len) {
 		_tnow = t;
 		_tnow *= 1000;
 		_tnow += stt.ms;
-		do {
-			spl_mutex_lock(__simple_log_static__.mtx_off);
-				do {
-
-					if (!pre_tnow) {
-						break;
-					}
-					if (_tnow > pre_tnow) {
-						_delta = _tnow - pre_tnow;
-					}
-				} while (0);
-				pre_tnow = _tnow;
-			spl_mutex_unlock(__simple_log_static__.mtx_off);
-		} while (0);
+		//do {
+		//	spl_mutex_lock(__simple_log_static__.mtx_off);
+		//		do {
+		//
+		//			if (!pre_tnow) {
+		//				break;
+		//			}
+		//			if (_tnow > pre_tnow) {
+		//				_delta = _tnow - pre_tnow;
+		//			}
+		//		} while (0);
+		//		pre_tnow = _tnow;
+		//	spl_mutex_unlock(__simple_log_static__.mtx_off);
+		//} while (0);
 
 		n = snprintf(buff, 20, SPL_FMT_DATE_ADDING, stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day);
 		if (n < 1) {
@@ -1083,7 +1089,7 @@ int spl_gen_file(SIMPLE_LOG_ST* t, int *sz, int limit, int *index) {
 }
 /*===========================================================================================================================*/
 void* spl_get_mtx() {
-	return __simple_log_static__.mtx;
+	return __simple_log_static__.mtx_rw;
 }
 /*===========================================================================================================================*/
 void* spl_get_sem_rwfile() {
@@ -1170,8 +1176,8 @@ int spl_finish_log() {
 	int ret = 0; 
 	spl_set_off(1);
 #ifndef UNIX_LINUX
-	SPL_CloseHandle(__simple_log_static__.mtx);
-	SPL_CloseHandle(__simple_log_static__.mtx_off);
+	SPL_CloseHandle(__simple_log_static__.mtx_rw);
+	//SPL_CloseHandle(__simple_log_static__.mtx_off);
 	SPL_CloseHandle(__simple_log_static__.sem_rwfile);
 	SPL_CloseHandle(__simple_log_static__.sem_off);
 #else
