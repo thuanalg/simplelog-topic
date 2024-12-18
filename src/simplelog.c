@@ -1195,17 +1195,20 @@ int spl_finish_log() {
 	return ret;
 }
 /*===========================================================================================================================*/
+#define STSPLOG						(&__simple_log_static__)
+#define STSPLOGBUF					STSPLOG->buf
 char* spl_get_buf(int* n, int** ppl) {
-	SIMPLE_LOG_ST* t = &__simple_log_static__;
-	char* ret = 0;
-	if (t->buf) {
-		if (n && ppl) {
-			*n = (t->buf->total > sizeof(generic_dta_st) + t->buf->pl) ? (t->buf->total - sizeof(generic_dta_st) - t->buf->pl) : 0;
-			ret = t->buf->data;
-			(*ppl) = &(t->buf->pl);
-		}
-	}
-	return ret;
+	//SIMPLE_LOG_ST* t = &__simple_log_static__;
+	//char* ret = 0;
+	//if (t->buf) {
+		//if (n && ppl) {
+			*n = (STSPLOGBUF->total > sizeof(generic_dta_st) + STSPLOGBUF->pl) ? (STSPLOGBUF->total - sizeof(generic_dta_st) - STSPLOGBUF->pl) : 0;
+			//ret = t->buf->data;
+			(*ppl) = &(STSPLOGBUF->pl);
+			return STSPLOGBUF->data;
+		//}
+	//}
+	return 0;
 }
 /*===========================================================================================================================*/
 /*https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createdirectorya*/
