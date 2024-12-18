@@ -10,6 +10,7 @@
 *		<2024-July-14>
 * The lasted modified date:									
 *		<2024-Sep-12>
+*		<2024-Dec-18>
 * Decription:													
 *		The (only) main file to implement simple log.
 */
