@@ -36,7 +36,7 @@ int get_off_process() {
 	return ret;
 }
 int number = 10;
-int main_(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
 	char pathcfg[1024];
 	char* path = (char*)"simplelog.cfg";
 	char nowfmt[64];
@@ -55,7 +55,8 @@ int main_(int argc, char* argv[]) {
 		}
 	}
 	// Init log with "pathcfg" path of file, after starting well, ready to use.
-	ret = spl_init_log(pathcfg);
+	//ret = spl_init_log(pathcfg);
+	ret = spl_init_log("C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
 	if (ret) {
 		spl_console_log("spl_init_log ret: %d", ret);
 		exit(1);
@@ -65,7 +66,7 @@ int main_(int argc, char* argv[]) {
 	while (1) {
 		FILE* fp = 0;
 		
-		spl_sleep(60 * 2);
+		spl_sleep(10);
 		
 		spllog(SPL_LOG_DEBUG, "%s", "Looping for waiting trigger.\n");
 		fp = fopen("trigger.txt", "r");
@@ -121,7 +122,7 @@ void* posix_thread_routine(void* lpParam) {
 		int count = 0;
 		spl_console_log("Main close: Start.\n");
 		while (count < 100000) {
-			spllog(SPL_LOG_INFO, "test log");
+			spllog(SPL_LOG_INFO, "test log: %d", count);
 			//tpic = (spl_milli_now() % 3);
 			//spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
 			//splloglib(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
@@ -137,7 +138,7 @@ void* posix_thread_routine(void* lpParam) {
 	return 0;
 }
 
-int main() {
+int __main() {
 	int ret = spl_init_log((char *)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
 	int count = 10;
 	for (int i = 0; i < count; ++i) {

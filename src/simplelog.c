@@ -901,6 +901,63 @@ int spl_simple_log_thread(SIMPLE_LOG_ST* t) {
 	return ret;
 }
 /*===========================================================================================================================*/
+char* spl_fmt_now_ext(char* fmtt, int len, int lv, const char* filename, const char* funcname, int  line)
+{
+	char* p = fmtt;
+	int ret = 0;
+	spl_local_time_st stt;
+	static LLU pre_tnow = 0;
+	LLU _tnow = 0;
+	LLU _delta = 0;
+	int n = 0;
+	char buff[20], buff1[20];
+	memset(buff, 0, 20);
+	memset(buff1, 0, 20);
+
+	time_t t = time(0);
+	do {
+		memset(&stt, 0, sizeof(stt));
+		ret = spl_local_time_now(&stt);
+		if (ret) {
+			break;
+		}
+		if (!fmtt) {
+			ret = (int)SPL_LOG_FMT_NULL_ERROR;
+			break;
+		}
+
+		_tnow = t;
+		_tnow *= 1000;
+		_tnow += stt.nn;
+		//do {
+		//	spl_mutex_lock(__simple_log_static__.mtx_off);
+		//		do {
+		//
+		//			if (!pre_tnow) {
+		//				break;
+		//			}
+		//			if (_tnow > pre_tnow) {
+		//				_delta = _tnow - pre_tnow;
+		//			}
+		//		} while (0);
+		//		pre_tnow = _tnow;
+		//	spl_mutex_unlock(__simple_log_static__.mtx_off);
+		//} while (0);
+
+		n = snprintf(buff, 20, SPL_FMT_DATE_ADDING, stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day);
+		if (n < 1) {
+			ret = SPL_LOG_PRINTF_ERROR;
+			break;
+		}
+		n = snprintf(buff1, 20, SPL_FMT_HOUR_ADDING, stt.hour, stt.minute, stt.sec);
+		n = snprintf(fmtt, len, "["SPL_FMT_DELT_ADDING"] [%s] [tid:\t %llu]\t[%s:%s:%d]\t", 
+			buff, buff1, (unsigned int)stt.nn, spl_get_text(lv), spl_get_threadid(), 
+			filename, funcname, line);
+
+	} while (0);
+	return p;
+}
+/*===========================================================================================================================*/
 int spl_fmt_now(char* fmtt, int len) {
 	int ret = 0;
 	spl_local_time_st stt;

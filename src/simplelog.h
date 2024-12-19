@@ -45,6 +45,8 @@ extern "C" {
 #define					SPL_LOG_FATAL					5
 #define					SPL_LOG_PEAK					6
 
+#define					SPL_RL_BUF						256
+
 #ifndef  UNIX_LINUX
 	#ifndef __SIMPLE_STATIC_LOG__
 		#ifdef EXPORT_DLL_API_SIMPLE_LOG
@@ -123,14 +125,14 @@ if(len > 0) (*__ppl) += (len -1);}\
 spl_mutex_unlock(__mtx__); spl_rel_sem(spl_get_sem_rwfile());}
 
 #define __spl_log_buf_level__(__lv__, ___fmttt___, ...)	{if(spl_get_log_levwel() <= (__lv__) )\
-{int *__ppl = 0; char tnow[40]; int range=0; char* __p = 0; void *__mtx__ =  spl_get_mtx(); LLU thrid = spl_get_threadid();\
-int len = 0; const char *lv_text = spl_get_text(__lv__);const char *pfn = 0; __FILLE__(pfn);;spl_fmt_now(tnow, 40);\
+{char *pprefmt = 0; int *__ppl = 0; char tnow[SPL_RL_BUF]; int range=0; char* __p = 0; void *__mtx__ =  spl_get_mtx();;\
+int len = 0;;const char *pfn = 0; __FILLE__(pfn);;\
+pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__);\
 spl_mutex_lock(__mtx__);\
 __p = spl_get_buf(&range, &__ppl); if (__p && __ppl) { len = snprintf((__p + (*__ppl)), range, \
-"[%s] [%s] [tid:\t%llu]\t[%s:%s:%d]\t"___fmttt___"\n\n", \
-tnow, lv_text, thrid, pfn, __FUNCTION__, __LINE__, ##__VA_ARGS__); \
+"%s"___fmttt___"\n\n", pprefmt, ##__VA_ARGS__); \
 if(len > 0) (*__ppl) += (len -1);}\
-spl_mutex_unlock(__mtx__); spl_rel_sem(spl_get_sem_rwfile());}\
+spl_mutex_unlock(__mtx__); spl_rel_sem(spl_get_sem_rwfile()); if(pprefmt != tnow) { free(pprefmt);}}\
 }
 
 
@@ -241,6 +243,8 @@ DLL_API_SIMPLE_LOG int
 	spl_get_log_levwel();
 DLL_API_SIMPLE_LOG int									
 	spl_fmt_now(char* fmtt, int len);
+DLL_API_SIMPLE_LOG char *
+	spl_fmt_now_ext(char* fmtt, int len, int lv, const char *filename, const char* funcname, int  line);
 DLL_API_SIMPLE_LOG int									
 	spl_fmmt_now(char* fmtt, int len);
 DLL_API_SIMPLE_LOG int									
