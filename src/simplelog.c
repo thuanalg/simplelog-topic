@@ -798,15 +798,18 @@ void* spl_written_thread_routine(void* lpParam)
 				spl_mutex_lock(t->mtx_rw);
 				do {
 					is_off = t->off;
-					if (t->buf->pl > t->buf->pc) {
+					//if (t->buf->pl > t->buf->pc) {
+					if (t->buf->pl) {
 
-						memcpy(buffer, t->buf, sizeof(generic_dta_st) + t->buf->pl + 1);
-						t->buf->pl = t->buf->pc = 0;
+						memcpy(buffer, t->buf, sizeof(generic_dta_st) + t->buf->pl);
+						t->buf->pl = 0;
+						//t->buf->pl = t->buf->pc = 0;
 					}
 					for (i = 0; i < t->n_topic; ++i) {
 						if (t->arr_topic[i].buf->pl > t->arr_topic[i].buf->pc) {
-							memcpy(buffer + (t->buff_size * (i + 1)), t->arr_topic[i].buf, sizeof(generic_dta_st) + t->arr_topic[i].buf->pl + 1);
-							t->arr_topic[i].buf->pl = t->arr_topic[i].buf->pc = 0;
+							memcpy(buffer + (t->buff_size * (i + 1)), t->arr_topic[i].buf, sizeof(generic_dta_st) + t->arr_topic[i].buf->pl);
+							//t->arr_topic[i].buf->pl = t->arr_topic[i].buf->pc = 0;
+							t->arr_topic[i].buf->pl = 0;
 						}
 					}
 				} while (0);
