@@ -36,7 +36,7 @@ int get_off_process() {
 	return ret;
 }
 int number = 10;
-int main(int argc, char* argv[]) {
+int main_(int argc, char* argv[]) {
 	char pathcfg[1024];
 	char* path = (char*)"simplelog.cfg";
 	char nowfmt[64];
@@ -134,5 +134,15 @@ void* posix_thread_routine(void* lpParam) {
 		spl_console_log("Main close: End.\n");
 		break;
 	}
+	return 0;
+}
+
+int main() {
+	int ret = spl_init_log((char *)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
+	int count = 10;
+	for (int i = 0; i < count; ++i) {
+		spllog(SPL_LOG_INFO, "test log : %d", i);
+	}
+	spl_finish_log();
 	return 0;
 }

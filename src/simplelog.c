@@ -1195,7 +1195,10 @@ int spl_finish_log() {
 	int ret = 0; 
 	spl_set_off(1);
 #ifndef UNIX_LINUX
+#ifndef SPL_USING_SPIN_LOCK
 	SPL_CloseHandle(__simple_log_static__.mtx_rw);
+#else
+#endif
 	//SPL_CloseHandle(__simple_log_static__.mtx_off);
 	SPL_CloseHandle(__simple_log_static__.sem_rwfile);
 	SPL_CloseHandle(__simple_log_static__.sem_off);
