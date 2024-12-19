@@ -35,7 +35,7 @@ int get_off_process() {
 	spl_mutex_unlock(main_mtx);
 	return ret;
 }
-int number = 100;
+int number = 10;
 int main(int argc, char* argv[]) {
 	char pathcfg[1024];
 	char* path = (char*)"simplelog.cfg";
