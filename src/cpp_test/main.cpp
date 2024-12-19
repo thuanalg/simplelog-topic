@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 	if (argc > 1) {
 		n = sscanf(argv[1], "%d", &number);
 	}
-	main_mtx = spl_mutex_create();
+	//main_mtx = spl_mutex_create();
 	spl_console_log("Main thread.\n");
 
 	snprintf(pathcfg, 1024, path);
@@ -66,19 +66,19 @@ int main(int argc, char* argv[]) {
 	while (1) {
 		FILE* fp = 0;
 		
-		spl_sleep(10);
+		spl_sleep(7);
 		
-		spllog(SPL_LOG_DEBUG, "%s", "Looping for waiting trigger.\n");
-		fp = fopen("trigger.txt", "r");
+		//spllog(SPL_LOG_DEBUG, "%s", "Looping for waiting trigger.\n");
+		fp = fopen("C:/z/simplelog-topic/win64/Debug/trigger.txt", "r");
 		if (fp) {
 			fclose(fp);
 			break;
 		}
 
 	}
-	spllog(SPL_LOG_INFO, "%s", "set_off_process.\n");
-	set_off_process(1);
-	spl_sleep(1);
+	//spllog(SPL_LOG_INFO, "%s", "set_off_process.\n");
+	//set_off_process(1);
+	//spl_sleep(1);
 	spl_console_log("Main close: spl_finish_log.\n");
 	spl_finish_log();
 	return EXIT_SUCCESS;
@@ -91,6 +91,9 @@ void dotest() {
 	HANDLE hThread = 0;
 	for (i = 0; i < number; ++i) {
 		hThread = CreateThread(NULL, 0, win32_thread_routine, 0, 0, &dwThreadId);
+		if (i % 10 == 0) {
+			spl_sleep(3);
+		}
 	}
 #else
 	pthread_t idd = 0;
@@ -115,10 +118,6 @@ void* posix_thread_routine(void* lpParam) {
 	int k = 0;
 	int tpic = 0;
 	while (1) {
-		k = get_off_process();
-		if (k) {
-			break;
-		}
 		int count = 0;
 		spl_console_log("Main close: Start.\n");
 		while (count < 100000) {
