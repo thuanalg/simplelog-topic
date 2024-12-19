@@ -1293,7 +1293,7 @@ char* spl_get_buf(int* n, int** ppl) {
 	if (STSPLOG->off) {
 		return 0;
 	}
-			(*n) = (STSPLOGBUF->total > sizeof(generic_dta_st) + STSPLOGBUF->pl + 1024) ? (STSPLOGBUF->total - (sizeof(generic_dta_st) + STSPLOGBUF->pl)) : 0;
+			(*n) = (STSPLOGBUF->total > sizeof(generic_dta_st) + STSPLOGBUF->pl + 2048) ? (STSPLOGBUF->total - (sizeof(generic_dta_st) + STSPLOGBUF->pl)) : 0;
 			//ret = t->buf->data;
 			if (!(*n)) {
 				return 0;
