@@ -1295,6 +1295,9 @@ char* spl_get_buf(int* n, int** ppl) {
 	}
 			(*n) = (STSPLOGBUF->total > sizeof(generic_dta_st) + STSPLOGBUF->pl) ? (STSPLOGBUF->total - (sizeof(generic_dta_st) + STSPLOGBUF->pl)) : 0;
 			//ret = t->buf->data;
+			if (!(*n)) {
+				return 0;
+			}
 			(*ppl) = &(STSPLOGBUF->pl);
 			return STSPLOGBUF->data;
 		//}
