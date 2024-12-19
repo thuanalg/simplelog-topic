@@ -91,9 +91,6 @@ void dotest() {
 	HANDLE hThread = 0;
 	for (i = 0; i < number; ++i) {
 		hThread = CreateThread(NULL, 0, win32_thread_routine, 0, 0, &dwThreadId);
-		if (i % 10 == 0) {
-			spl_sleep(3);
-		}
 	}
 #else
 	pthread_t idd = 0;
@@ -109,7 +106,7 @@ void dotest() {
 #define spllogexe(__level__, __fmt__, ...)					spllogtopic(__level__, 2, __fmt__, ##__VA_ARGS__);
 #define spllognaxyax(__level__, __fmt__, ...)				spllogtopic(__level__, 3, __fmt__, ##__VA_ARGS__);
 #define spllogsksgn(__level__, __fmt__, ...)				spllogtopic(__level__, 4, __fmt__, ##__VA_ARGS__);
-
+//https://github.com/gabime/spdlog, 10 thread
 #ifndef UNIX_LINUX
 DWORD WINAPI win32_thread_routine(LPVOID lpParam) {
 #else
