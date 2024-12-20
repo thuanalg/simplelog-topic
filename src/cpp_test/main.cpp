@@ -118,7 +118,8 @@ void* posix_thread_routine(void* lpParam) {
 }
 
 int main() {
-	int ret = spl_init_log((char *)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
+	//int ret = spl_init_log((char *)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
+	int ret = spl_init_log((char *)"simplelog.cfg");
 	int count = 10;
 	for (int i = 0; i < count; ++i) {
 		spllog(SPL_LOG_INFO, "test log : %d", i);
