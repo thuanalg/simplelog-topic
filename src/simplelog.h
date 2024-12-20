@@ -10,6 +10,7 @@
 * The lasted modified date:
 *		<2024-Sep-14>
 *		<2024-Dec-18>
+*		<2024-Dec-20>
 * Decription:
 *		The (only) main header file to export 3 APIs: [spl_init_log, spllog, spllogtopic, spl_finish_log].
 */
