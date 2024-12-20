@@ -36,7 +36,7 @@ int get_off_process() {
 	return ret;
 }
 int number = 10;
-int main(int argc, char* argv[]) {
+int main___(int argc, char* argv[]) {
 	char pathcfg[1024];
 	char* path = (char*)"simplelog.cfg";
 	char nowfmt[64];
@@ -134,7 +134,7 @@ void* posix_thread_routine(void* lpParam) {
 	return 0;
 }
 
-int __main() {
+int main() {
 	int ret = spl_init_log((char *)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
 	int count = 10;
 	for (int i = 0; i < count; ++i) {

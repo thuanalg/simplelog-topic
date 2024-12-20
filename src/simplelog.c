@@ -1305,6 +1305,27 @@ char* spl_get_buf(int* n, int** ppl) {
 	return 0;
 }
 /*===========================================================================================================================*/
+char* spl_get_buf_ext(int* n, int** ppl, char *isOff) {
+	//SIMPLE_LOG_ST* t = &__simple_log_static__;
+	//char* ret = 0;
+	//if (t->buf) {
+		//if (n && ppl) {
+	if (STSPLOG->off) {
+		*isOff = 1;
+		return 0;
+	}
+	(*n) = (STSPLOGBUF->total > sizeof(generic_dta_st) + STSPLOGBUF->pl + 2048) ? (STSPLOGBUF->total - (sizeof(generic_dta_st) + STSPLOGBUF->pl)) : 0;
+	//ret = t->buf->data;
+	if (!(*n)) {
+		return 0;
+	}
+	(*ppl) = &(STSPLOGBUF->pl);
+	return STSPLOGBUF->data;
+	//}
+//}
+	return 0;
+}
+/*===========================================================================================================================*/
 /*https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createdirectorya*/
 int spl_folder_sup(char* folder, spl_local_time_st* lctime, char* year_month) {
 	int ret = 0;
@@ -1407,6 +1428,14 @@ void spl_sleep(unsigned int sec) {
 	Sleep( ((DWORD)(sec)) * 1000);
 #else
 	sleep(sec);
+#endif 
+}
+/*===========================================================================================================================*/
+void spl_milli_sleep(unsigned int mill_sec) {
+#ifndef UNIX_LINUX
+	Sleep(((DWORD)(mill_sec)));
+#else
+	usleep(sec);
 #endif 
 }
 /*===========================================================================================================================*/
