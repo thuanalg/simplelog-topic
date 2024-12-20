@@ -123,7 +123,7 @@ static	void splUnlockSpinlock(volatile long* p);
 static
 	volatile long spl_rw_spin = 0;
 #else
-
+	pthread_spinlock_t	spl_rw_spin;
 #endif
 /*===========================================================================================================================*/
 

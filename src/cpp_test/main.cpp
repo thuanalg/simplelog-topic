@@ -18,7 +18,7 @@ void* main_mtx = 0;
 int off_process = 0;
 
 
-int number = 30;
+int number = 100;
 int main(int argc, char* argv[]) {
 	char pathcfg[1024];
 	char* path = (char*)"simplelog.cfg";
