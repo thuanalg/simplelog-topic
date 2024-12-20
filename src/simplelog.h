@@ -134,7 +134,7 @@ __p = spl_get_buf_ext(&range, &__ppl, &__isOof); if (__p && __ppl) { len = snpri
 "%s"___fmttt___"\n\n", pprefmt, ##__VA_ARGS__); \
 if(len > 0) (*__ppl) += (len -1);}\
 spl_mutex_unlock(__mtx__);\
-if(__isOof)break;if(!__p)spl_milli_sleep(1);}\
+if(__isOof)break;if(!__p)spl_milli_sleep(10);}\
 while(!__p);\
 spl_rel_sem(spl_get_sem_rwfile()); if(pprefmt != tnow) { free(pprefmt);}}\
 }

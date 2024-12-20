@@ -35,8 +35,8 @@ int get_off_process() {
 	spl_mutex_unlock(main_mtx);
 	return ret;
 }
-int number = 10;
-int main___(int argc, char* argv[]) {
+int number = 100;
+int main(int argc, char* argv[]) {
 	char pathcfg[1024];
 	char* path = (char*)"simplelog.cfg";
 	char nowfmt[64];
@@ -134,7 +134,7 @@ void* posix_thread_routine(void* lpParam) {
 	return 0;
 }
 
-int main() {
+int main___() {
 	int ret = spl_init_log((char *)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
 	int count = 10;
 	for (int i = 0; i < count; ++i) {
