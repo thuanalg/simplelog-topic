@@ -113,15 +113,15 @@
 #define				SPL_MEMO_PADDING				2
 /*===========================================================================================================================*/
 #ifndef UNIX_LINUX
-//DLL_API_SIMPLE_LOG
-static	void splLockSpinlock(volatile long* p);
-//DLL_API_SIMPLE_LOG
-static	void splUnlockSpinlock(volatile long* p);
-#define SplLockSpinlock(__p__)				splLockSpinlock((volatile long*)(__p__))
-#define SplUnlockSpinlock(__p__)			splUnlockSpinlock((volatile long*)(__p__))
-
-static
-	volatile long spl_rw_spin = 0;
+	//DLL_API_SIMPLE_LOG
+	static	void splLockSpinlock(volatile long* p);
+	//DLL_API_SIMPLE_LOG
+	static	void splUnlockSpinlock(volatile long* p);
+	#define SplLockSpinlock(__p__)				splLockSpinlock((volatile long*)(__p__))
+	#define SplUnlockSpinlock(__p__)			splUnlockSpinlock((volatile long*)(__p__))
+	
+	static
+		volatile long spl_rw_spin = 0;
 #else
 	pthread_spinlock_t	spl_rw_spin;
 #endif
