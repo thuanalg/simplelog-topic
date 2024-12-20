@@ -16,26 +16,9 @@
 void dotest();
 void* main_mtx = 0;
 int off_process = 0;
-int set_off_process(int val) {
-	int ret = 0;
-	spl_mutex_lock(main_mtx);
-	do {
-		off_process = val;
-	} while (0);
-	spl_mutex_unlock(main_mtx);
-	return ret;
-}
 
-int get_off_process() {
-	int ret = 0;
-	spl_mutex_lock(main_mtx);
-	do {
-		ret = off_process;
-	} while (0);
-	spl_mutex_unlock(main_mtx);
-	return ret;
-}
-int number = 10;
+
+int number = 30;
 int main(int argc, char* argv[]) {
 	char pathcfg[1024];
 	char* path = (char*)"simplelog.cfg";

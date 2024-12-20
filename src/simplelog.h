@@ -299,6 +299,7 @@ DLL_API_SIMPLE_LOG
 
 DLL_API_SIMPLE_LOG
 	int spl_standardize_path(char* fname);
+
 DLL_API_SIMPLE_LOG
 	LLU spl_milli_now();
 //DLL_API_SIMPLE_LOG

@@ -1435,7 +1435,7 @@ void spl_milli_sleep(unsigned int mill_sec) {
 #ifndef UNIX_LINUX
 	Sleep(((DWORD)(mill_sec)));
 #else
-	usleep(sec);
+	usleep(mill_sec * 1000);
 #endif 
 }
 /*===========================================================================================================================*/
@@ -1674,13 +1674,13 @@ spl_get_buf_topic_ext(int* n, int** ppl, int i, char *isOOf) {
 		return 0;
 	}
 	if (i < 0 || ((i + 1) > STSPLOG->n_topic)) {
-		return spl_get_buf(n, ppl);
+		return spl_get_buf_ext(n, ppl, isOOf);
 		//break;
 	}
 	if (STSPLOG->arr_topic) {
 		//SIMPLE_LOG_TOPIC_ST* obj = &(STSPLOG->arr_topic[i]);
 		//if (n && ppl) {
-		*n = (STSPLOGBUFTOPIC(i)->total > sizeof(generic_dta_st) + STSPLOGBUFTOPIC(i)->pl) ?
+		*n = (STSPLOGBUFTOPIC(i)->total > (sizeof(generic_dta_st) + STSPLOGBUFTOPIC(i)->pl + 2048)) ?
 			(STSPLOGBUFTOPIC(i)->total - (sizeof(generic_dta_st) + STSPLOGBUFTOPIC(i)->pl)) : 0;
 		//ret = obj->buf->data;
 		(*ppl) = &(STSPLOGBUFTOPIC(i)->pl);
