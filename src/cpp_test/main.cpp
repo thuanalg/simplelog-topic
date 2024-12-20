@@ -121,7 +121,7 @@ void* posix_thread_routine(void* lpParam) {
 			spllog(SPL_LOG_INFO, "test log: %d", count);
 			//tpic = (spl_milli_now() % 3);
 			spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
-			splloglib(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sys");
+			splloglib(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "lib");
 			spllogexe(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
 			//spllognaxyax(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
 			//spllogsksgn(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
