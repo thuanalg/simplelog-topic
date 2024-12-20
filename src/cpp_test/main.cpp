@@ -35,8 +35,8 @@ int get_off_process() {
 	spl_mutex_unlock(main_mtx);
 	return ret;
 }
-int number = 100;
-int main__(int argc, char* argv[]) {
+int number = 10;
+int main(int argc, char* argv[]) {
 	char pathcfg[1024];
 	char* path = (char*)"simplelog.cfg";
 	char nowfmt[64];
@@ -121,8 +121,8 @@ void* posix_thread_routine(void* lpParam) {
 			spllog(SPL_LOG_INFO, "test log: %d", count);
 			//tpic = (spl_milli_now() % 3);
 			spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
-			//splloglib(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
-			//spllogexe(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+			splloglib(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sys");
+			spllogexe(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
 			//spllognaxyax(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
 			//spllogsksgn(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
 			//spl_sleep(1);
@@ -134,7 +134,7 @@ void* posix_thread_routine(void* lpParam) {
 	return 0;
 }
 
-int main() {
+int __main() {
 	int ret = spl_init_log((char *)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
 	int count = 10;
 	for (int i = 0; i < count; ++i) {
