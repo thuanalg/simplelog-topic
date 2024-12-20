@@ -151,8 +151,8 @@ if(len > 0) (*__ppl) += (len -1);}\
 spl_mutex_unlock(__mtx__); spl_rel_sem(spl_get_sem_rwfile());}
 
 #define __spl_log_buf_topic_level__(__lv__, __tpic, ___fmttt___, ...)	{ if(spl_get_log_levwel() <= (__lv__) ) \
-{int *__ppl = 0; char tnow[40]; int range=0; char* __p = 0; void *__mtx__ =  spl_get_mtx(); LLU thrid = spl_get_threadid();\
-int len = 0; const char *lv_text = spl_get_text(__lv__);const char *pfn = 0; __FILLE__(pfn);;spl_fmt_now(tnow, 40);\
+{int *__ppl = 0; char tnow[SPL_RL_BUF]; int range=0; char* __p = 0; void *__mtx__ =  spl_get_mtx(); LLU thrid = spl_get_threadid();\
+int len = 0; const char *lv_text = spl_get_text(__lv__);const char *pfn = 0; __FILLE__(pfn);;spl_fmt_now(tnow, SPL_RL_BUF);\
 spl_mutex_lock(__mtx__);\
 __p = spl_get_buf_topic(&range, &__ppl, (__tpic)); if (__p && __ppl) { len = snprintf((__p + (*__ppl)), range, \
 "[%s] [%s] [tid:\t%llu]\t[%s:%s:%d]\t"___fmttt___"\n\n", \
