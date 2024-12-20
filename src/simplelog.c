@@ -1286,8 +1286,8 @@ int spl_finish_log() {
 #else
 	//Don't need free
 #endif
-	SPL_pthread_mutex_destroy(__simple_log_static__.mtx_off, err);
-	spl_free(__simple_log_static__.mtx_off);
+	//SPL_pthread_mutex_destroy(__simple_log_static__.mtx_off, err);
+	//spl_free(__simple_log_static__.mtx_off);
 	SPL_sem_destroy(__simple_log_static__.sem_rwfile, err);
 	spl_free(__simple_log_static__.sem_rwfile);
 	SPL_sem_destroy(__simple_log_static__.sem_off, err);
