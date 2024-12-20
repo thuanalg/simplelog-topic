@@ -617,6 +617,7 @@ void* spl_mutex_create() {
 		ret = &spl_rw_spin;
 	#endif
 #else
+#ifndef SPL_USING_SPIN_LOCK
 	/*https://linux.die.net/man/3/pthread_mutex_init*/
 		spl_malloc(sizeof(pthread_mutex_t), ret, void);
 		//ret = malloc(sizeof(pthread_mutex_t));
@@ -625,6 +626,9 @@ void* spl_mutex_create() {
 		}
 		memset(ret, 0, sizeof(pthread_mutex_t));
 		pthread_mutex_init((pthread_mutex_t*)ret, 0);
+#else
+		ret = &spl_rw_spin;
+#endif
 #endif 
 	} while (0);
 	return ret;
@@ -671,7 +675,12 @@ int spl_mutex_lock(void* obj) {
 		SplLockSpinlock(obj);
 	#endif
 #else
+	#ifndef SPL_USING_SPIN_LOCK
 		SPL_pthread_mutex_lock((pthread_mutex_t*)obj, ret);
+	#else
+		pthread_spin_lock((pthread_spinlock_t*)obj);
+	#endif
+		
 #endif
 	} while (0);
 	return ret;
@@ -700,7 +709,11 @@ int spl_mutex_unlock(void* obj) {
 		SplUnlockSpinlock(obj);
 	#endif
 #else
+	#ifndef SPL_USING_SPIN_LOCK
 		SPL_pthread_mutex_unlock((pthread_mutex_t*)obj, ret);
+	#else
+		pthread_spin_unlock((pthread_spinlock_t*)obj);
+	#endif
 #endif
 	} while (0);
 	return ret;
@@ -1258,6 +1271,7 @@ int spl_finish_log() {
 #ifndef SPL_USING_SPIN_LOCK
 	SPL_CloseHandle(__simple_log_static__.mtx_rw);
 #else
+	//Don't need free
 #endif
 	//SPL_CloseHandle(__simple_log_static__.mtx_off);
 	SPL_CloseHandle(__simple_log_static__.sem_rwfile);
@@ -1266,8 +1280,12 @@ int spl_finish_log() {
 	int err = 0;
 /*https://linux.die.net/man/3/SPL_sem_destroy
 //https://linux.die.net/man/3/pthread_mutex_init*/
+#ifndef SPL_USING_SPIN_LOCK
 	SPL_pthread_mutex_destroy(__simple_log_static__.mtx, err);
 	spl_free(__simple_log_static__.mtx);
+#else
+	//Don't need free
+#endif
 	SPL_pthread_mutex_destroy(__simple_log_static__.mtx_off, err);
 	spl_free(__simple_log_static__.mtx_off);
 	SPL_sem_destroy(__simple_log_static__.sem_rwfile, err);
