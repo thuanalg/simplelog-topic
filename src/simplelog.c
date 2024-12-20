@@ -612,9 +612,9 @@ void* spl_mutex_create() {
 	do {
 #ifndef UNIX_LINUX
 	#ifndef SPL_USING_SPIN_LOCK
-		ret = CreateMutexA(0, 0, 0);
+		ret = (void*) CreateMutexA(0, 0, 0);
 	#else
-		ret = &spl_rw_spin;
+		ret = (void*) & spl_rw_spin;
 	#endif
 #else
 #ifndef SPL_USING_SPIN_LOCK
@@ -627,7 +627,7 @@ void* spl_mutex_create() {
 		memset(ret, 0, sizeof(pthread_mutex_t));
 		pthread_mutex_init((pthread_mutex_t*)ret, 0);
 #else
-		ret = &spl_rw_spin;
+		ret = (void *) &spl_rw_spin;
 #endif
 #endif 
 	} while (0);
