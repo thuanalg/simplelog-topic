@@ -628,6 +628,7 @@ void* spl_mutex_create() {
 		pthread_mutex_init((pthread_mutex_t*)ret, 0);
 #else
 		ret = (void *) &spl_rw_spin;
+		pthread_spin_init((pthread_spinlock_t*)ret, PTHREAD_PROCESS_PRIVATE);
 #endif
 #endif 
 	} while (0);
