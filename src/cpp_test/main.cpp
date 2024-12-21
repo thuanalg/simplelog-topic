@@ -14,55 +14,30 @@
 #endif // !UNIX_LINUX
 
 void dotest();
-void* main_mtx = 0;
-int off_process = 0;
+int numbe_thread = 10;
+int loop_count = 100 * 1000;
 
+#define		TNUMBEER_OF_THREADS					"--nthread="	
+#define		TCONFIG_FILE						"--cfg="	
+#define		TLOOP_COUNT							"--loopcount="	
 
-int number = 10;
-int __main(int argc, char* argv[]) {
-	char pathcfg[1024];
-	char* path = (char*)"simplelog.cfg";
-	char nowfmt[64];
-	int n = 0, ret = 0, i = 0;
-	if (argc > 1) {
-		n = sscanf(argv[1], "%d", &number);
-	}
-	//main_mtx = spl_mutex_create();
-	spl_console_log("Main thread.\n");
+int main(int argc, char* argv[]) {
+	int ret = 0, i = 0;
+	char cfgpath[1024];
+	snprintf(cfgpath, 1024, "C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
+	ret = spl_init_log(cfgpath);
 
-	snprintf(pathcfg, 1024, path);
-	n = strlen(pathcfg);
-	for (i = 0; i < n; ++i) {
-		if (pathcfg[i] == '\\') {
-			pathcfg[i] = '/';
+	for (i = 1; i < argc; ++i) {
+		char* pp = argv[i];
+		if (strstr(pp, TLOOP_COUNT) == pp) {
+			sscanf(pp, TLOOP_COUNT"%d", &loop_count);
+			continue;
 		}
 	}
-	// Init log with "pathcfg" path of file, after starting well, ready to use.
-	//ret = spl_init_log(pathcfg);
-	ret = spl_init_log("C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
-	if (ret) {
-		spl_console_log("spl_init_log ret: %d", ret);
-		exit(1);
-	}
-	n = 0;
+	spl_console_log("====================Main close: Start.\n");
 	dotest();
-	while (1) {
-		FILE* fp = 0;
-		
-		spl_sleep(7);
-		
-		//spllog(SPL_LOG_DEBUG, "%s", "Looping for waiting trigger.\n");
-		fp = fopen("C:/z/simplelog-topic/win64/Debug/trigger.txt", "r");
-		if (fp) {
-			fclose(fp);
-			break;
-		}
-
-	}
-	//spllog(SPL_LOG_INFO, "%s", "set_off_process.\n");
-	//set_off_process(1);
-	//spl_sleep(1);
-	spl_console_log("Main close: spl_finish_log.\n");
+	spl_console_log("==================Main close: End.\n");
+	//spl_console_log("Main close: spl_finish_log.\n");
 	spl_finish_log();
 	return EXIT_SUCCESS;
 }
@@ -70,11 +45,31 @@ void dotest() {
 	int i = 0;
 #ifndef UNIX_LINUX
 
-	DWORD dwThreadId = 0;
-	HANDLE hThread = 0;
-	for (i = 0; i < number; ++i) {
-		hThread = CreateThread(NULL, 0, win32_thread_routine, 0, 0, &dwThreadId);
+	DWORD *dwpThreadId = 0, dwEvent = 0;
+	HANDLE *hpThread = 0;
+
+	dwpThreadId = (DWORD*)malloc(numbe_thread * sizeof(DWORD));
+	if (!dwpThreadId) {
+		exit(1);
 	}
+	memset(dwpThreadId, 0, numbe_thread * sizeof(DWORD));
+
+	hpThread = (HANDLE*)malloc(numbe_thread * sizeof(HANDLE));
+	if (!hpThread) {
+		exit(1);
+	}
+	memset(hpThread, 0, numbe_thread * sizeof(HANDLE));
+	
+	for (i = 0; i < numbe_thread; ++i) {
+		hpThread[i] = CreateThread(NULL, 0, win32_thread_routine, 0, 0, (dwpThreadId + i));
+	}
+	//https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitformultipleobjects
+	//https://learn.microsoft.com/en-us/windows/win32/sync/waiting-for-multiple-objects
+	dwEvent = WaitForMultipleObjects(
+			numbe_thread,           // number of objects in array
+			hpThread,				// array of objects
+			TRUE,					// wait for any object
+			INFINITE);				// five-second wait
 #else
 	pthread_t idd = 0;
 	for (i = 0; i < number; ++i) {
@@ -97,10 +92,10 @@ void* posix_thread_routine(void* lpParam) {
 #endif // !UNIX_LINUX
 	int k = 0;
 	int tpic = 0;
-	while (1) {
+	//while (1) {
 		int count = 0;
-		spl_console_log("Main close: Start.\n");
-		while (count < 100000) {
+		
+		while (count < loop_count) {
 			spllog(SPL_LOG_INFO, "test log: %d", count);
 			//tpic = (spl_milli_now() % 3);
 			//spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
@@ -111,13 +106,13 @@ void* posix_thread_routine(void* lpParam) {
 			//spl_sleep(1);
 			++count;
 		}
-		spl_console_log("Main close: End.\n");
-		break;
-	}
+		//spl_console_log("Main close: End.\n");
+		//break;
+	//}
 	return 0;
 }
 
-int main() {
+int __main() {
 	//int ret = spl_init_log((char *)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
 	int ret = spl_init_log((char *)"simplelog.cfg");
 	int count = 10;
