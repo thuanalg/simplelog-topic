@@ -37,7 +37,6 @@ int main(int argc, char* argv[]) {
 	spl_console_log("====================Main close: Start.\n");
 	dotest();
 	spl_console_log("==================Main close: End.\n");
-	//spl_console_log("Main close: spl_finish_log.\n");
 	spl_finish_log();
 	return EXIT_SUCCESS;
 }
