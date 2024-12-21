@@ -24,7 +24,8 @@ int loop_count = 100 * 1000;
 int main(int argc, char* argv[]) {
 	int ret = 0, i = 0;
 	char cfgpath[1024];
-	snprintf(cfgpath, 1024, "C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
+	//snprintf(cfgpath, 1024, "C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
+	snprintf(cfgpath, 1024, "simplelog.cfg");
 	ret = spl_init_log(cfgpath);
 
 	for (i = 1; i < argc; ++i) {
