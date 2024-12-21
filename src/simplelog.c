@@ -133,6 +133,9 @@ struct __GENERIC_DATA__ {
 	int	
 		total;	 
 		/*Total size*/
+	int
+		range;
+		/*Total size*/
 	int	
 		pc;		 
 		/*Point to the current*/
@@ -1334,7 +1337,7 @@ char* spl_get_buf_ext(int* n, int** ppl, char *isOff) {
 		*isOff = 1;
 		return 0;
 	}
-	(*n) = (STSPLOGBUF->total > sizeof(generic_dta_st) + STSPLOGBUF->pl + 2048) ? (STSPLOGBUF->total - (sizeof(generic_dta_st) + STSPLOGBUF->pl)) : 0;
+	(*n) = (STSPLOGBUF->range > (STSPLOGBUF->pl + 2048)) ? (STSPLOGBUF->total - STSPLOGBUF->pl) : 0;
 	//ret = t->buf->data;
 	if (!(*n)) {
 		return 0;
@@ -1700,8 +1703,8 @@ spl_get_buf_topic_ext(int* n, int** ppl, int i, char *isOOf) {
 	if (STSPLOG->arr_topic) {
 		//SIMPLE_LOG_TOPIC_ST* obj = &(STSPLOG->arr_topic[i]);
 		//if (n && ppl) {
-		*n = (STSPLOGBUFTOPIC(i)->total > (sizeof(generic_dta_st) + STSPLOGBUFTOPIC(i)->pl + 2048)) ?
-			(STSPLOGBUFTOPIC(i)->total - (sizeof(generic_dta_st) + STSPLOGBUFTOPIC(i)->pl)) : 0;
+		*n = (STSPLOGBUFTOPIC(i)->range > (STSPLOGBUFTOPIC(i)->pl + 2048)) ?
+			(STSPLOGBUFTOPIC(i)->total - (STSPLOGBUFTOPIC(i)->pl)) : 0;
 		//ret = obj->buf->data;
 		(*ppl) = &(STSPLOGBUFTOPIC(i)->pl);
 		return STSPLOGBUFTOPIC(i)->data;
@@ -1754,6 +1757,7 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 		}
 		tmpBuff = (generic_dta_st*)buffer;
 		tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
+		tmpBuff->range = tmpBuff->total - sizeof(generic_dta_st);
 		t->buf = tmpBuff;
 
 		if (!t->arr_topic) {
@@ -1781,6 +1785,7 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 
 				tmpBuff = (generic_dta_st*)(buffer + (( i + 1) * t->buff_size));
 				tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
+				tmpBuff->range = tmpBuff->total - sizeof(generic_dta_st);
 				t->arr_topic[i].buf = tmpBuff;
 			}
 			if (ret) {
