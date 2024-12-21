@@ -15,7 +15,7 @@
 
 void dotest();
 int num_threads = 10;
-int loop_count = 100 * 1000;
+int loop_count = 1000 * 1000;
 
 #define		TNUMBEER_OF_THREADS					"--nthread="	
 #define		TCONFIG_FILE						"--cfg="	
