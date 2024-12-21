@@ -14,7 +14,7 @@
 #endif // !UNIX_LINUX
 
 void dotest();
-int numbe_thread = 10;
+int num_threads = 10;
 int loop_count = 100 * 1000;
 
 #define		TNUMBEER_OF_THREADS					"--nthread="	
@@ -47,33 +47,48 @@ void dotest() {
 	DWORD *dwpThreadId = 0, dwEvent = 0;
 	HANDLE *hpThread = 0;
 
-	dwpThreadId = (DWORD*)malloc(numbe_thread * sizeof(DWORD));
+	dwpThreadId = (DWORD*)malloc(num_threads * sizeof(DWORD));
 	if (!dwpThreadId) {
 		exit(1);
 	}
-	memset(dwpThreadId, 0, numbe_thread * sizeof(DWORD));
+	memset(dwpThreadId, 0, num_threads * sizeof(DWORD));
 
-	hpThread = (HANDLE*)malloc(numbe_thread * sizeof(HANDLE));
+	hpThread = (HANDLE*)malloc(num_threads * sizeof(HANDLE));
 	if (!hpThread) {
 		exit(1);
 	}
-	memset(hpThread, 0, numbe_thread * sizeof(HANDLE));
+	memset(hpThread, 0, num_threads * sizeof(HANDLE));
 	
-	for (i = 0; i < numbe_thread; ++i) {
+	for (i = 0; i < num_threads; ++i) {
 		hpThread[i] = CreateThread(NULL, 0, win32_thread_routine, 0, 0, (dwpThreadId + i));
 	}
 	//https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitformultipleobjects
 	//https://learn.microsoft.com/en-us/windows/win32/sync/waiting-for-multiple-objects
 	dwEvent = WaitForMultipleObjects(
-			numbe_thread,           // number of objects in array
+			num_threads,           // number of objects in array
 			hpThread,				// array of objects
 			TRUE,					// wait for any object
 			INFINITE);				// five-second wait
+	free(dwpThreadId);
+	free(hpThread);
 #else
-	pthread_t idd = 0;
-	for (i = 0; i < number; ++i) {
-		int err = pthread_create(&idd, 0, posix_thread_routine, 0);
+	//https://man7.org/linux/man-pages/man3/pthread_create.3.html
+	pthread_t *pidds = 0;
+	pidds = (pthread_t*) malloc(num_threads * sizeof(pthread_t));
+	if(!pidds) {
+		exit(1);
 	}
+	for (i = 0; i < num_threads; ++i) {
+		int err = pthread_create(pidds + i, 0, posix_thread_routine, 0);
+	}
+	for (int i = 0; i < num_threads; i++) {
+		pthread_join(pidds[i], 0);
+		if (s != 0) {
+			spl_console_log("pthread_join error.\n");
+		}
+	}
+	free(pidds);
+
 #endif
 }
 
