@@ -111,7 +111,7 @@
 #define				SPL_TEXT_FATAL					"F"
 
 
-#define				SPL_MEMO_PADDING				2
+#define				SPL_MEMO_PADDING				2048
 /*===========================================================================================================================*/
 #ifndef UNIX_LINUX
 	//DLL_API_SIMPLE_LOG

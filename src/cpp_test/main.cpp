@@ -14,7 +14,7 @@
 #endif // !UNIX_LINUX
 
 void dotest();
-int num_threads = 10;
+int num_threads = 20;
 int loop_count = 1000 * 1000;
 
 #define		TNUMBEER_OF_THREADS					"--nthread="	

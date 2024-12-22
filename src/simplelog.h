@@ -246,8 +246,7 @@ spl_mutex_unlock(__mtx__); spl_rel_sem(spl_get_sem_rwfile());}
 #define __spl_log_buf_level__(__lv__, ___fmttt___, ...)	{if(spl_get_log_levwel() <= (__lv__) )\
 {SIMPLE_LOG_ST *t = 0;int len = 0;;const char *pfn = 0;char __isOof = 0; char *pprefmt = 0;\
  char tnow[SPL_RL_BUF];void *__mtx__ =  spl_get_mtx();;\
- __FILLE__(pfn);;\
-pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__);t = spl_control_obj();\
+ __FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__);t = spl_control_obj();\
 do{\
 spl_mutex_lock(__mtx__);\
 	do {\
