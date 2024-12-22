@@ -265,10 +265,11 @@ spl_rel_sem(spl_get_sem_rwfile()); if(pprefmt != tnow) { free(pprefmt);}}\
 ; __FILLE__(pfn);t = spl_control_obj();\
 ;pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__);;\
 do{\
+if (__tpic < 0 || ((__tpic + 1) > t->n_topic)){ __isbrf = 1; break;}/*they are constant.*/\
 spl_mutex_lock(__mtx__);\
 	do {\
 		if(SPLCHECKOFF(t)) { __isbrf = 1; break;};\
-		;;if (__tpic < 0 || ((__tpic + 1) > t->n_topic)){ __isbrf = 1; break;}\
+		;\
 		if(t->arr_topic){\
 			if(STSPLOGBUFTOPIC(t,__tpic)->range > STSPLOGBUFTOPIC(t,__tpic)->pl) {\
 				len = snprintf(STSPLOGBUFTOPIC(t, __tpic)->data + STSPLOGBUFTOPIC(t, __tpic)->pl, \
@@ -332,10 +333,11 @@ int len = 0;;const char *pfn = 0;SIMPLE_LOG_ST *t = 0;char __isbrf = 0; char *pp
 ; __FILLE__(pfn);t = spl_control_obj();\
 ;pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__);;\
 do{\
+if (__tpic < 0 || ((__tpic + 1) > t->n_topic)){ __isbrf = 1; break;}/*they are constant.*/\
 spl_mutex_lock(__mtx__);\
 	do {\
 		if(SPLCHECKOFF(t)) { __isbrf = 1; break;};\
-		;;if (__tpic < 0 || ((__tpic + 1) > t->n_topic)){ __isbrf = 1; break;}\
+		;\
 		if(t->arr_topic){\
 			if(STSPLOGBUFTOPIC(t,__tpic)->range > STSPLOGBUFTOPIC(t,__tpic)->pl) {\
 				len = snprintf(STSPLOGBUFTOPIC(t, __tpic)->data + STSPLOGBUFTOPIC(t, __tpic)->pl, \
