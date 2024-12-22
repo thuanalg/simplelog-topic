@@ -276,7 +276,7 @@ spl_mutex_lock(__mtx__);\
 					STSPLOGBUFTOPIC(t,__tpic)->range - STSPLOGBUFTOPIC(t,__tpic)->pl, \
 					"%s"___fmttt___"\n\n", pprefmt, ##__VA_ARGS__);\
 				if(len > 0) STSPLOGBUFTOPIC(t,__tpic)->pl += (len-1);\
-			}else{__isbrf = 1; break;;}\
+			}\
 		}else{__isbrf = 1; break;;}\
 	}\
 	while(0);\
@@ -344,7 +344,7 @@ spl_mutex_lock(__mtx__);\
 					STSPLOGBUFTOPIC(t,__tpic)->range - STSPLOGBUFTOPIC(t,__tpic)->pl, \
 					__c11fmt_c_str__, pprefmt, ##__VA_ARGS__);\
 				if(len > 0) STSPLOGBUFTOPIC(t,__tpic)->pl += (len-1);\
-			}else{__isbrf = 1; break;;}\
+			}\
 		}else{__isbrf = 1; break;;}\
 	}\
 	while(0);\
