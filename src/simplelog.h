@@ -295,9 +295,9 @@ spl_mutex_lock(__mtx__);\
 				len = snprintf(STSPLOGBUFTOPIC(t, __tpic)->data + STSPLOGBUFTOPIC(t, __tpic)->pl, \
 					STSPLOGBUFTOPIC(t,__tpic)->range - STSPLOGBUFTOPIC(t,__tpic)->pl, \
 					"%s"___fmttt___"\n\n", pprefmt, ##__VA_ARGS__);\
+				if(len > 0) STSPLOGBUFTOPIC(t,__tpic)->pl += (len-1);\
 			}\
 		}\
-		if(len > 0) STSPLOGBUFTOPIC(t,__tpic)->pl += (len-1);\
 	}\
 	while(0);\
 spl_mutex_unlock(__mtx__);\
