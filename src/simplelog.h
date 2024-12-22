@@ -102,6 +102,119 @@ extern "C" {
 
 		SPL_END_ERROR,
 	} SPL_LOG_ERR_CODE;
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+	typedef
+		struct __GENERIC_DATA__ {
+		int
+			total;
+		/*Total size*/
+		int
+			range;
+		/*Total size*/
+		int
+			pc;
+		/*Point to the current*/
+		int
+			pl;
+		/*Point to the last*/
+		char
+			data[0];
+		/*Generic data */
+	} generic_dta_st;
+
+#define spl_uchar			unsigned char
+#define spl_uint			unsigned int
+
+	typedef struct __spl_local_time_st__ {
+		spl_uint	year;
+		spl_uchar	month;
+		spl_uchar	day;
+		spl_uchar	hour;
+		spl_uchar	minute;
+		spl_uchar	sec;
+		//spl_uint	ms;						/*Millisecond*/
+		spl_uint	nn;						/*Nanosecond*/
+	} spl_local_time_st;
+
+#define SPL_TOPIC_SIZE		32
+
+	typedef
+		struct __SIMPLE_LOG_TOPIC_ST__ {
+		int
+			index;
+		/*Index of a topic*/
+		char
+			topic[SPL_TOPIC_SIZE];
+		/*Name of topic*/
+		generic_dta_st*
+			buf;
+		/*Buff for writing*/
+		int
+			fizize;
+		/*Size of file.*/
+		void*
+			fp;
+		/*File stream.*/
+	} SIMPLE_LOG_TOPIC_ST;
+
+	typedef
+		struct __SIMPLE_LOG_ST__ {
+		int
+			llevel;
+		int
+			file_limit_size;
+		/*Limitation of each log file. No nead SYNC.*/
+		int
+			buff_size;
+		/*Buffer size for each buffer. No nead SYNC.*/
+		int
+			index;
+		/*Index of default log, not in a topic. No nead SYNC.*/
+		char
+			folder[1024];
+		/*Path of genera folder. No nead SYNC.*/
+		char
+			off;
+		/*Must be sync*/
+		void*
+			mtx_rw;
+		/*mtx: Need to close handle*/
+//	void*
+//		mtx_off;				
+//		/*mtx_off: Need to close handle*/
+		void*
+			sem_rwfile;
+		/*sem_rwfile: Need to close handle*/
+		void*
+			sem_off;
+		/*sem_off: Need to close handle*/
+		spl_local_time_st
+			lc_time_now;
+		/*lc_time: Need to sync, free*/
+		FILE*
+			fp;
+		/*fp: Need to close*/
+
+		generic_dta_st*
+			buf;
+		/*buf: Must be sync, free*/
+		char*
+			topics;
+		/*topics: topics string. Must be freed */
+		int
+			n_topic;
+		/*Number of topics, SIMPLE_LOG_TOPIC_ST.*/
+		SIMPLE_LOG_TOPIC_ST*
+			arr_topic;
+		/*List od topics: SIMPLE_LOG_TOPIC_ST*.*/
+		int
+			renew;
+		/*In a thread of logger, NO NEED SYNC.*/
+		char
+			path_template[1024];
+		/*In a thread of logger, NO NEED SYNC.*/
+	} SIMPLE_LOG_ST;
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
 #define __FILLE__(__p__)	do { __p__ = strrchr(__FILE__, '/'); if(__p__) {++__p__;break;} \
 __p__ = strrchr(__FILE__, '\\'); if(__p__) {++__p__;break;}\
@@ -135,9 +248,9 @@ __p = spl_get_buf_ext(&range, &__ppl, &__isOof); if (__p && __ppl) { len = snpri
 "%s"___fmttt___"\n\n", pprefmt, ##__VA_ARGS__); \
 if(len > 0) (*__ppl) += (len -1);}\
 spl_mutex_unlock(__mtx__);\
-if(__isOof)break;if(!__p)spl_milli_sleep(10);\
+if(__p) break;if(__isOof)break;spl_milli_sleep(10);continue;\
 }\
-while(!__p);\
+while(1);\
 spl_rel_sem(spl_get_sem_rwfile()); if(pprefmt != tnow) { free(pprefmt);}}\
 }
 
