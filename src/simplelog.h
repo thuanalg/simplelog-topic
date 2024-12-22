@@ -228,17 +228,6 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 
 
 
-
-//#define __spl_log_buf__(___fmttt___, ...)	{int *__ppl = 0; char tnow[40]; int range=0; char* __p = 0; void *__mtx__ =  spl_get_mtx(); LLU thrid = spl_get_threadid();\
-//int len = 0;const char *pfn = 0; __FILLE__(pfn);; spl_fmt_now(tnow, 40);\
-//spl_mutex_lock(__mtx__);\
-//__p = spl_get_buf(&range, &__ppl); if (__p && __ppl) { len = snprintf((__p + (*__ppl)), range, \
-//"[%s] [tid: %llu] [%s:%s:%d] "___fmttt___"\n\n", \
-//tnow, thrid, pfn, __FUNCTION__, __LINE__, ##__VA_ARGS__); \
-//if(len > 0) (*__ppl) += (len -1);}\
-//spl_mutex_unlock(__mtx__); spl_rel_sem(spl_get_sem_rwfile());}
-
-
 #define SPLCHECKOFF(__t__)					__t__->off
 #define SPLCHECKBUF(__t__)					__t__->buf
 #define SLPCHECKRANGE(__t__)				((SPLCHECKBUF(__t__)->range > (SPLCHECKBUF(__t__)->pl)) ? (SPLCHECKBUF(__t__)->range - SPLCHECKBUF(__t__)->pl) : 0);
@@ -264,16 +253,6 @@ while(1);\
 spl_rel_sem(spl_get_sem_rwfile()); if(pprefmt != tnow) { free(pprefmt);}}\
 }
 
-
-
-//#define __spl_log_buf_topic__(__tpic, ___fmttt___, ...)	{int *__ppl = 0; char tnow[40]; int range=0; char* __p = 0; void *__mtx__ =  spl_get_mtx(); LLU thrid = spl_get_threadid();\
-//int len = 0; spl_fmt_now(tnow, 40);\
-//spl_mutex_lock(__mtx__);\
-//__p = spl_get_buf_topic(&range, &__ppl, (__tpic)); if (__p && __ppl) { len = snprintf((__p + (*__ppl)), range, \
-//"[%s] [tid:\t%llu]\t[%s:%d] "___fmttt___"\n\n", \
-//tnow, thrid, __FUNCTION__, __LINE__, ##__VA_ARGS__); \
-//if(len > 0) (*__ppl) += (len -1);}\
-//spl_mutex_unlock(__mtx__); spl_rel_sem(spl_get_sem_rwfile());}
 
 
 
@@ -343,62 +322,6 @@ spl_rel_sem(spl_get_sem_rwfile()); if(pprefmt != tnow) { free(pprefmt);}}\
 }
 
 
-
-//#define __spl_log_buf_level__(__lv__, ___fmttt___, ...)	{if(spl_get_log_levwel() <= (__lv__) )\
-//{std::string __c11fmt__="%s";__c11fmt__+=___fmttt___;__c11fmt__+="\n\n"; const char *__c11fmt_c_str__ = __c11fmt__.c_str();\
-//char __isOof = 0; char *pprefmt = 0; int *__ppl = 0; char tnow[SPL_RL_BUF]; int range=0; char* __p = 0; void *__mtx__ =  spl_get_mtx();;\
-//int len = 0;;const char *pfn = 0; __FILLE__(pfn);;\
-//pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__);\
-//do{\
-//spl_mutex_lock(__mtx__);\
-//__p = spl_get_buf_ext(&range, &__ppl, &__isOof); if (__p && __ppl) { len = snprintf((__p + (*__ppl)), range, \
-//__c11fmt_c_str__, pprefmt, ##__VA_ARGS__); \
-//if(len > 0) (*__ppl) += (len -1);}\
-//spl_mutex_unlock(__mtx__);\
-//if(__isOof)break;if(!__p)spl_milli_sleep(10);\
-//}\
-//while(!__p);\
-//spl_rel_sem(spl_get_sem_rwfile()); if(pprefmt != tnow) { free(pprefmt);}}\
-//}
-
-
-//#define __spl_log_buf_level__(__lv__, ___fmttt___, ...)	{if(spl_get_log_levwel() <= (__lv__) )\
-//{std::string __c11fmt__="%s";__c11fmt__+=___fmttt___;__c11fmt__+="\n\n"; const char *__c11fmt_c_str__ = __c11fmt__.c_str();\
-//char __isOof = 0; char *pprefmt = 0; int *__ppl = 0; char tnow[SPL_RL_BUF]; int range=0; char* __p = 0; void *__mtx__ =  spl_get_mtx();;\
-//int len = 0;;const char *pfn = 0; __FILLE__(pfn);;\
-//pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__);\
-//do{\
-//spl_mutex_lock(__mtx__);\
-//__p = spl_get_buf_ext(&range, &__ppl, &__isOof); if (__p && __ppl) { len = snprintf((__p + (*__ppl)), range, \
-//"__c11fmt_c_str__"); \
-//if(len > 0) (*__ppl) += (len -1);}\
-//spl_mutex_unlock(__mtx__);\
-//if(__isOof)break;if(!__p)spl_milli_sleep(10);\
-//}\
-//while(!__p);\
-//spl_rel_sem(spl_get_sem_rwfile()); if(pprefmt != tnow) { free(pprefmt);}}\
-//}
-
-
-
-
-
-//#define __spl_log_buf_topic_level__(__lv__, __tpic, ___fmttt___, ...)	{ if(spl_get_log_levwel() <= (__lv__) ) \
-//{std::string __c11fmt__="%s";__c11fmt__+=___fmttt___;__c11fmt__+="\n\n"; const char *__c11fmt_c_str__ = __c11fmt__.c_str();\
-//char __isOof = 0; char *pprefmt = 0;int *__ppl = 0; char tnow[SPL_RL_BUF]; int range=0; char* __p = 0; void *__mtx__ =  spl_get_mtx();;\
-//int len = 0;;const char *pfn = 0; __FILLE__(pfn);\
-//;pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__);;\
-//do{\
-//spl_mutex_lock(__mtx__);\
-//__p = spl_get_buf_topic_ext(&range, &__ppl, (__tpic), &__isOof); if (__p && __ppl) { len = snprintf((__p + (*__ppl)), range, \
-//__c11fmt_c_str__, pprefmt, ##__VA_ARGS__); \
-//if(len > 0) (*__ppl) += (len -1);}\
-//spl_mutex_unlock(__mtx__);\
-//if(__isOof)break;if(!__p)spl_milli_sleep(10);\
-//}\
-//while(!__p);\
-//spl_rel_sem(spl_get_sem_rwfile());if(pprefmt != tnow) { free(pprefmt);}}\
-//}
 
 #define SLPCHECKINDEX(__t__)	
 #define STSPLOGBUFTOPIC(__t__,__i__)				(&(__t__->arr_topic[__i__]))->buf
