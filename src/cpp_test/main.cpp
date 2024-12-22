@@ -21,7 +21,7 @@ int loop_count = 1000 * 1000;
 #define		TCONFIG_FILE						"--cfg="	
 #define		TLOOP_COUNT							"--loopcount="	
 
-int main(int argc, char* argv[]) {
+int main__(int argc, char* argv[]) {
 	int ret = 0, i = 0;
 	char cfgpath[1024];
 #ifndef UNIX_LINUX
@@ -130,7 +130,7 @@ void* posix_thread_routine(void* lpParam) {
 	return 0;
 }
 
-int main__() {
+int main() {
 	int ret = 0;
 	//int ret = spl_init_log((char *)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
 #ifndef UNIX_LINUX
@@ -138,10 +138,10 @@ int main__() {
 #else
 	ret = spl_init_log((char*)"simplelog.cfg");
 #endif
-	int count = 10;
+	int count = 7;
 	for (int i = 0; i < count; ++i) {
 		spllog(SPL_LOG_INFO, "test log : %d", i);
-		//spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sys");
+		spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sys");
 	}
 	spl_finish_log();
 	return 0;
