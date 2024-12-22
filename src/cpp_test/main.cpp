@@ -138,7 +138,7 @@ int main() {
 #else
 	ret = spl_init_log((char*)"simplelog.cfg");
 #endif
-	int count = 7;
+	int count = 100;
 	for (int i = 0; i < count; ++i) {
 		spllog(SPL_LOG_INFO, "test log : %d", i);
 		spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sys");
