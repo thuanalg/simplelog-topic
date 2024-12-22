@@ -24,6 +24,16 @@ int loop_count = 1000 * 1000;
 int main(int argc, char* argv[]) {
 	int ret = 0, i = 0;
 	char cfgpath[1024];
+	for (i = 1; i < argc; ++i) {
+		if (strstr(argv[i], TNUMBEER_OF_THREADS) == argv[i]) {
+			ret = sscanf(argv[i], TNUMBEER_OF_THREADS"%d", &num_threads);
+			continue;
+		}
+		if (strstr(argv[i], TLOOP_COUNT) == argv[i]) {
+			ret = sscanf(argv[i], TLOOP_COUNT"%d", &loop_count);
+			continue;
+		}
+	}
 #ifndef UNIX_LINUX
 	snprintf(cfgpath, 1024, "C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
 #else
@@ -31,13 +41,6 @@ int main(int argc, char* argv[]) {
 #endif
 	ret = spl_init_log(cfgpath);
 
-	for (i = 1; i < argc; ++i) {
-		char* pp = argv[i];
-		if (strstr(pp, TLOOP_COUNT) == pp) {
-			sscanf(pp, TLOOP_COUNT"%d", &loop_count);
-			continue;
-		}
-	}
 	spl_console_log("====================Main close: Start.\n");
 	dotest();
 	spl_console_log("==================Main close: End.\n");
@@ -130,7 +133,7 @@ void* posix_thread_routine(void* lpParam) {
 	return 0;
 }
 
-int __main() {
+int __main(int argc, char* argv[]) {
 	//int ret = spl_init_log((char *)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
 	int ret = spl_init_log((char*)"simplelog.cfg");
 	int count = 10;
