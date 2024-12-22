@@ -12,6 +12,7 @@
 *		<2024-Sep-12>
 *		<2024-Dec-18>
 *		<2024-Dec-20>
+*		<2024-Dec-22>
 * Decription:													
 *		The (only) main file to implement simple log.
 */
