@@ -196,6 +196,10 @@ static int
 	spl_fflush_err(int t, void *fpp);
 
 /*===========================================================================================================================*/
+SIMPLE_LOG_ST* spl_control_obj() {
+	return (SIMPLE_LOG_ST*)&__simple_log_static__;
+}
+/*===========================================================================================================================*/
 int spl_local_time_now(spl_local_time_st*stt) {
 	int ret = 0;
 #ifndef UNIX_LINUX

@@ -433,6 +433,9 @@ DLL_API_SIMPLE_LOG
 
 DLL_API_SIMPLE_LOG
 	LLU spl_milli_now();
+
+DLL_API_SIMPLE_LOG
+	SIMPLE_LOG_ST *spl_control_obj();
 //DLL_API_SIMPLE_LOG
 //	void splLockSpinlock(volatile long* p);
 //DLL_API_SIMPLE_LOG
