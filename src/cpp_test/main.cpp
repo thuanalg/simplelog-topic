@@ -130,13 +130,18 @@ void* posix_thread_routine(void* lpParam) {
 	return 0;
 }
 
-int __main() {
+int main__() {
+	int ret = 0;
 	//int ret = spl_init_log((char *)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
-	int ret = spl_init_log((char *)"simplelog.cfg");
+#ifndef UNIX_LINUX
+	ret = spl_init_log((char*)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
+#else
+	ret = spl_init_log((char*)"simplelog.cfg");
+#endif
 	int count = 10;
 	for (int i = 0; i < count; ++i) {
 		spllog(SPL_LOG_INFO, "test log : %d", i);
-		spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sys");
+		//spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sys");
 	}
 	spl_finish_log();
 	return 0;

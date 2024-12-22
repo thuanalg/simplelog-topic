@@ -238,17 +238,28 @@ tnow, thrid, pfn, __FUNCTION__, __LINE__, ##__VA_ARGS__); \
 if(len > 0) (*__ppl) += (len -1);}\
 spl_mutex_unlock(__mtx__); spl_rel_sem(spl_get_sem_rwfile());}
 
+
+#define SPLCHECKOFF(__t__)					__t__->off
+#define SPLCHECKBUF(__t__)					__t__->buf
+#define SLPCHECKRANGE(__t__)				((SPLCHECKBUF(__t__)->range > (SPLCHECKBUF(__t__)->pl)) ? (SPLCHECKBUF(__t__)->range - SPLCHECKBUF(__t__)->pl) : 0);
+
 #define __spl_log_buf_level__(__lv__, ___fmttt___, ...)	{if(spl_get_log_levwel() <= (__lv__) )\
-{char __isOof = 0; char *pprefmt = 0; int *__ppl = 0; char tnow[SPL_RL_BUF]; int range=0; char* __p = 0; void *__mtx__ =  spl_get_mtx();;\
-int len = 0;;const char *pfn = 0; __FILLE__(pfn);;\
-pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__);\
+{SIMPLE_LOG_ST *t = 0;int len = 0;;const char *pfn = 0;char __isOof = 0; char *pprefmt = 0;\
+ char tnow[SPL_RL_BUF];void *__mtx__ =  spl_get_mtx();;\
+ __FILLE__(pfn);;\
+pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__);t = spl_control_obj();\
 do{\
 spl_mutex_lock(__mtx__);\
-__p = spl_get_buf_ext(&range, &__ppl, &__isOof); if (__p && __ppl) { len = snprintf((__p + (*__ppl)), range, \
-"%s"___fmttt___"\n\n", pprefmt, ##__VA_ARGS__); \
-if(len > 0) (*__ppl) += (len -1);}\
+	do {\
+		if(SPLCHECKOFF(t)) { __isOof = 1; break;}\
+		if(SPLCHECKBUF(t)->range > SPLCHECKBUF(t)->pl) {\
+			len = snprintf((SPLCHECKBUF(t)->data + SPLCHECKBUF(t)->pl), SPLCHECKBUF(t)->range - SPLCHECKBUF(t)->pl, \
+				"%s"___fmttt___"\n\n", pprefmt, ##__VA_ARGS__);\
+			if(len > 0) SPLCHECKBUF(t)->pl += (len-1);\
+		}\
+	}while(0);\
 spl_mutex_unlock(__mtx__);\
-if(__p) break;if(__isOof)break;spl_milli_sleep(10);continue;\
+if(len > 0) break;if(__isOof)break;spl_milli_sleep(10);continue;\
 }\
 while(1);\
 spl_rel_sem(spl_get_sem_rwfile()); if(pprefmt != tnow) { free(pprefmt);}}\
