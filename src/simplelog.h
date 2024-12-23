@@ -197,6 +197,10 @@ extern "C" {
 			renew; /*In a thread of logger, NO NEED SYNC.*/
 		char
 			path_template[1024]; /*In a thread of logger, NO NEED SYNC.*/
+		int
+			ncpu; /*Number of CPU.*/
+		char
+			trigger_thread; /*Use trigger thread or not.*/
 	} SIMPLE_LOG_ST;
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
