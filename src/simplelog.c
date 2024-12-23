@@ -381,6 +381,11 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 			if (__simple_log_static__.ncpu < 1) {
 				__simple_log_static__.ncpu = 1;
 			}
+			//__simple_log_static__.arr_mtx
+			//#ifndef  UNIX_LINUX
+			//__simple_log_static__.arr_mtx
+			//#else
+			//#endif /*! UNIX_LINUX */ 
 			break;
 		}
 		if (strcmp(key, SPLOG_TRIGGER) == 0) {
