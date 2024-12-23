@@ -161,59 +161,42 @@ extern "C" {
 	typedef
 		struct __SIMPLE_LOG_ST__ {
 		int
-			llevel;
+			llevel; /*Level of log.*/
 		int
-			file_limit_size;
-		/*Limitation of each log file. No nead SYNC.*/
+			file_limit_size; /*Limitation of each log file. No nead SYNC.*/
 		int
-			buff_size;
-		/*Buffer size for each buffer. No nead SYNC.*/
+			buff_size; /*Buffer size for each buffer. No nead SYNC.*/
 		int
-			index;
-		/*Index of default log, not in a topic. No nead SYNC.*/
+			index; /*Index of default log, not in a topic. No nead SYNC.*/
 		char
-			folder[1024];
-		/*Path of genera folder. No nead SYNC.*/
+			folder[1024]; /*Path of genera folder. No nead SYNC.*/
 		char
-			off;
-		/*Must be sync*/
+			off; /*Must be sync*/
 		void*
-			mtx_rw;
-		/*mtx: Need to close handle*/
+			mtx_rw; /*mtx: Need to close handle*/
 //	void*
 //		mtx_off;				
 //		/*mtx_off: Need to close handle*/
 		void*
-			sem_rwfile;
-		/*sem_rwfile: Need to close handle*/
+			sem_rwfile; /*sem_rwfile: Need to close handle*/
 		void*
-			sem_off;
-		/*sem_off: Need to close handle*/
+			sem_off; /*sem_off: Need to close handle*/
 		spl_local_time_st
-			lc_time_now;
-		/*lc_time: Need to sync, free*/
+			lc_time_now; /*lc_time: Need to sync, free*/
 		FILE*
-			fp;
-		/*fp: Need to close*/
-
+			fp; /*fp: Need to close*/
 		generic_dta_st*
-			buf;
-		/*buf: Must be sync, free*/
+			buf; /*buf: Must be sync, free*/
 		char*
-			topics;
-		/*topics: topics string. Must be freed */
+			topics; /*topics: topics string. Must be freed */
 		int
-			n_topic;
-		/*Number of topics, SIMPLE_LOG_TOPIC_ST.*/
+			n_topic; /*Number of topics, SIMPLE_LOG_TOPIC_ST.*/
 		SIMPLE_LOG_TOPIC_ST*
-			arr_topic;
-		/*List od topics: SIMPLE_LOG_TOPIC_ST*.*/
+			arr_topic; /*List od topics: SIMPLE_LOG_TOPIC_ST*.*/
 		int
-			renew;
-		/*In a thread of logger, NO NEED SYNC.*/
+			renew; /*In a thread of logger, NO NEED SYNC.*/
 		char
-			path_template[1024];
-		/*In a thread of logger, NO NEED SYNC.*/
+			path_template[1024]; /*In a thread of logger, NO NEED SYNC.*/
 	} SIMPLE_LOG_ST;
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
