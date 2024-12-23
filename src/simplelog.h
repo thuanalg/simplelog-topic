@@ -175,8 +175,7 @@ extern "C" {
 		void*
 			mtx_rw; /*mtx: Need to close handle*/
 //	void*
-//		mtx_off;				
-//		/*mtx_off: Need to close handle*/
+//		mtx_off; /*mtx_off: Need to close handle*/
 		void*
 			sem_rwfile; /*sem_rwfile: Need to close handle*/
 		void*
