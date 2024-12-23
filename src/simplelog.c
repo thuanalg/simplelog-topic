@@ -306,9 +306,7 @@ int spl_set_off(int isoff) {
 int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 	int ret = SPL_NO_ERROR;
 	do {
-		if (buff[0] == '#') {
-			break;
-		}
+
 		if (strcmp(key, SPLOG_PATHFOLDR) == 0) {
 			if (!buff[0]) {
 				ret = SPL_INIT_PATH_FOLDER_EMPTY_ERROR;
