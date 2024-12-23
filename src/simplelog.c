@@ -154,8 +154,8 @@ static const char* __splog_pathfolder[] = {
 		SPLOG_LEVEL, 
 		SPLOG_BUFF_SIZE, 
 		SPLOG_ROT_SIZE, 
-		SPLOG_TOPIC, 
-		SPLOG_END_CFG,
+		SPLOG_TOPIC, SPLOG_NCPU, SPLOG_TRIGGER,
+		SPLOG_END_CFG, 
 		0 
 };
 
@@ -306,6 +306,9 @@ int spl_set_off(int isoff) {
 int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 	int ret = SPL_NO_ERROR;
 	do {
+		if (buff[0] == '#') {
+			break;
+		}
 		if (strcmp(key, SPLOG_PATHFOLDR) == 0) {
 			if (!buff[0]) {
 				ret = SPL_INIT_PATH_FOLDER_EMPTY_ERROR;
@@ -370,6 +373,22 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 			}
 			__simple_log_static__.n_topic = count;
 			__simple_log_static__.topics = p;
+			break;
+		}
+		if (strcmp(key, SPLOG_NCPU) == 0) {
+			int sz = 0;
+			int n = 0;
+			sz = sscanf(buff, "%d", &n);
+			__simple_log_static__.ncpu = n;
+			if (__simple_log_static__.ncpu < 1) {
+				__simple_log_static__.ncpu = 1;
+			}
+			break;
+		}
+		if (strcmp(key, SPLOG_TRIGGER) == 0) {
+			if (buff[0] != '0') {
+				__simple_log_static__.trigger_thread = 1;
+			}
 			break;
 		}
 		if (strcmp(key, SPLOG_END_CFG) == 0) {

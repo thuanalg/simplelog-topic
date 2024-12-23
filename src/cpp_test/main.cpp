@@ -133,7 +133,7 @@ void* posix_thread_routine(void* lpParam) {
 	return 0;
 }
 
-int main1(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
 	int ret = 0;
 	//int ret = spl_init_log((char *)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
 #ifndef UNIX_LINUX
@@ -153,7 +153,7 @@ int main1(int argc, char* argv[]) {
 #include <stdio.h>
 #include <windows.h>
 
-int main() {
+int __1main() {
 	//LARGE_INTEGER frequency;
 	LARGE_INTEGER counter;
 
