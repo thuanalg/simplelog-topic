@@ -88,6 +88,10 @@
 	"rotation_size="
 #define	SPLOG_TOPIC \
 	"topic="
+#define	SPLOG_NCPU \
+	"NCPU="
+#define	SPLOG_TRIGGER \
+	"trigger="
 #define	SPLOG_END_CFG \
 	"end_configuring="
 
