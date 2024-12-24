@@ -1805,17 +1805,23 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 	char* buffer = 0;
 	int total_buf_sz = 0;
 	generic_dta_st* tmpBuff = 0;
-	total_buf_sz = t->buff_size * (1 + t->n_topic);
+	total_buf_sz = t->buff_size * (1 + t->n_topic) * t->ncpu;
 	spl_malloc(total_buf_sz, buffer, char);
 	do {
 		if (!buffer) {
 			ret = SPL_LOG_TOPIC_BUFF_MEM;
 			break;
 		}
-		tmpBuff = (generic_dta_st*)buffer;
-		tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
-		tmpBuff->range = tmpBuff->total - sizeof(generic_dta_st);
-		t->buf = tmpBuff;
+		t->buf = buffer;
+		for (i = 0; i < t->ncpu; ++i) {
+			tmpBuff = (generic_dta_st*)(buffer + t->buff_size * i);
+			tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
+			tmpBuff->range = tmpBuff->total - sizeof(generic_dta_st);
+		}
+		//tmpBuff = (generic_dta_st*)buffer;
+		//tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
+		//tmpBuff->range = tmpBuff->total - sizeof(generic_dta_st);
+		//t->buf = tmpBuff;
 
 		if (!t->arr_topic) {
 			char* p0 = t->topics;
