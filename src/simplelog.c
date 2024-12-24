@@ -600,7 +600,6 @@ void* spl_mutex_create_arr(int n) {
 			/*https://linux.die.net/man/3/pthread_mutex_init*/
 			pthread_mutex_t* tmp = 0;
 			spl_malloc(sizeof(pthread_mutex_t), tmp, pthread_mutex_t);
-			//ret = malloc(sizeof(pthread_mutex_t));
 			if (!tmp) {
 				break;
 			}
