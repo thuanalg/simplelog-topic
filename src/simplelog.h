@@ -234,11 +234,11 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 {\
 /*spl_mutex_lock(t->mtx_rw); __isOof = SPLCHECKOFF(t); spl_mutex_unlock(t->mtx_rw);*/\
 do{\
-	/*if(__isOof)break;*/\
+	/*if(__isOof)break;*/;\
 	int len = 0;;const char *pfn = 0;;unsigned short r = 0;\
 	;__FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r);;r %= t->ncpu;\
 	spl_mutex_lock(t->arr_mtx[r]);\
-		/*do{*/\
+		/*do{*/;\
 			if(SPLKEYBUF(t, r)->range > SPLKEYBUF(t, r)->pl) {\
 				len = snprintf( SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl, SPLKEYBUF(t, r)->range - SPLKEYBUF(t, r)->pl, \
 					"%s"___fmttt___"\n\n", pprefmt, ##__VA_ARGS__); if(len > 0) SPLKEYBUF(t, r)->pl += (len -1);\
