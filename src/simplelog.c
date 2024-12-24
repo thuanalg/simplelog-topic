@@ -290,8 +290,10 @@ int spl_set_off(int isoff) {
 	
 	if (isoff) {
 		int errCode = 0;
+		//spl_milli_sleep( 1000);
 		spl_rel_sem(__simple_log_static__.sem_rwfile);
 #ifndef UNIX_LINUX
+		//spl_milli_sleep(100 * 1000);
 		//errCode = (int) WaitForSingleObject(__simple_log_static__.sem_off, 3 * 1000);
 		errCode = (int) WaitForSingleObject(__simple_log_static__.sem_off, INFINITE);
 #else
@@ -809,7 +811,9 @@ void* spl_written_thread_routine(void* lpParam)
 		if (!t->mtx_rw) {
 			exit(1);
 		}
-		//spl_console_log("Mutex: 0x%p.\n", t->mtx);
+		if (is_off) {
+			break;
+		}
 		while (1) {
 			if (is_off) {
 				break;
@@ -866,7 +870,8 @@ void* spl_written_thread_routine(void* lpParam)
 				for (i = 0; i < t->ncpu; ++i) {
 					spl_mutex_lock(t->arr_mtx[i]);
 					//do {
-						if (MYCASTGEN(st_buff[i])->pl) {
+						if (MYCASTGEN(st_buff[i])->pl > 0) {
+							int n = MYCASTGEN(st_buff[i])->pl;
 							memcpy(main_buff[i], st_buff[i], sizeof(generic_dta_st) + MYCASTGEN(st_buff[i])->pl);
 							MYCASTGEN(st_buff[i])->pl = 0;
 						}
@@ -876,7 +881,7 @@ void* spl_written_thread_routine(void* lpParam)
 
 				for (i = 0; i < t->ncpu; ++i) {
 					if (MYCASTGEN(main_buff[i])->pl > 0) {
-						k = (int)fwrite(MYCASTGEN(main_buff[i]), 1, MYCASTGEN(main_buff[i])->pl, t->fp);
+						k = (int)fwrite(MYCASTGEN(main_buff[i])->data, 1, MYCASTGEN(main_buff[i])->pl, t->fp);
 						MYCASTGEN(main_buff[i])->pl = 0;
 						sz += k;
 					}
@@ -940,9 +945,9 @@ void* spl_written_thread_routine(void* lpParam)
 
 		
 	} while (0);
-	spl_free(buffer);
-	spl_free(main_buff);
-	spl_free(st_buff);
+	//spl_free(buffer);
+	//spl_free(main_buff);
+	//spl_free(st_buff);
 	/*Send a signal to the waiting thread.*/
 	spl_rel_sem(__simple_log_static__.sem_rwfile);
 	spl_rel_sem(__simple_log_static__.sem_off);
@@ -987,7 +992,7 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 	char buff[20], buff1[20];
 	memset(buff, 0, 20);
 	memset(buff1, 0, 20);
-
+	spl_console_log("-----------------------=========================");
 	time_t t = time(0);
 	do {
 		memset(&stt, 0, sizeof(stt));
