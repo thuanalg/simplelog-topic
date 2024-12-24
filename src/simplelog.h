@@ -222,7 +222,7 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 
 
 
-#define SPLKEYBUF(__t__, __i__)				((generic_dta_st*)(__t__->buf + (t->buff_size * __i__)))
+#define SPLKEYBUF(__t__, __i__)				((generic_dta_st*)( (char*)__t__->buf + (t->buff_size * __i__)))
 #define SPLKEYMTX(__t__, __i__)				(__t__->arr_mtx[__i__])
 
 #define SPLCHECKOFF(__t__)					__t__->off
@@ -234,20 +234,20 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 {\
  char tnow[SPL_RL_BUF];unsigned short r = 0;;void *__mtx__ =  spl_get_mtx();;\
  __FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r);;r %= t->ncpu;\
-do{spl_console_log("----------------------------------------------__mtx__: %p", __mtx__);\
+do{;\
 	spl_mutex_lock(__mtx__); __isOof = SPLCHECKOFF(t); spl_mutex_unlock(__mtx__);\
 	/*---------*/\
-	if(__isOof)break;spl_console_log("----------------------------------------------__isOof: %d, SPLKEYMTX(t, r): %p", __isOof, SPLKEYMTX(t, r));\
+	if(__isOof)break;spl_console_log("----------------------------------------------__isOof: %d, SPLKEYMTX(t, r): %p, r: %d", __isOof, SPLKEYMTX(t, r), (int) r);\
 	/*---------*/\
-	spl_mutex_lock(SPLKEYMTX(t, r));\
-		/*do{*/\
+	spl_mutex_lock(t->arr_mtx[r]);\
+		/*do{*/spl_console_log("---------------------------------------------- t: %p, t->arr_mtx: %p, t->arr_mtx[r]: %p", t->arr_mtx[r], t->arr_mtx, t->arr_mtx[r]);\
 			if(SPLKEYBUF(t, r)->range > SPLKEYBUF(t, r)->pl) {\
 				len = snprintf( SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl, SPLKEYBUF(t, r)->range - SPLKEYBUF(t, r)->pl, \
 					"%s"___fmttt___"\n\n", pprefmt, ##__VA_ARGS__); if(len > 0) SPLKEYBUF(t, r)->pl += (len -1);\
 				spl_console_log("----------------------------------------------len: %d", len);\
 			}\
 		/*}while(0);*/\
-	spl_mutex_unlock(SPLKEYMTX(t, r));\
+	spl_mutex_unlock(t->arr_mtx[r]);\
 	/*---------*/\
 	if(len > 0) break;;spl_milli_sleep(10);continue;\
 }\
