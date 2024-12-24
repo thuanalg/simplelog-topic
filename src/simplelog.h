@@ -100,8 +100,13 @@ extern "C" {
 		SPL_LOG_TOPIC_FOPEN,
 		SPL_LOG_TOPIC_FLUSH,
 		SPL_LOG_TOPIC_BUFF_MEM,
+		SPL_LOG_ALOCK_NUM,
+		SPL_LOG_ALOCK_NULL,
 
 
+		
+		
+		
 		SPL_END_ERROR,
 	} SPL_LOG_ERR_CODE;
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/

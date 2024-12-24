@@ -546,9 +546,14 @@ int spl_mutex_del_arr(int n) {
 	SIMPLE_LOG_ST* t = &__simple_log_static__;
 	do {
 		if (n < 1) {
+			ret = SPL_LOG_ALOCK_NUM;
 			return ret;
 		}
-		ret = (void**)malloc(sizeof(void*) * n);
+		if (!t->arr_mtx) {
+			ret = SPL_LOG_ALOCK_NULL;
+			return ret;
+		}
+		//ret = (void**)malloc(sizeof(void*) * n);
 		for (i = 0; i < n; ++i) {
 #ifndef UNIX_LINUX
 #ifndef SPL_USING_SPIN_LOCK
@@ -559,30 +564,30 @@ int spl_mutex_del_arr(int n) {
 			//volatile long* tmp = 0;
 			//spl_malloc(sizeof(volatile long), tmp, volatile long);
 			//ret[i] = (void*)tmp;
-			free(t->arr_mtx[i]);
+			spl_free(t->arr_mtx[i]);
 #endif
 #else
 #ifndef SPL_USING_SPIN_LOCK
 			/*https://linux.die.net/man/3/pthread_mutex_init*/
-			pthread_mutex_t* tmp = 0;
-			spl_malloc(sizeof(pthread_mutex_t), tmp, pthread_mutex_t);
-			ret = malloc(sizeof(pthread_mutex_t));
-			if (!tmp) {
-				break;
-			}
-			memset(tmp, 0, sizeof(pthread_mutex_t));
-			pthread_mutex_init((pthread_mutex_t*)tmp, 0);
-			ret[i] = (void*)tmp;
+			//pthread_mutex_t* tmp = 0;
+			//spl_malloc(sizeof(pthread_mutex_t), tmp, pthread_mutex_t);
+			//ret = malloc(sizeof(pthread_mutex_t));
+			//if (!tmp) {
+			//	break;
+			//}
+			//memset(tmp, 0, sizeof(pthread_mutex_t));
+			//pthread_mutex_init((pthread_mutex_t*)tmp, 0);
+			//ret[i] = (void*)tmp;
 #else
-			pthread_spinlock_t* tmp = 0;
-			spl_malloc(sizeof(pthread_spinlock_t), tmp, pthread_spinlock_t);
-			pthread_spin_init((pthread_spinlock_t*)tmp, PTHREAD_PROCESS_PRIVATE);
-			ret[i] = (void*)tmp;
+			//pthread_spinlock_t* tmp = 0;
+			//spl_malloc(sizeof(pthread_spinlock_t), tmp, pthread_spinlock_t);
+			//pthread_spin_init((pthread_spinlock_t*)tmp, PTHREAD_PROCESS_PRIVATE);
+			//ret[i] = (void*)tmp;
 #endif
-			free(t->arr_mtx[i]);
+			spl_free(t->arr_mtx[i]);
 #endif 
 		}
-		free(t->arr_mtx);
+		spl_free(t->arr_mtx);
 	} while (0);
 	return ret = 0;
 }
