@@ -118,6 +118,7 @@
 
 
 #define				SPL_MEMO_PADDING				2048
+#define MYCASTGEN(__t__)	((generic_dta_st*)__t__)
 /*===========================================================================================================================*/
 #ifndef UNIX_LINUX
 	//DLL_API_SIMPLE_LOG
@@ -775,10 +776,24 @@ void* spl_written_thread_routine(void* lpParam)
 	char* buffer = 0;
 	int total_buf_sz = 0;
 	generic_dta_st* tmpBuff = 0;
-	total_buf_sz = t->buff_size * (1 + t->n_topic);
+	total_buf_sz = (t->buff_size * (1 + t->n_topic)) * t->ncpu;
 	spl_malloc(total_buf_sz, buffer, char);
 	register char is_off = 0;
 	register int i = 0;
+	char** main_buff = 0;
+	char** st_buff = 0;
+	//main_buff
+
+	spl_malloc(t->ncpu, main_buff, char*);
+	for (i = 0; i < t->ncpu; ++i) {
+		main_buff[i] = buffer + (t->buff_size * i);
+	}
+
+	spl_malloc(t->ncpu, st_buff, char*);
+	for (i = 0; i < t->ncpu; ++i) {
+		st_buff[i] = t->buf + (t->buff_size * i);
+	}
+
 	do {	
 		if (!buffer) {
 			ret = SPL_LOG_TOPIC_BUFF_MEM;
@@ -819,6 +834,7 @@ void* spl_written_thread_routine(void* lpParam)
 					spl_console_log("--spl_gen_topics, ret: %d --\n", ret);
 					continue;
 				}
+				/*
 				spl_mutex_lock(t->mtx_rw);
 				do {
 					is_off = t->off;
@@ -838,15 +854,43 @@ void* spl_written_thread_routine(void* lpParam)
 					}
 				} while (0);
 				spl_mutex_unlock(t->mtx_rw);
-				tmpBuff = (generic_dta_st*)buffer;
-				k = (int)fwrite(tmpBuff->data, 1, tmpBuff->pl, t->fp);
-				sz += k;
+				*/
+				//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+				spl_mutex_lock(t->mtx_rw);
+				//do {
+					is_off = t->off;
+				//} while (0);
+				spl_mutex_unlock(t->mtx_rw);
+
+				//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+				for (i = 0; i < t->ncpu; ++i) {
+					spl_mutex_lock(t->arr_mtx[i]);
+					//do {
+						if (MYCASTGEN(st_buff[i])->pl) {
+							memcpy(main_buff[i], st_buff[i], sizeof(generic_dta_st) + MYCASTGEN(st_buff[i])->pl);
+							MYCASTGEN(st_buff[i])->pl = 0;
+						}
+					//} while (0);
+					spl_mutex_unlock(t->arr_mtx[i]);
+				}
+
+				for (i = 0; i < t->ncpu; ++i) {
+					if (MYCASTGEN(main_buff[i])->pl > 0) {
+						k = (int)fwrite(MYCASTGEN(main_buff[i]), 1, MYCASTGEN(main_buff[i])->pl, t->fp);
+						MYCASTGEN(main_buff[i])->pl = 0;
+						sz += k;
+					}
+				}
+				//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+				//tmpBuff = (generic_dta_st*)buffer;
+				//k = (int)fwrite(tmpBuff->data, 1, tmpBuff->pl, t->fp);
+				//sz += k;
 
 				//err = SPL_FFLUSH((FILE *)(t->fp));
 
 				SPL_FFLUSH((t->fp), err);
 
-				tmpBuff->pl = 0;
+				//tmpBuff->pl = 0;
 				if (err) {
 					//TO-TEST
 					ret = SPL_LOG_TOPIC_FLUSH;
@@ -896,7 +940,8 @@ void* spl_written_thread_routine(void* lpParam)
 
 		spl_free(buffer);
 	} while (0);
-	
+	spl_free(main_buff);
+	spl_free(st_buff);
 	/*Send a signal to the waiting thread.*/
 	spl_rel_sem(__simple_log_static__.sem_rwfile);
 	spl_rel_sem(__simple_log_static__.sem_off);
