@@ -14,7 +14,7 @@
 #endif // !UNIX_LINUX
 
 void dotest();
-int num_threads = 10;
+int num_threads = 20;
 int loop_count = 1000 * 1000;
 
 #define		TNUMBEER_OF_THREADS					"--nthread="	
@@ -144,11 +144,9 @@ int main(int argc, char* argv[]) {
 	int count = 10;
 	//spl_milli_sleep(1000 * 10);
 	for (int i = 0; i < count; ++i) {
-		//srand(time(NULL));
 		spllog(SPL_LOG_INFO, "test log %d", i);
-		//spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sys");
 	}
-	spl_milli_sleep( 1000);
+	//spl_milli_sleep( 1000);
 	spl_finish_log();
 	//spl_milli_sleep(100 * 1000);
 	return 0;

@@ -878,7 +878,7 @@ void* spl_written_thread_routine(void* lpParam)
 				for (i = 0; i < t->ncpu; ++i) {
 					spl_mutex_lock(t->arr_mtx[i]);
 					//do {
-						generic_dta_st* yyyy = MYCASTGEN(st_buff[i]);
+						//generic_dta_st* yyyy = MYCASTGEN(st_buff[i]);
 						if (MYCASTGEN(st_buff[i])->pl > 0) {
 							int n = MYCASTGEN(st_buff[i])->pl;
 							memcpy(main_buff[i], st_buff[i], sizeof(generic_dta_st) + MYCASTGEN(st_buff[i])->pl);
@@ -1001,7 +1001,7 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 	char buff[20], buff1[20];
 	memset(buff, 0, 20);
 	memset(buff1, 0, 20);
-	spl_console_log("-----------------------=========================");
+	//spl_console_log("-----------------------=========================");
 	time_t t = time(0);
 	do {
 		memset(&stt, 0, sizeof(stt));
@@ -1856,7 +1856,7 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 					snprintf(t->arr_topic[i].topic, SPL_TOPIC_SIZE, "%s", p0);
 				}
 				else {
-					int n = p1 - p0;
+					int n = (int)(p1 - p0);
 					snprintf(t->arr_topic[i].topic, n + 1, "%s", p0);
 					p1++;
 					p0 = p1;
