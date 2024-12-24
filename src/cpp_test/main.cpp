@@ -141,7 +141,7 @@ int main(int argc, char* argv[]) {
 #else
 	ret = spl_init_log((char*)"simplelog.cfg");
 #endif
-	int count = 1000;
+	int count = 10;
 	for (int i = 0; i < count; ++i) {
 		srand(time(NULL));
 		spllog(SPL_LOG_INFO, "test log : %d, random: %d", i, rand()%8);
@@ -153,14 +153,14 @@ int main(int argc, char* argv[]) {
 #include <stdio.h>
 #include <windows.h>
 
-int __1main() {
+int main__01() {
 	//LARGE_INTEGER frequency;
 	LARGE_INTEGER counter;
 
 	// Query the performance frequency (ticks per second)
 	//if (QueryPerformanceFrequency(&frequency)) {
 		// Get the current value of the performance counter
-	for (int i = 0; i < 100; ++i) {
+	for (int i = 0; i < 10; ++i) {
 		QueryPerformanceCounter(&counter);
 
 		// Convert ticks to nanoseconds
@@ -168,13 +168,57 @@ int __1main() {
 		// counter.QuadPart gives the number of ticks that have passed since the system was booted
 		// To get nanoseconds, we calculate (counter * 10^9) / frequency
 		short nanoseconds = (counter.QuadPart & 0xFF );
-
-		printf("Current time in nanoseconds: %d\n", nanoseconds % 8);
+#ifdef DEBUG_MODE_0
+		printf("debug Current time in nanoseconds: %d\n", nanoseconds % 8);
+		//open trigger socket, subprogram
+		//socket(UDP, 20000);
+#else
+		printf("Current time in nanoseconds: %d\n", nanoseconds % 7);
+#endif
+		
 	}
-	//}
-	//else {
-	//	printf("QueryPerformanceFrequency failed!\n");
-	//}
+
 
 	return 0;
+}
+int quick_sort(int* arr, int n);
+int validate_quick_sort(int* arr, int n);
+int main____() {
+	LARGE_INTEGER counter;
+	int arr[10];
+	////......
+	//arr = (int*)malloc(sizeof(int) * n);
+	//if (!arr) {
+	//	exit(1);
+	//}
+	for (int i = 0; i < 10; i++)
+	{
+		int tmp = 0;
+		QueryPerformanceCounter(&counter);
+		tmp = (counter.QuadPart & 0xFF)%7;
+		arr[i] = tmp;
+	}
+	quick_sort(arr, 10);
+#ifdef VALIDATE
+	int ret = validate_quick_sort(arr, 10);
+	if (ret) {
+		fprintf(stderr, "sort err at: %d\n", ret - 1);
+	}
+#endif
+	return 0;
+}
+
+int quick_sort(int* arr, int n) {
+	return 0;
+}
+
+int validate_quick_sort(int* arr, int n) {
+	int ret = 0;
+	for (int i = 0; i < n - 1; ++i) {
+		if (arr[i] > arr[i + 1]) {
+			ret = i + 1;
+			break;
+		}
+	}
+	return ret;
 }

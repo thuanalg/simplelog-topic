@@ -201,12 +201,8 @@ extern "C" {
 			ncpu; /*Number of CPU.*/
 		char
 			trigger_thread; /*Use trigger thread or not.*/
-#ifndef  UNIX_LINUX
-		volatile long*
-#else
-		pthread_spinlock_t*
-#endif /*! UNIX_LINUX */ 
-			arr_mtx; /*Use trigger thread or not.*/
+		void	
+			**arr_mtx; /*Use trigger thread or not.*/
 	} SIMPLE_LOG_ST;
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
