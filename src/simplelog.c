@@ -227,7 +227,9 @@ int spl_local_time_now(spl_local_time_st*stt) {
 			break;
 		}
 #ifndef UNIX_LINUX
+		LARGE_INTEGER counter;
 		GetLocalTime(&lt);
+		QueryPerformanceCounter(&counter);
 		stt->year = (unsigned int) lt.wYear;
 		stt->month = (unsigned char)lt.wMonth;
 		stt->day = (unsigned char)lt.wDay;
@@ -236,7 +238,7 @@ int spl_local_time_now(spl_local_time_st*stt) {
 		stt->minute = (unsigned char)lt.wMinute;
 		stt->sec = (unsigned char)lt.wSecond;
 		//stt->ms = (unsigned int)lt.wMilliseconds;
-		stt->nn = (unsigned int)lt.wMilliseconds * 1000000;
+		stt->nn = (unsigned int)lt.wMilliseconds * 1000000 + counter.QuadPart%1000000;
 #else
 /* https://linux.die.net/man/3/localtime*/
 /* https://linux.die.net/man/3/clock_gettime*/
