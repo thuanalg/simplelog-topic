@@ -786,12 +786,12 @@ void* spl_written_thread_routine(void* lpParam)
 	char** st_buff = 0;
 	//main_buff
 
-	spl_malloc(t->ncpu, main_buff, char*);
+	spl_malloc(t->ncpu * sizeof( char*), main_buff, char*);
 	for (i = 0; i < t->ncpu; ++i) {
 		main_buff[i] = buffer + (t->buff_size * i);
 	}
 
-	spl_malloc(t->ncpu, st_buff, char*);
+	spl_malloc(t->ncpu * sizeof(char*), st_buff, char*);
 	for (i = 0; i < t->ncpu; ++i) {
 		st_buff[i] = t->buf + (t->buff_size * i);
 	}
@@ -945,9 +945,9 @@ void* spl_written_thread_routine(void* lpParam)
 
 		
 	} while (0);
-	//spl_free(buffer);
-	//spl_free(main_buff);
-	//spl_free(st_buff);
+	spl_free(buffer);
+	spl_free(main_buff);
+	spl_free(st_buff);
 	/*Send a signal to the waiting thread.*/
 	spl_rel_sem(__simple_log_static__.sem_rwfile);
 	spl_rel_sem(__simple_log_static__.sem_off);
