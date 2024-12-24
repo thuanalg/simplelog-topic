@@ -224,6 +224,7 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 
 #define SPLKEYBUF(__t__, __i__)				((generic_dta_st*)(__t__->buf + (t->buff_size * __i__)))
 #define SPLKEYMTX(__t__, __i__)				(__t__->arr_mtx[__i__])
+
 #define SPLCHECKOFF(__t__)					__t__->off
 #define SPLCHECKBUF(__t__)					__t__->buf
 #define SLPCHECKRANGE(__t__)				((SPLCHECKBUF(__t__)->range > (SPLCHECKBUF(__t__)->pl)) ? (SPLCHECKBUF(__t__)->range - SPLCHECKBUF(__t__)->pl) : 0);
@@ -233,15 +234,7 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
  char tnow[SPL_RL_BUF];unsigned short r = 0;;void *__mtx__ =  spl_get_mtx();;\
  __FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r);;r %= t->ncpu;t = spl_control_obj();\
 do{\
-	spl_mutex_lock(__mtx__);\
-	\
-		__isOof = SPLCHECKOFF(t);\
-		/*if(SPLCHECKBUF(t)->range > SPLCHECKBUF(t)->pl) {\
-			len = snprintf((SPLCHECKBUF(t)->data + SPLCHECKBUF(t)->pl), SPLCHECKBUF(t)->range - SPLCHECKBUF(t)->pl, \
-				"%s"___fmttt___"\n\n", pprefmt, ##__VA_ARGS__);\
-			if(len > 0) SPLCHECKBUF(t)->pl += (len-1);\
-		}*/\
-	spl_mutex_unlock(__mtx__);\
+	spl_mutex_lock(__mtx__); __isOof = SPLCHECKOFF(t); spl_mutex_unlock(__mtx__);\
 	/*---------*/\
 	if(__isOof)break;\
 	/*---------*/\
