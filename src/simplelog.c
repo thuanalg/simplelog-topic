@@ -566,9 +566,9 @@ int spl_mutex_del_arr(int n) {
 	#else
 			spl_free(t->arr_mtx[i]);
 	#endif
-	#else
+#else
 			spl_free(t->arr_mtx[i]);
-	#endif 
+#endif 
 		}
 		spl_free(t->arr_mtx);
 	} while (0);
@@ -600,7 +600,7 @@ void* spl_mutex_create_arr(int n) {
 			/*https://linux.die.net/man/3/pthread_mutex_init*/
 			pthread_mutex_t* tmp = 0;
 			spl_malloc(sizeof(pthread_mutex_t), tmp, pthread_mutex_t);
-			ret = malloc(sizeof(pthread_mutex_t));
+			//ret = malloc(sizeof(pthread_mutex_t));
 			if (!tmp) {
 				break;
 			}
@@ -632,7 +632,6 @@ void* spl_mutex_create() {
 #ifndef SPL_USING_SPIN_LOCK
 	/*https://linux.die.net/man/3/pthread_mutex_init*/
 		spl_malloc(sizeof(pthread_mutex_t), ret, void);
-		//ret = malloc(sizeof(pthread_mutex_t));
 		if (!ret) {
 			break;
 		}
