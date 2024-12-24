@@ -784,16 +784,23 @@ void* spl_written_thread_routine(void* lpParam)
 	register int i = 0;
 	char** main_buff = 0;
 	char** st_buff = 0;
+	generic_dta_st* yyyy = 0;
 	//main_buff
 
 	spl_malloc(t->ncpu * sizeof( char*), main_buff, char*);
 	for (i = 0; i < t->ncpu; ++i) {
-		main_buff[i] = buffer + (t->buff_size * i);
+		int kk = t->buff_size * i;
+		main_buff[i] = buffer + kk;
+		yyyy = MYCASTGEN(main_buff[i]);
+		int k = 0;
 	}
 
 	spl_malloc(t->ncpu * sizeof(char*), st_buff, char*);
 	for (i = 0; i < t->ncpu; ++i) {
-		st_buff[i] = t->buf + (t->buff_size * i);
+		int kk = t->buff_size * i;
+		st_buff[i] = ((char*)t->buf) + kk;
+		yyyy = MYCASTGEN(st_buff[i]);
+		int k;
 	}
 
 	do {	
@@ -870,6 +877,7 @@ void* spl_written_thread_routine(void* lpParam)
 				for (i = 0; i < t->ncpu; ++i) {
 					spl_mutex_lock(t->arr_mtx[i]);
 					//do {
+						generic_dta_st* yyyy = MYCASTGEN(st_buff[i]);
 						if (MYCASTGEN(st_buff[i])->pl > 0) {
 							int n = MYCASTGEN(st_buff[i])->pl;
 							memcpy(main_buff[i], st_buff[i], sizeof(generic_dta_st) + MYCASTGEN(st_buff[i])->pl);
@@ -1810,7 +1818,7 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 	char* buffer = 0;
 	int total_buf_sz = 0;
 	generic_dta_st* tmpBuff = 0;
-	total_buf_sz = t->buff_size * (1 + t->n_topic) * t->ncpu;
+	total_buf_sz = (t->buff_size * t->ncpu) * (1 + t->n_topic) ;
 	spl_malloc(total_buf_sz, buffer, char);
 	do {
 		if (!buffer) {
@@ -1819,9 +1827,11 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 		}
 		t->buf = buffer;
 		for (i = 0; i < t->ncpu; ++i) {
-			tmpBuff = (generic_dta_st*)(buffer + t->buff_size * i);
+			int kkkv = t->buff_size * i;
+			tmpBuff = (generic_dta_st*)(buffer + kkkv);
 			tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
-			tmpBuff->range = tmpBuff->total - sizeof(generic_dta_st);
+			tmpBuff->range = tmpBuff->total - sizeof(generic_dta_st) - i;
+			int kkk = 0;
 		}
 		//tmpBuff = (generic_dta_st*)buffer;
 		//tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
