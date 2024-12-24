@@ -1529,7 +1529,6 @@ void spl_sleep(unsigned int sec) {
 void spl_milli_sleep(unsigned int mill_sec) {
 #ifndef UNIX_LINUX
 	Sleep(((DWORD)(mill_sec)));
-	spl_console_log("-------------------");
 #else
 	usleep(mill_sec * 1000);
 #endif 
