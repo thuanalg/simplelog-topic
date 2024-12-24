@@ -787,21 +787,22 @@ void* spl_written_thread_routine(void* lpParam)
 	generic_dta_st* yyyy = 0;
 	//main_buff
 
+	spl_malloc(t->ncpu * sizeof(char*), st_buff, char*);
+	for (i = 0; i < t->ncpu; ++i) {
+		char* p = (char*)t->buf;
+		st_buff[i] = p + t->buff_size * i;
+		//yyyy = MYCASTGEN(st_buff[i]);
+		//int k = 0;
+	}
+
 	spl_malloc(t->ncpu * sizeof( char*), main_buff, char*);
 	for (i = 0; i < t->ncpu; ++i) {
-		int kk = t->buff_size * i;
-		main_buff[i] = buffer + kk;
+		main_buff[i] = buffer + t->buff_size * i;
 		yyyy = MYCASTGEN(main_buff[i]);
 		int k = 0;
 	}
 
-	spl_malloc(t->ncpu * sizeof(char*), st_buff, char*);
-	for (i = 0; i < t->ncpu; ++i) {
-		int kk = t->buff_size * i;
-		st_buff[i] = ((char*)t->buf) + kk;
-		yyyy = MYCASTGEN(st_buff[i]);
-		int k;
-	}
+
 
 	do {	
 		if (!buffer) {
