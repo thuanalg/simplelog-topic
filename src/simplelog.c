@@ -974,7 +974,8 @@ int spl_simple_log_thread(SIMPLE_LOG_ST* t) {
 	return ret;
 }
 /*===========================================================================================================================*/
-char* spl_fmt_now_ext(char* fmtt, int len, int lv, const char* filename, const char* funcname, int  line)
+char* spl_fmt_now_ext(char* fmtt, int len, int lv, 
+	const char* filename, const char* funcname, int  line, unsigned short *r)
 {
 	char* p = fmtt;
 	int ret = 0;
@@ -993,6 +994,9 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv, const char* filename, const c
 		ret = spl_local_time_now(&stt);
 		if (ret) {
 			break;
+		}
+		if (r) {
+			*r = (stt.nn & 0xFFFF);
 		}
 		if (!fmtt) {
 			ret = (int)SPL_LOG_FMT_NULL_ERROR;

@@ -139,7 +139,6 @@ extern "C" {
 		spl_uchar	hour;
 		spl_uchar	minute;
 		spl_uchar	sec;
-		//spl_uint	ms;						/*Millisecond*/
 		spl_uint	nn;						/*Nanosecond*/
 	} spl_local_time_st;
 
@@ -229,8 +228,8 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 
 #define __spl_log_buf_level__(__lv__, ___fmttt___, ...)	{if(spl_get_log_levwel() <= (__lv__) )\
 {SIMPLE_LOG_ST *t = 0;int len = 0;;const char *pfn = 0;char __isOof = 0; char *pprefmt = 0;\
- char tnow[SPL_RL_BUF];void *__mtx__ =  spl_get_mtx();;\
- __FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__);t = spl_control_obj();\
+ char tnow[SPL_RL_BUF];unsigned short r = 0;;void *__mtx__ =  spl_get_mtx();;\
+ __FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r);t = spl_control_obj();\
 do{\
 spl_mutex_lock(__mtx__);\
 	do {\
@@ -256,9 +255,9 @@ spl_rel_sem(spl_get_sem_rwfile()); if(pprefmt != tnow) { free(pprefmt);}}\
 #define STSPLOGBUFTOPIC(__t__,__i__)				(&(__t__->arr_topic[__i__]))->buf
 
 #define __spl_log_buf_topic_level__(__lv__, __tpic, ___fmttt___, ...)	{ if(spl_get_log_levwel() <= (__lv__) ) \
-{int len = 0;;const char *pfn = 0;SIMPLE_LOG_ST *t = 0;char __isbrf = 0; char *pprefmt = 0;; char tnow[SPL_RL_BUF];; void *__mtx__ =  spl_get_mtx();;\
+{int len = 0;unsigned short r = 0;;const char *pfn = 0;SIMPLE_LOG_ST *t = 0;char __isbrf = 0; char *pprefmt = 0;; char tnow[SPL_RL_BUF];; void *__mtx__ =  spl_get_mtx();;\
 ; __FILLE__(pfn);t = spl_control_obj();\
-;pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__);;\
+;pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r);;\
 do{\
 if (__tpic < 0 || ((__tpic + 1) > t->n_topic)){ __isbrf = 1; break;}/*they are constant.*/\
 spl_mutex_lock(__mtx__);\
@@ -297,9 +296,9 @@ fprintf(stdout, __c11fmt__.c_str(), buf, pfn, __FUNCTION__, __LINE__, spl_get_th
 
 #define __spl_log_buf_level__(__lv__, ___fmttt___, ...)	{if(spl_get_log_levwel() <= (__lv__) )\
 {std::string __c11fmt__="%s";__c11fmt__+=___fmttt___;__c11fmt__+="\n\n"; const char *__c11fmt_c_str__ = __c11fmt__.c_str();\
-;SIMPLE_LOG_ST *t = 0;int len = 0;;const char *pfn = 0;char __isOof = 0; char *pprefmt = 0;\
+;SIMPLE_LOG_ST *t = 0;unsigned short r = 0;int len = 0;;const char *pfn = 0;char __isOof = 0; char *pprefmt = 0;\
  char tnow[SPL_RL_BUF];void *__mtx__ =  spl_get_mtx();;\
- __FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__);t = spl_control_obj();\
+ __FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r);t = spl_control_obj();\
 do{\
 spl_mutex_lock(__mtx__);\
 	do {\
@@ -324,9 +323,9 @@ spl_rel_sem(spl_get_sem_rwfile()); if(pprefmt != tnow) { free(pprefmt);}}\
 
 #define __spl_log_buf_topic_level__(__lv__, __tpic, ___fmttt___, ...)	{ if(spl_get_log_levwel() <= (__lv__) ) \
 {std::string __c11fmt__="%s";__c11fmt__+=___fmttt___;__c11fmt__+="\n\n"; const char *__c11fmt_c_str__ = __c11fmt__.c_str();\
-int len = 0;;const char *pfn = 0;SIMPLE_LOG_ST *t = 0;char __isbrf = 0; char *pprefmt = 0;; char tnow[SPL_RL_BUF];; void *__mtx__ =  spl_get_mtx();;\
+;unsigned short r = 0;int len = 0;;const char *pfn = 0;SIMPLE_LOG_ST *t = 0;char __isbrf = 0; char *pprefmt = 0;; char tnow[SPL_RL_BUF];; void *__mtx__ =  spl_get_mtx();;\
 ; __FILLE__(pfn);t = spl_control_obj();\
-;pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__);;\
+;pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r);;\
 do{\
 if (__tpic < 0 || ((__tpic + 1) > t->n_topic)){ __isbrf = 1; break;}/*they are constant.*/\
 spl_mutex_lock(__mtx__);\
@@ -388,7 +387,7 @@ DLL_API_SIMPLE_LOG int
 
 DLL_API_SIMPLE_LOG char *
 	spl_fmt_now_ext(char* fmtt, int len, int lv, 
-		const char *filename, const char* funcname, int  line);
+		const char *filename, const char* funcname, int  line, unsigned short* r);
 
 DLL_API_SIMPLE_LOG int									
 	spl_fmmt_now(char* fmtt, int len);
