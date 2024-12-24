@@ -239,12 +239,12 @@ do{\
 	if(__isOof)break;\
 	/*---------*/\
 	spl_mutex_lock(SPLKEYMTX(t, r));\
-		do{\
+		/*do{*/\
 			if(SPLKEYBUF(t, r)->range > SPLKEYBUF(t, r)->pl) {\
 				len = snprintf( SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl, SPLKEYBUF(t, r)->range - SPLKEYBUF(t, r)->pl, \
 					"%s"___fmttt___"\n\n", pprefmt, ##__VA_ARGS__);\
 			}\
-		}while(0);\
+		/*}while(0);*/\
 	spl_mutex_unlock(SPLKEYMTX(t, r));\
 	/*---------*/\
 	if(len > 0) break;;spl_milli_sleep(10);continue;\
