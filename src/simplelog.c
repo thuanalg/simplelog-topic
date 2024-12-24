@@ -938,8 +938,9 @@ void* spl_written_thread_routine(void* lpParam)
 			spl_mutex_unlock(t->mtx_rw);
 		}
 
-		spl_free(buffer);
+		
 	} while (0);
+	spl_free(buffer);
 	spl_free(main_buff);
 	spl_free(st_buff);
 	/*Send a signal to the waiting thread.*/
