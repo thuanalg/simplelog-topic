@@ -220,5 +220,6 @@ int validate_quick_sort(int* arr, int n) {
 			break;
 		}
 	}
+	spl_console_log("jhgfjgf");
 	return ret;
 }

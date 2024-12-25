@@ -237,6 +237,7 @@ do{\
 	/*if(__isOof)break;*/;\
 	int len = 0;;const char *pfn = 0;;unsigned short r = 0;\
 	;__FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r);;r %= t->ncpu;\
+	spl_console_log("t->arr_mtx[%d]: %p", (int)r, t->arr_mtx[r])\
 	spl_mutex_lock(t->arr_mtx[r]);\
 		/*do{*/;\
 			if(SPLKEYBUF(t, r)->range > SPLKEYBUF(t, r)->pl) {\
