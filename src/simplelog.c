@@ -882,7 +882,7 @@ void* spl_written_thread_routine(void* lpParam)
 				for (i = 0; i < t->ncpu; ++i) {
 					spl_mutex_lock(t->arr_mtx[i]);
 					//do {
-						yyyy = MYCASTGEN(st_buff[i]);
+						//yyyy = MYCASTGEN(st_buff[i]);
 						if (MYCASTGEN(st_buff[i])->pl > 0) {
 							int n = MYCASTGEN(st_buff[i])->pl;
 							memcpy(main_buff[i], st_buff[i], sizeof(generic_dta_st) + MYCASTGEN(st_buff[i])->pl);
@@ -893,7 +893,7 @@ void* spl_written_thread_routine(void* lpParam)
 				}
 				//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 				for (i = 0; i < t->ncpu; ++i) {
-					yyyy = MYCASTGEN(main_buff[i]);
+					//yyyy = MYCASTGEN(main_buff[i]);
 					if (MYCASTGEN(main_buff[i])->pl > 0) {
 						k = (int)fwrite(MYCASTGEN(main_buff[i])->data, 1, MYCASTGEN(main_buff[i])->pl, t->fp);
 						MYCASTGEN(main_buff[i])->pl = 0;
