@@ -1360,8 +1360,8 @@ int spl_finish_log() {
 /*https://linux.die.net/man/3/SPL_sem_destroy
 //https://linux.die.net/man/3/pthread_mutex_init*/
 #ifndef SPL_USING_SPIN_LOCK
-	SPL_pthread_mutex_destroy(__simple_log_static__.mtx, err);
-	spl_free(__simple_log_static__.mtx);
+	SPL_pthread_mutex_destroy(__simple_log_static__.mtx_rw, err);
+	spl_free(__simple_log_static__.mtx_rw);
 #else
 	//Don't need free
 #endif
