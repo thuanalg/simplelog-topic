@@ -235,9 +235,9 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 /*spl_mutex_lock(t->mtx_rw); __isOof = SPLCHECKOFF(t); spl_mutex_unlock(t->mtx_rw);*/\
 do{\
 	/*if(__isOof)break;*/;\
-	int len = 0;;const char *pfn = 0;;unsigned short r = 0;\
+	int len = 0;;const char *pfn = 0;;unsigned short r = 0;spl_console_log("==============t: %p", t);\
 	;__FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r);;r %= t->ncpu;\
-	spl_console_log("t->arr_mtx[%d]: %p", (int)r, t->arr_mtx[r])\
+	spl_console_log("t->arr_mtx[%d]: %p", (int)r, t->arr_mtx[r]);\
 	spl_mutex_lock(t->arr_mtx[r]);\
 		/*do{*/;\
 			if(SPLKEYBUF(t, r)->range > SPLKEYBUF(t, r)->pl) {\
