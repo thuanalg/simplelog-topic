@@ -234,11 +234,9 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 		;;/*char __isOof = 0;*/ ;\
 		char tnow[SPL_RL_BUF]; char *pprefmt = 0; ;SIMPLE_LOG_ST *t = spl_control_obj();\
 		{\
-			\
+			int len = 0;;const char *pfn = 0;;unsigned short r = 0;\
+			;__FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r);;r %= t->ncpu;\
 			do{\
-				;\
-				int len = 0;;const char *pfn = 0;;unsigned short r = 0;;;\
-				;__FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r);;r %= t->ncpu;\
 				;;\
 				spl_mutex_lock(t->arr_mtx[r]);\
 					;\
@@ -270,30 +268,31 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 { \
 	if(spl_get_log_levwel() <= (__lv__) ) \
 	{\
-	;int len = 0;unsigned short r = 0;;const char *pfn = 0;SIMPLE_LOG_ST *t = 0;char __isbrf = 0; char *pprefmt = 0;; char tnow[SPL_RL_BUF];;;\
-	; __FILLE__(pfn);t = spl_control_obj();\
-	;pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r);;r %= t->ncpu;\
-	do\
-	{\
-		/*they are constant.*/\
-		spl_mutex_lock(t->arr_mtx[r]);\
-			do \
-			{\
-				if(t->arr_topic){\
-					if(STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->range > STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl) {\
-						len = snprintf(STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->data + STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl, \
-							STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->range - STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl, \
-							"%s"___fmttt___"\n\n", pprefmt,##__VA_ARGS__);\
-						if(len > 0) STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl += (len-1);\
+		;int len = 0;unsigned short r = 0;;const char *pfn = 0;SIMPLE_LOG_ST *t = 0;char __isbrf = 0; char *pprefmt = 0;; char tnow[SPL_RL_BUF];;;\
+		; __FILLE__(pfn);t = spl_control_obj();\
+		;pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r);;r %= t->ncpu;\
+		do\
+		{\
+			/*they are constant.*/\
+			spl_mutex_lock(t->arr_mtx[r]);\
+				do \
+				{\
+					if(t->arr_topic){\
+						if(STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->range > STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl) {\
+							len = snprintf(STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->data + STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl, \
+								STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->range - STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl, \
+								"%s"___fmttt___"\n\n", pprefmt,##__VA_ARGS__);\
+							if(len > 0) STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl += (len-1);\
+						}\
 					}\
 				}\
-			}\
-			while(0);\
-		spl_mutex_unlock(t->arr_mtx[r]);\
-		if(len > 0) break;if(__isbrf)break;spl_milli_sleep(10);continue;\
+				while(0);\
+			spl_mutex_unlock(t->arr_mtx[r]);\
+			if(len > 0) break;if(__isbrf)break;spl_milli_sleep(10);continue;\
+		}\
+		while(1);\
+		if(!t->trigger_thread)spl_rel_sem(t->sem_rwfile);;if(pprefmt != tnow) { free(pprefmt);}\
 	}\
-	while(1);\
-	if(!t->trigger_thread)spl_rel_sem(t->sem_rwfile);;if(pprefmt != tnow) { free(pprefmt);}}\
 }
 
 
