@@ -250,7 +250,7 @@ do{\
 	if(len > 0) break;;spl_milli_sleep(10);continue;\
 }\
 while(1);\
-spl_rel_sem(spl_get_sem_rwfile()); if(pprefmt != tnow) { free(pprefmt);}}\
+if(!t->trigger_thread)spl_rel_sem(t->sem_rwfile); if(pprefmt != tnow) { free(pprefmt);}}\
 }\
 }
 

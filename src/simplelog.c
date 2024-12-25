@@ -135,7 +135,7 @@
 #endif
 /*===========================================================================================================================*/
 
-
+typedef void* (*THREAD_ROUTINE)(void*);
 
 typedef enum 
 __CHANGE_NAME_E__ {
@@ -209,6 +209,10 @@ static void*
 static int
 	spl_mutex_del_arr(int n);
 
+static int 
+	spl_create_thread(THREAD_ROUTINE f, void* arg);
+static void*
+	spl_trigger_routine(void* arg);
 /*===========================================================================================================================*/
 SIMPLE_LOG_ST* spl_control_obj() {
 	return (SIMPLE_LOG_ST*)&__simple_log_static__;
@@ -802,9 +806,9 @@ void* spl_written_thread_routine(void* lpParam)
 		yyyy = MYCASTGEN(main_buff[i]);
 		int k = 0;
 	}
-
-
-
+	if (t->trigger_thread > 0) {
+		spl_create_thread(spl_trigger_routine, t);
+	}
 	do {	
 		if (!buffer) {
 			ret = SPL_LOG_TOPIC_BUFF_MEM;
@@ -1827,7 +1831,7 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 			ret = SPL_LOG_TOPIC_BUFF_MEM;
 			break;
 		}
-		t->buf = buffer;
+		t->buf = (generic_dta_st*)buffer;
 		for (i = 0; i < t->ncpu; ++i) {
 			int kkkv = t->buff_size * i;
 			tmpBuff = (generic_dta_st*)(buffer + kkkv);
@@ -1930,10 +1934,42 @@ void splUnlockSpinlock(volatile long* p) {
 #else
 #endif
 /*===========================================================================================================================*/
+
+
+
+void* spl_trigger_routine(void* arg)
+{
+	SIMPLE_LOG_ST* t = (SIMPLE_LOG_ST*)arg;
+	while (1) {
+		spl_rel_sem(t->sem_rwfile);
+		spl_milli_sleep(t->trigger_thread);
+	}
+}
+/*===========================================================================================================================*/
+
+
+int spl_create_thread(THREAD_ROUTINE f, void* arg) {
+	int ret = 0;
+#ifndef UNIX_LINUX
+	DWORD dwThreadId = 0;
+	HANDLE hThread = 0;
+	hThread = CreateThread(NULL, 0, f, arg, 0, &dwThreadId);
+	if (!hThread) {
+		ret = 1;
+	}
+#else
+	pthread_t tidd = 0;
+	ret = pthread_create(&tidd, 0, f, 0);
+	if (ret) {
+		//
+	}
+#endif
+	return ret;
+}
+/*===========================================================================================================================*/
 #ifndef UNIX_LINUX
 #else
 #endif
-/*===========================================================================================================================*/
 /*===========================================================================================================================*/
 /*===========================================================================================================================*/
 /*===========================================================================================================================*/

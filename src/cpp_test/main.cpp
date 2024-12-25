@@ -142,11 +142,11 @@ int main(int argc, char* argv[]) {
 	ret = spl_init_log((char*)"simplelog.cfg");
 #endif
 	int count = 10;
-	//spl_milli_sleep(1000 * 100);
+	spl_milli_sleep(1000 * 100);
 	for (int i = 0; i < count; ++i) {
 		spllog(SPL_LOG_INFO, "test log %d", i);
 	}
-	//spl_milli_sleep( 1000);
+	spl_milli_sleep( 1000 * 100);
 	spl_finish_log();
 	//spl_milli_sleep(100 * 1000);
 	return 0;
@@ -154,7 +154,7 @@ int main(int argc, char* argv[]) {
 #include <stdio.h>
 #include <windows.h>
 
-int main__01() {
+int main____() {
 	//LARGE_INTEGER frequency;
 	LARGE_INTEGER counter;
 
@@ -184,7 +184,7 @@ int main__01() {
 }
 int quick_sort(int* arr, int n);
 int validate_quick_sort(int* arr, int n);
-int main____() {
+int main__1__() {
 	LARGE_INTEGER counter;
 	int arr[10];
 	////......
