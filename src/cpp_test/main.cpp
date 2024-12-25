@@ -141,11 +141,11 @@ int main(int argc, char* argv[]) {
 #else
 	ret = spl_init_log((char*)"simplelog.cfg");
 #endif
-	int count = 10;
+	int count = 2;
 	spl_milli_sleep(100);
 	for (int i = 0; i < count; ++i) {
 		spl_console_log("spl_milli_sleep ------------------------------ ");
-		spllog(SPL_LOG_INFO, "test log %d", i);
+		//spllog(SPL_LOG_INFO, "test log %d", i);
 	}
 	//spl_milli_sleep( 1000 * 100);
 	spl_finish_log();
