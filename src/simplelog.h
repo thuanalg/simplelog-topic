@@ -252,7 +252,7 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 				spl_mutex_unlock(t->arr_mtx[r]); \
 				\
 				if(len > 0) break; r++; r%=t->ncpu;\
-				;spl_milli_sleep(5);spl_console_log("--------------OOoooooooooVERRRRRRRRRRRR---r: %d, len: %d", (int)r, len);continue;\
+				;spl_console_log("--------------OOoooooooooVERRRRRRRRRRRR---r: %d, len: %d", (int)r, len);continue;\
 			}\
 			while(1);\
 			if(!t->trigger_thread)spl_rel_sem(t->sem_rwfile); if(pprefmt != tnow) { free(pprefmt);}\
