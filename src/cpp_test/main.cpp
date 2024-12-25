@@ -152,7 +152,6 @@ int main_07(int argc, char* argv[]) {
 	return 0;
 }
 #include <stdio.h>
-#include <windows.h>
 
 int main____() {
 	//LARGE_INTEGER frequency;
