@@ -787,9 +787,12 @@ void* spl_written_thread_routine(void* lpParam)
 	total_buf_sz = (t->buff_size * (1 + t->n_topic)) * t->ncpu;
 	spl_malloc(total_buf_sz, buffer, char);
 	register char is_off = 0;
-	register int i = 0;
+	register int i = 0, j = 0;
 	char** main_buff = 0;
 	char** st_buff = 0;
+
+	char*** topic_main_buff = 0;
+	char*** topic_st_buff = 0;
 	generic_dta_st* yyyy = 0;
 	//main_buff
 
@@ -807,6 +810,29 @@ void* spl_written_thread_routine(void* lpParam)
 		yyyy = MYCASTGEN(main_buff[i]);
 		int k = 0;
 	}
+	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+	
+	if (t->arr_topic)
+	{
+		spl_malloc(t->n_topic * sizeof(char*), topic_st_buff, char**);
+		for (i = 0; i < t->n_topic; ++i) {
+			char* p = (char*)t->arr_topic[i].buf;
+			spl_malloc(t->ncpu * sizeof(char*), topic_st_buff[i], char*);
+			for (j = 0; j < t->ncpu; ++j) {
+				topic_st_buff[i][j] = p + t->buff_size * j;
+			}
+		}
+		spl_malloc(t->n_topic * sizeof(char*), topic_main_buff, char**);
+		for (i = 0; i < t->n_topic; ++i) {
+			char* p = buffer + t->buff_size * (1 + i) * t->ncpu;
+			spl_malloc(t->ncpu * sizeof(char*), topic_main_buff[i], char*);
+			for (j = 0; j < t->ncpu; ++j) {
+				topic_main_buff[i][j] = p + t->buff_size * j;
+			}
+		}
+	}
+
+	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 	if (t->trigger_thread > 0) {
 		spl_create_thread(spl_trigger_routine, t);
 	}
@@ -890,6 +916,26 @@ void* spl_written_thread_routine(void* lpParam)
 						}
 					//} while (0);
 					spl_mutex_unlock(t->arr_mtx[i]);
+
+
+				}
+				if (t->n_topic > 0) {
+					char* p = 0;
+					char* q = 0;
+					for (i = 0; i < t->n_topic; ++i) {
+						for (j = 0; j < t->ncpu; ++j) {
+							p = topic_st_buff[i][j];
+							q = topic_st_buff[i][j];
+							spl_mutex_lock(t->arr_mtx[j]);
+							do {
+								if (MYCASTGEN(p)->pl > 0) {
+									memcpy(MYCASTGEN(p), MYCASTGEN(q), sizeof(generic_dta_st) + MYCASTGEN(p)->pl);
+									MYCASTGEN(p)->pl = 0;
+								}
+							} while (0);
+							spl_mutex_unlock(t->arr_mtx[j]);
+						}
+					}
 				}
 				//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 				for (i = 0; i < t->ncpu; ++i) {
@@ -900,13 +946,7 @@ void* spl_written_thread_routine(void* lpParam)
 						sz += k;
 					}
 				}
-				//spl_console_log("---------)))))))))))))))))))))))--------------========================= is_off: %d", (int)is_off);
 				//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-				//tmpBuff = (generic_dta_st*)buffer;
-				//k = (int)fwrite(tmpBuff->data, 1, tmpBuff->pl, t->fp);
-				//sz += k;
-
-				//err = SPL_FFLUSH((FILE *)(t->fp));
 
 				SPL_FFLUSH((t->fp), err);
 
@@ -960,6 +1000,17 @@ void* spl_written_thread_routine(void* lpParam)
 	spl_free(buffer);
 	spl_free(main_buff);
 	spl_free(st_buff);
+	if (t->arr_topic) {
+		for (i = 0; i < t->n_topic; ++i) {
+			spl_free(topic_st_buff[i]);
+		}
+		spl_free(topic_st_buff);
+
+		for (i = 0; i < t->n_topic; ++i) {
+			spl_free(topic_main_buff[i]);
+		}
+		spl_free(topic_main_buff);
+	}
 	/*Send a signal to the waiting thread.*/
 	spl_rel_sem(__simple_log_static__.sem_rwfile);
 	spl_rel_sem(__simple_log_static__.sem_off);
@@ -1832,11 +1883,11 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 		}
 		t->buf = (generic_dta_st*)buffer;
 		for (i = 0; i < t->ncpu; ++i) {
-			int kkkv = t->buff_size * i;
-			tmpBuff = (generic_dta_st*)(buffer + kkkv);
+			int count = t->buff_size * i;
+			char* p = buffer + count;
+			tmpBuff = (generic_dta_st*)p;
 			tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
 			tmpBuff->range = tmpBuff->total - sizeof(generic_dta_st);
-			int kkk = 0;
 		}
 		//tmpBuff = (generic_dta_st*)buffer;
 		//tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
@@ -1853,6 +1904,8 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 				break;
 			}
 			for (i = 0; i < t->n_topic; ++i) {
+				int j = 0;
+				int steep = 0;
 				char* p1 = 0;
 
 				p1 = strstr(p0, ",");
@@ -1865,11 +1918,23 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 					p1++;
 					p0 = p1;
 				}
-
-				tmpBuff = (generic_dta_st*)(buffer + (( i + 1) * t->buff_size));
-				tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
-				tmpBuff->range = tmpBuff->total - sizeof(generic_dta_st);
+				steep = ((i + 1) * t->buff_size * t->ncpu);
+				tmpBuff = (generic_dta_st*)(buffer + steep);
 				t->arr_topic[i].buf = tmpBuff;
+
+				for (j = 0; j < t->ncpu; ++j) {
+					char* p = 0;
+					generic_dta_st* seg = 0;
+					p = (char*)tmpBuff + j * t->buff_size;
+					seg = (generic_dta_st*)p;
+					seg->total = t->buff_size - SPL_MEMO_PADDING;
+					seg->range = seg->total - sizeof(generic_dta_st);
+				}
+
+				//tmpBuff = (generic_dta_st*)(buffer + (( i + 1) * t->buff_size));
+				//tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
+				//tmpBuff->range = tmpBuff->total - sizeof(generic_dta_st);
+				
 			}
 			if (ret) {
 				break;
