@@ -43,7 +43,7 @@
 /*===========================================================================================================================*/
 
 #define spl_malloc(__nn__, __obj__, __type__) { (__obj__) = (__type__*) malloc(__nn__); if(__obj__) \
-	{spl_console_log("Malloc: 0x%p\n", (__obj__)); memset((__obj__), 0, (__nn__));} \
+	{spl_console_log("Malloc: 0x%p\n", (__obj__)); memset((void*)(__obj__), 0, (__nn__));} \
 	else {spl_console_log("Malloc: error.\n");}} 
 
 #define spl_free(__obj__) \
@@ -616,12 +616,7 @@ void** spl_mutex_create_arr(int n) {
 			ret[i] = (void*)tmp;
 #else
 			pthread_spinlock_t* tmp = 0;
-			//spl_malloc(sizeof(pthread_spinlock_t), tmp, pthread_spinlock_t);
-			tmp = (pthread_spinlock_t*)malloc(sizeof(pthread_spinlock_t));
-			if (!tmp) {
-				exit(1);
-			}
-			memset((void*)tmp, 0, sizeof(pthread_spinlock_t));
+			spl_malloc(sizeof(pthread_spinlock_t), tmp, pthread_spinlock_t);
 			pthread_spin_init((pthread_spinlock_t*)tmp, PTHREAD_PROCESS_PRIVATE);
 			ret[i] = (void*)tmp;
 #endif			
