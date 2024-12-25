@@ -1002,7 +1002,7 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 	char buff[20], buff1[20];
 	memset(buff, 0, 20);
 	memset(buff1, 0, 20);
-	//spl_console_log("-----------------------=========================");
+	spl_console_log("-----------------------=========================");
 	time_t t = time(0);
 	do {
 		memset(&stt, 0, sizeof(stt));
