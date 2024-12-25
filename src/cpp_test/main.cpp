@@ -144,6 +144,7 @@ int main(int argc, char* argv[]) {
 	int count = 10;
 	spl_milli_sleep(100);
 	for (int i = 0; i < count; ++i) {
+		spl_console_log("spl_milli_sleep ------------------------------ ");
 		spllog(SPL_LOG_INFO, "test log %d", i);
 	}
 	//spl_milli_sleep( 1000 * 100);
