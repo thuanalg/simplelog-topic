@@ -203,7 +203,7 @@ extern "C" {
 			path_template[1024]; /*In a thread of logger, NO NEED SYNC.*/
 		int
 			ncpu; /*Number of CPU.*/
-		char
+		int
 			trigger_thread; /*Use trigger thread or not.*/
 		void	
 			**arr_mtx; /*Use trigger thread or not.*/

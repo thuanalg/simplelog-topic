@@ -405,9 +405,9 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 			break;
 		}
 		if (strcmp(key, SPLOG_TRIGGER) == 0) {
-			if (buff[0] != '0') {
-				__simple_log_static__.trigger_thread = 1;
-			}
+			int n = 0, sz = 0;
+			sz = sscanf(buff, "%d", &n);
+			__simple_log_static__.trigger_thread = n;
 			break;
 		}
 		if (strcmp(key, SPLOG_END_CFG) == 0) {
