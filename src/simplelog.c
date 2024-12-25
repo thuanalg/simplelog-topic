@@ -1946,6 +1946,7 @@ void* spl_trigger_routine(void* arg)
 
 int spl_create_thread(THREAD_ROUTINE f, void* arg) {
 	int ret = 0;
+	spl_console_log("f: %p, arg: %p", f, arg);
 #ifndef UNIX_LINUX
 	DWORD dwThreadId = 0;
 	HANDLE hThread = 0;
