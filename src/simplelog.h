@@ -142,7 +142,8 @@ extern "C" {
 		spl_uint	nn;						/*Nanosecond*/
 	} spl_local_time_st;
 
-#define SPL_TOPIC_SIZE		32
+#define				SPL_TOPIC_SIZE					32
+#define				SPL_MEMO_PADDING				2048
 
 	typedef
 		struct __SIMPLE_LOG_TOPIC_ST__ {
@@ -231,24 +232,27 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 {;;\
 	if(spl_get_log_levwel() <= (__lv__) )\
 	{\
-		;;/*char __isOof = 0;*/ ;\
-		char tnow[SPL_RL_BUF]; char *pprefmt = 0; ;SIMPLE_LOG_ST *t = spl_control_obj();\
+		;int outlen = 0;;const char *pfn = 0;/*char __isOof = 0;*/ ;\
+		;;unsigned short r = 0;char tnow[SPL_RL_BUF]; char *pprefmt = 0; ;SIMPLE_LOG_ST *t = spl_control_obj();\
+		;;__FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r, &outlen);;\
 		{\
 			do{\
-				;int len = 0;;const char *pfn = 0;;unsigned short r = 0;;__FILLE__(pfn);\
-				;pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r);\
+				;int len = 0;; \
+				\
 				;;;\
 				spl_mutex_lock(t->arr_mtx[r]);\
 					;\
 						if(SPLKEYBUF(t, r)->range > SPLKEYBUF(t, r)->pl) {\
-							len = snprintf( SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl, SPLKEYBUF(t, r)->range - SPLKEYBUF(t, r)->pl, \
-								"%s"___fmttt___"\n\n", pprefmt, ##__VA_ARGS__); if(len > 0) SPLKEYBUF(t, r)->pl += (len -1);\
+							;memcpy(SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl, pprefmt, outlen);SPLKEYBUF(t, r)->pl += outlen;\
+							;len = snprintf( SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl, (SPLKEYBUF(t, r)->range + SPL_MEMO_PADDING - SPLKEYBUF(t, r)->pl), \
+								___fmttt___"\n",##__VA_ARGS__); if(len > 0) SPLKEYBUF(t, r)->pl += (len); else  SPLKEYBUF(t, r)->pl -= outlen ;\
 							\
 						}\
 					\
-				spl_mutex_unlock(t->arr_mtx[r]);\
+				spl_mutex_unlock(t->arr_mtx[r]); \
 				\
-				if(len > 0) break;;spl_milli_sleep(10);continue;\
+				if(len > 0) break; r++; r%=t->ncpu;\
+				;spl_milli_sleep(5);spl_console_log("--------------OOoooooooooVERRRRRRRRRRRR---r: %d, len: %d", (int)r, len);continue;\
 			}\
 			while(1);\
 			if(!t->trigger_thread)spl_rel_sem(t->sem_rwfile); if(pprefmt != tnow) { free(pprefmt);}\
@@ -268,9 +272,10 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 { \
 	if(spl_get_log_levwel() <= (__lv__) ) \
 	{\
-		;int len = 0;unsigned short r = 0;;const char *pfn = 0;SIMPLE_LOG_ST *t = 0;char __isbrf = 0; char *pprefmt = 0;; char tnow[SPL_RL_BUF];;;\
+		;int len = 0;unsigned short r = 0;;const char *pfn = 0;SIMPLE_LOG_ST *t = 0;char __isbrf = 0;\
+		;int outlen = 0;;char *pprefmt = 0;; char tnow[SPL_RL_BUF];;;\
 		; __FILLE__(pfn);t = spl_control_obj();\
-		;pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r);;r %= t->ncpu;\
+		;pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r, &outlen);;r %= t->ncpu;\
 		do\
 		{\
 			/*they are constant.*/\
@@ -279,9 +284,10 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 				{\
 					if(t->arr_topic){\
 						if(STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->range > STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl) {\
-							len = snprintf(STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->data + STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl, \
+							;memcpy(SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl, pprefmt, outlen);;\
+							;len = snprintf(STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->data + STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl, \
 								STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->range - STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl, \
-								"%s"___fmttt___"\n\n", pprefmt,##__VA_ARGS__);\
+								___fmttt___"\n\n", ##__VA_ARGS__);\
 							if(len > 0) STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl += (len-1);\
 						}\
 					}\
@@ -446,7 +452,7 @@ DLL_API_SIMPLE_LOG int
 
 DLL_API_SIMPLE_LOG char *
 	spl_fmt_now_ext(char* fmtt, int len, int lv, 
-		const char *filename, const char* funcname, int  line, unsigned short* r);
+		const char *filename, const char* funcname, int  line, unsigned short* r, int *);
 
 DLL_API_SIMPLE_LOG int									
 	spl_fmmt_now(char* fmtt, int len);

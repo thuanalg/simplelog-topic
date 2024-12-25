@@ -117,7 +117,7 @@
 #define				SPL_TEXT_FATAL					"F"
 
 
-#define				SPL_MEMO_PADDING				2048
+
 #define MYCASTGEN(__t__)	((generic_dta_st*)__t__)
 /*===========================================================================================================================*/
 #ifndef UNIX_LINUX
@@ -856,6 +856,12 @@ void* spl_written_thread_routine(void* lpParam)
 		}
 		while (1) {
 			if (is_off) {
+				spl_milli_sleep(t->trigger_thread * 2);
+				spl_rel_sem(__simple_log_static__.sem_rwfile);
+				is_off++;
+				if (is_off > 5) {
+					
+				}
 				break;
 			}
 #ifndef UNIX_LINUX
@@ -865,9 +871,7 @@ void* spl_written_thread_routine(void* lpParam)
 #endif
 			do{
 				//off = spl_get_off();
-				if (is_off) {
-					break;
-				}
+
 				ret = spl_gen_file(t, &sz, t->file_limit_size, &(t->index));
 				if (ret) {
 					spl_console_log("--spl_gen_file, ret: %d --\n", ret);
@@ -900,9 +904,11 @@ void* spl_written_thread_routine(void* lpParam)
 				spl_mutex_unlock(t->mtx_rw);
 				*/
 				//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-				spl_mutex_lock(t->mtx_rw);
-					is_off = t->off;
-				spl_mutex_unlock(t->mtx_rw);
+				if (!is_off) {
+					spl_mutex_lock(t->mtx_rw);
+						is_off = t->off;
+					spl_mutex_unlock(t->mtx_rw);
+				}
 				//spl_console_log("---------(((((((((--------------========================= is_off: %d", (int)is_off);
 				//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 				for (i = 0; i < t->ncpu; ++i) {
@@ -916,9 +922,10 @@ void* spl_written_thread_routine(void* lpParam)
 						}
 					//} while (0);
 					spl_mutex_unlock(t->arr_mtx[i]);
-
-
 				}
+				//if (is_off) {
+				//	spl_console_log("======================== is_off: %d", (int)is_off);
+				//}
 				if (t->n_topic > 0) {
 					char* p = 0;
 					char* q = 0;
@@ -927,12 +934,12 @@ void* spl_written_thread_routine(void* lpParam)
 							p = topic_st_buff[i][j];
 							q = topic_st_buff[i][j];
 							spl_mutex_lock(t->arr_mtx[j]);
-							do {
+							//do {
 								if (MYCASTGEN(p)->pl > 0) {
 									memcpy(MYCASTGEN(p), MYCASTGEN(q), sizeof(generic_dta_st) + MYCASTGEN(p)->pl);
 									MYCASTGEN(p)->pl = 0;
 								}
-							} while (0);
+							//} while (0);
 							spl_mutex_unlock(t->arr_mtx[j]);
 						}
 					}
@@ -972,6 +979,9 @@ void* spl_written_thread_routine(void* lpParam)
 						ret = SPL_LOG_TOPIC_FLUSH;
 						break;
 					}
+				}
+				if (is_off) {
+					break;
 				}
 			} while (0);
 		}
@@ -1043,7 +1053,7 @@ int spl_simple_log_thread(SIMPLE_LOG_ST* t) {
 }
 /*===========================================================================================================================*/
 char* spl_fmt_now_ext(char* fmtt, int len, int lv, 
-	const char* filename, const char* funcname, int  line, unsigned short *r)
+	const char* filename, const char* funcname, int  line, unsigned short *r, int *outlen)
 {
 	char* p = fmtt;
 	int ret = 0;
@@ -1095,10 +1105,9 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 			break;
 		}
 		n = snprintf(buff1, 20, SPL_FMT_HOUR_ADDING, stt.hour, stt.minute, stt.sec);
-		n = snprintf(fmtt, len, "["SPL_FMT_DELT_ADDING"] [%s] [tid:\t %llu]\t[%s:%s:%d]\t", 
+		*outlen = snprintf(fmtt, len, "["SPL_FMT_DELT_ADDING"] [%s] [tid:\t %llu]\t[%s:%s:%d]\t",
 			buff, buff1, (unsigned int)stt.nn, spl_get_text(lv), spl_get_threadid(), 
 			filename, funcname, line);
-
 	} while (0);
 	//spl_console_log("---------)))))))))))))))))))))))--------------=========================");
 	return p;
