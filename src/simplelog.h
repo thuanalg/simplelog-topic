@@ -263,7 +263,8 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 
 
 //#define SLPCHECKINDEX(__t__)	
-#define STSPLOGBUFTOPIC(__t__,__i__)				(&(__t__->arr_topic[__i__]))->buf
+//#define STSPLOGBUFTOPIC(__t__,__i__)							(&(__t__->arr_topic[__i__]))->buf
+#define STSPLOGBUFTOPIC_RANGE(__t__,__i__, __r__)				((generic_dta_st*)((char *)STSPLOGBUFTOPIC(__t__,__i__) + t->buff_size * __i__))
 ////////////////hereeeeeeeeeeeeeee
 #define __spl_log_buf_topic_level__(__lv__, __tpic, ___fmttt___, ...)	\
 { \
@@ -279,11 +280,11 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 			do \
 			{\
 				if(t->arr_topic){\
-					if(STSPLOGBUFTOPIC(t,__tpic)->range > STSPLOGBUFTOPIC(t,__tpic)->pl) {\
-						len = snprintf(STSPLOGBUFTOPIC(t, __tpic)->data + STSPLOGBUFTOPIC(t, __tpic)->pl, \
-							STSPLOGBUFTOPIC(t,__tpic)->range - STSPLOGBUFTOPIC(t,__tpic)->pl, \
+					if(STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->range > STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl) {\
+						len = snprintf(STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->data + STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl, \
+							STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->range - STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl, \
 							"%s"___fmttt___"\n\n", pprefmt,##__VA_ARGS__);\
-						if(len > 0) STSPLOGBUFTOPIC(t,__tpic)->pl += (len-1);\
+						if(len > 0) STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl += (len-1);\
 					}\
 				}\
 			}\
