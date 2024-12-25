@@ -540,7 +540,7 @@ spl_init_log( char *pathcfg)
 			break;
 		}
 	} while (0);
-
+	spl_console_log("------------------------- ret: %d-----------------------------", ret);
 	if (fp) {
 		SPL_FCLOSE(fp,ret);
 	}
