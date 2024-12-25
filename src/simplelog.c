@@ -1955,7 +1955,7 @@ int spl_create_thread(THREAD_ROUTINE f, void* arg) {
 	}
 #else
 	pthread_t tidd = 0;
-	ret = pthread_create(&tidd, 0, f, 0);
+	ret = pthread_create(&tidd, 0, f, arg);
 	if (ret) {
 		//
 	}
