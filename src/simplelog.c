@@ -883,7 +883,6 @@ void* spl_written_thread_routine(void* lpParam)
 				for (i = 0; i < t->ncpu; ++i) {
 					spl_mutex_lock(t->arr_mtx[i]);
 					//do {
-						//generic_dta_st* yyyy = MYCASTGEN(st_buff[i]);
 						if (MYCASTGEN(st_buff[i])->pl > 0) {
 							int n = MYCASTGEN(st_buff[i])->pl;
 							memcpy(main_buff[i], st_buff[i], sizeof(generic_dta_st) + MYCASTGEN(st_buff[i])->pl);
@@ -932,9 +931,6 @@ void* spl_written_thread_routine(void* lpParam)
 						break;
 					}
 				}
-				//if (ret) {
-				//	break;
-				//}
 			} while (0);
 		}
 		if (t->fp) {
