@@ -281,7 +281,7 @@ spl_mutex_lock(__mtx__);\
 			if(STSPLOGBUFTOPIC(t,__tpic)->range > STSPLOGBUFTOPIC(t,__tpic)->pl) {\
 				len = snprintf(STSPLOGBUFTOPIC(t, __tpic)->data + STSPLOGBUFTOPIC(t, __tpic)->pl, \
 					STSPLOGBUFTOPIC(t,__tpic)->range - STSPLOGBUFTOPIC(t,__tpic)->pl, \
-					___fmttt___"\n\n", ##__VA_ARGS__);\
+					"%s"___fmttt___"\n\n", pprefmt,##__VA_ARGS__);\
 				if(len > 0) STSPLOGBUFTOPIC(t,__tpic)->pl += (len-1);\
 			}\
 		}else{__isbrf = 1; break;;}\
