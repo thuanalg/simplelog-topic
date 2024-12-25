@@ -836,7 +836,7 @@ void* spl_written_thread_routine(void* lpParam)
 #else
 			SPL_sem_wait(t->sem_rwfile);
 #endif
-			while (1) {
+			do{
 				//off = spl_get_off();
 				if (is_off) {
 					break;
@@ -932,10 +932,10 @@ void* spl_written_thread_routine(void* lpParam)
 						break;
 					}
 				}
-				if (ret) {
-					break;
-				}
-			}
+				//if (ret) {
+				//	break;
+				//}
+			} while (0);
 		}
 		if (t->fp) {
 			int werr = 0;
