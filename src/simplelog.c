@@ -203,7 +203,7 @@ static int
 	spl_fclose_err(int t, void *fpp);
 static int
 	spl_fflush_err(int t, void *fpp);
-static void* 
+static void** 
 	spl_mutex_create_arr(int n);
 
 static int
@@ -583,7 +583,7 @@ int spl_mutex_del_arr(int n) {
 	return ret = 0;
 }
 /*===========================================================================================================================*/
-void* spl_mutex_create_arr(int n) {
+void** spl_mutex_create_arr(int n) {
 	void** ret = 0;
 	int i = 0;
 	do {
