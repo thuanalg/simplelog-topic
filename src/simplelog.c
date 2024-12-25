@@ -616,7 +616,12 @@ void** spl_mutex_create_arr(int n) {
 			ret[i] = (void*)tmp;
 #else
 			pthread_spinlock_t* tmp = 0;
-			spl_malloc(sizeof(pthread_spinlock_t), tmp, pthread_spinlock_t);
+			//spl_malloc(sizeof(pthread_spinlock_t), tmp, pthread_spinlock_t);
+			tmp = (pthread_spinlock_t*)malloc(sizeof(pthread_spinlock_t));
+			if (!tmp) {
+				exit(1);
+			}
+			memset(tmp, 0, sizeof(pthread_spinlock_t));
 			pthread_spin_init((pthread_spinlock_t*)tmp, PTHREAD_PROCESS_PRIVATE);
 			ret[i] = (void*)tmp;
 #endif			
