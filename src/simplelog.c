@@ -1013,7 +1013,7 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 			break;
 		}
 		if (r) {
-			*r = (stt.nn & 0xFFFF);
+			*r = (stt.nn  % __simple_log_static__.ncpu);
 		}
 		if (!fmtt) {
 			ret = (int)SPL_LOG_FMT_NULL_ERROR;

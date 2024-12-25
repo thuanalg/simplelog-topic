@@ -234,10 +234,10 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 		;;/*char __isOof = 0;*/ ;\
 		char tnow[SPL_RL_BUF]; char *pprefmt = 0; ;SIMPLE_LOG_ST *t = spl_control_obj();\
 		{\
-			int len = 0;;const char *pfn = 0;;unsigned short r = 0;\
-			;__FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r);;r %= t->ncpu;\
 			do{\
-				;;\
+				;int len = 0;;const char *pfn = 0;;unsigned short r = 0;;__FILLE__(pfn);\
+				;pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r);\
+				;;;\
 				spl_mutex_lock(t->arr_mtx[r]);\
 					;\
 						if(SPLKEYBUF(t, r)->range > SPLKEYBUF(t, r)->pl) {\
