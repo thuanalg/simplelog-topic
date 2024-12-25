@@ -151,32 +151,32 @@ int main_07(int argc, char* argv[]) {
 	//spl_milli_sleep(100 * 1000);
 	return 0;
 }
-#include <stdio.h>
-
-int main____() {
-	//LARGE_INTEGER frequency;
-	LARGE_INTEGER counter;
-
-	// Query the performance frequency (ticks per second)
-	//if (QueryPerformanceFrequency(&frequency)) {
-		// Get the current value of the performance counter
-	for (int i = 0; i < 10; ++i) {
-		QueryPerformanceCounter(&counter);
-
-		// Convert ticks to nanoseconds
-		// frequency.QuadPart gives the number of ticks per second
-		// counter.QuadPart gives the number of ticks that have passed since the system was booted
-		// To get nanoseconds, we calculate (counter * 10^9) / frequency
-		short nanoseconds = (counter.QuadPart & 0xFF );
-#ifdef DEBUG_MODE_0
-		printf("debug Current time in nanoseconds: %d\n", nanoseconds % 8);
-		//open trigger socket, subprogram
-		//socket(UDP, 20000);
-#else
-		printf("Current time in nanoseconds: %d\n", nanoseconds % 7);
-#endif
-		
-	}
+//#include <stdio.h>
+//
+//int main____() {
+//	//LARGE_INTEGER frequency;
+//	LARGE_INTEGER counter;
+//
+//	// Query the performance frequency (ticks per second)
+//	//if (QueryPerformanceFrequency(&frequency)) {
+//		// Get the current value of the performance counter
+//	for (int i = 0; i < 10; ++i) {
+//		QueryPerformanceCounter(&counter);
+//
+//		// Convert ticks to nanoseconds
+//		// frequency.QuadPart gives the number of ticks per second
+//		// counter.QuadPart gives the number of ticks that have passed since the system was booted
+//		// To get nanoseconds, we calculate (counter * 10^9) / frequency
+//		short nanoseconds = (counter.QuadPart & 0xFF );
+//#ifdef DEBUG_MODE_0
+//		printf("debug Current time in nanoseconds: %d\n", nanoseconds % 8);
+//		//open trigger socket, subprogram
+//		//socket(UDP, 20000);
+//#else
+//		printf("Current time in nanoseconds: %d\n", nanoseconds % 7);
+//#endif
+//		
+//	}
 
 
 	return 0;
