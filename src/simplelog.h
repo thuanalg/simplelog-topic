@@ -230,7 +230,7 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 #define SLPCHECKRANGE(__t__)				((SPLCHECKBUF(__t__)->range > (SPLCHECKBUF(__t__)->pl)) ? (SPLCHECKBUF(__t__)->range - SPLCHECKBUF(__t__)->pl) : 0);
 
 #define __spl_log_buf_level__(__lv__, ___fmttt___, ...)	\
-{\
+{spl_console_log("__spl_log_buf_level__==============++++++++++++++++++++++++++++++++");\
 	if(spl_get_log_levwel() <= (__lv__) )\
 	{\
 		spl_console_log("==============++++++++++++++++++++++++++++++++");/*char __isOof = 0;*/ ;\
