@@ -177,36 +177,36 @@ int main_07(int argc, char* argv[]) {
 //#endif
 //		
 //	}
-
-
-	return 0;
-}
-int quick_sort(int* arr, int n);
-int validate_quick_sort(int* arr, int n);
-int main__1__() {
-	LARGE_INTEGER counter;
-	int arr[10];
-	////......
-	//arr = (int*)malloc(sizeof(int) * n);
-	//if (!arr) {
-	//	exit(1);
-	//}
-	for (int i = 0; i < 10; i++)
-	{
-		int tmp = 0;
-		QueryPerformanceCounter(&counter);
-		tmp = (counter.QuadPart & 0xFF)%7;
-		arr[i] = tmp;
-	}
-	quick_sort(arr, 10);
-#ifdef VALIDATE
-	int ret = validate_quick_sort(arr, 10);
-	if (ret) {
-		fprintf(stderr, "sort err at: %d\n", ret - 1);
-	}
-#endif
-	return 0;
-}
+//
+//
+//	return 0;
+//}
+//int quick_sort(int* arr, int n);
+//int validate_quick_sort(int* arr, int n);
+//int main__1__() {
+//	LARGE_INTEGER counter;
+//	int arr[10];
+//	////......
+//	//arr = (int*)malloc(sizeof(int) * n);
+//	//if (!arr) {
+//	//	exit(1);
+//	//}
+//	for (int i = 0; i < 10; i++)
+//	{
+//		int tmp = 0;
+//		QueryPerformanceCounter(&counter);
+//		tmp = (counter.QuadPart & 0xFF)%7;
+//		arr[i] = tmp;
+//	}
+//	quick_sort(arr, 10);
+//#ifdef VALIDATE
+//	int ret = validate_quick_sort(arr, 10);
+//	if (ret) {
+//		fprintf(stderr, "sort err at: %d\n", ret - 1);
+//	}
+//#endif
+//	return 0;
+//}
 
 int quick_sort(int* arr, int n) {
 	return 0;
