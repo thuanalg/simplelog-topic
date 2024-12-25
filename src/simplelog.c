@@ -878,7 +878,7 @@ void* spl_written_thread_routine(void* lpParam)
 					is_off = t->off;
 				//} while (0);
 				spl_mutex_unlock(t->mtx_rw);
-				spl_console_log("---------)))))))))))))))))))))))--------------========================= is_off: %d", (int)is_off);
+				spl_console_log("---------(((((((((--------------========================= is_off: %d", (int)is_off);
 				//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 				for (i = 0; i < t->ncpu; ++i) {
 					spl_mutex_lock(t->arr_mtx[i]);
@@ -901,6 +901,7 @@ void* spl_written_thread_routine(void* lpParam)
 						sz += k;
 					}
 				}
+				spl_console_log("---------)))))))))))))))))))))))--------------========================= is_off: %d", (int)is_off);
 				//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 				//tmpBuff = (generic_dta_st*)buffer;
 				//k = (int)fwrite(tmpBuff->data, 1, tmpBuff->pl, t->fp);
