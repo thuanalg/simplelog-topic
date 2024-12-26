@@ -252,7 +252,7 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 				spl_mutex_unlock(t->arr_mtx[r]); \
 				\
 				if(len > 0) break; r++; r%=t->ncpu;\
-				;spl_console_log("--------------OOoooooooooVERRRRRRRRRRRR---r: %d, len: %d", (int)r, len);continue;\
+				;;continue;\
 			}\
 			while(1);\
 			if(!t->trigger_thread)spl_rel_sem(t->sem_rwfile); if(pprefmt != tnow) { free(pprefmt);}\
@@ -342,7 +342,7 @@ fprintf(stdout, __c11fmt__.c_str(), buf, pfn, __FUNCTION__, __LINE__, spl_get_th
 				spl_mutex_unlock(t->arr_mtx[r]); \
 				\
 				if(len > 0) break; r++; r%=t->ncpu;\
-				;spl_console_log("--------------OOoooooooooVERRRRRRRRRRRR---r: %d, len: %d", (int)r, len);continue;\
+				;;continue;\
 			}\
 			while(1);\
 			if(!t->trigger_thread)spl_rel_sem(t->sem_rwfile); if(pprefmt != tnow) { free(pprefmt);}\
@@ -377,9 +377,9 @@ fprintf(stdout, __c11fmt__.c_str(), buf, pfn, __FUNCTION__, __LINE__, spl_get_th
 							;len = snprintf(STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->data + STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl, \
 								STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->range + SPL_MEMO_PADDING - STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl, \
 								___fmttt___, ##__VA_ARGS__);\
-							;*(SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl) = '\n'; SPLKEYBUF(t, r)->pl++;\
 							;/*spl_console_log("--------------lllllllennnnnnnnnnnnnnnnn---r: %d, len: %d", (int)r, len);*/;\
 							if(len > 0) STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl += len;\
+							;*(SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl) = '\n'; SPLKEYBUF(t, r)->pl++;\
 						}\
 					}\
 				/*}\
