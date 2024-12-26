@@ -379,7 +379,8 @@ fprintf(stdout, __c11fmt__.c_str(), buf, pfn, __FUNCTION__, __LINE__, spl_get_th
 								___fmttt___, ##__VA_ARGS__);\
 							;/*spl_console_log("--------------lllllllennnnnnnnnnnnnnnnn---r: %d, len: %d", (int)r, len);*/;\
 							if(len > 0) STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl += len;\
-							;*(SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl) = '\n'; SPLKEYBUF(t, r)->pl++;\
+							;*(STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->data + STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl) = '\n'; \
+							;STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl++;\
 						}\
 					}\
 				/*}\
