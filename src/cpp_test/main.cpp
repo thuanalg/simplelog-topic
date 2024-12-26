@@ -148,7 +148,7 @@ int main(int argc, char* argv[]) {
 		spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), 0);
 		//spllog(SPL_LOG_INFO, "test log %d", i);
 	}
-	spl_milli_sleep( 1000 * 100);
+	//spl_milli_sleep( 1000 * 100);
 	spl_finish_log();
 	//spl_milli_sleep(100 * 1000);
 	return 0;

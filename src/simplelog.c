@@ -791,7 +791,7 @@ void* spl_written_thread_routine(void* lpParam)
 	char** main_buff = 0;
 	char** st_buff = 0;
 
-	char*** topic_main_buff = 0;
+	char*** topic_thrd_buff = 0;
 	char*** topic_st_buff = 0;
 	generic_dta_st* yyyy = 0;
 	//main_buff
@@ -822,12 +822,12 @@ void* spl_written_thread_routine(void* lpParam)
 				topic_st_buff[i][j] = p + t->buff_size * j;
 			}
 		}
-		spl_malloc(t->n_topic * sizeof(char*), topic_main_buff, char**);
+		spl_malloc(t->n_topic * sizeof(char*), topic_thrd_buff, char**);
 		for (i = 0; i < t->n_topic; ++i) {
 			char* p = buffer + t->buff_size * (1 + i) * t->ncpu;
-			spl_malloc(t->ncpu * sizeof(char*), topic_main_buff[i], char*);
+			spl_malloc(t->ncpu * sizeof(char*), topic_thrd_buff[i], char*);
 			for (j = 0; j < t->ncpu; ++j) {
-				topic_main_buff[i][j] = p + t->buff_size * j;
+				topic_thrd_buff[i][j] = p + t->buff_size * j;
 			}
 		}
 	}
@@ -932,12 +932,12 @@ void* spl_written_thread_routine(void* lpParam)
 					for (i = 0; i < t->n_topic; ++i) {
 						for (j = 0; j < t->ncpu; ++j) {
 							src = topic_st_buff[i][j];
-							dst = topic_main_buff[i][j];
+							dst = topic_thrd_buff[i][j];
 							spl_mutex_lock(t->arr_mtx[j]);
 							//do {
 								if (MYCASTGEN(src)->pl > 0) {
-									int k = MYCASTGEN(src)->pl;
-									spl_console_log("=====================kkkkkkkkkkkkk: %d", k);
+									//int k = MYCASTGEN(src)->pl;
+									//spl_console_log("=====================kkkkkkkkkkkkk: %d", k);
 									memcpy(MYCASTGEN(dst), MYCASTGEN(src), sizeof(generic_dta_st) + MYCASTGEN(src)->pl);
 									MYCASTGEN(src)->pl = 0;
 								}
@@ -973,7 +973,7 @@ void* spl_written_thread_routine(void* lpParam)
 					//t->arr_topic[i].fizize += k;
 					char* dst = 0;
 					for (j = 0; j < t->ncpu; ++j) {
-						dst = topic_main_buff[i][j];
+						dst = topic_thrd_buff[i][j];
 						if (MYCASTGEN(dst)->pl > 0) {
 							k = (int)fwrite(MYCASTGEN(dst)->data, 1, MYCASTGEN(dst)->pl, (FILE*)(t->arr_topic[i].fp));
 							MYCASTGEN(dst)->pl = 0;
@@ -981,10 +981,8 @@ void* spl_written_thread_routine(void* lpParam)
 						}
 					}
 
-					//err = SPL_FFLUSH((FILE *)(t->arr_topic[i].fp));
 					SPL_FFLUSH((t->arr_topic[i].fp), err);
 
-					//tmpBuff->pl = 0;
 					if (err) {
 						spl_console_log("--fflush, ret: %d --\n", err);
 						ret = SPL_LOG_TOPIC_FLUSH;
@@ -1028,9 +1026,9 @@ void* spl_written_thread_routine(void* lpParam)
 		spl_free(topic_st_buff);
 
 		for (i = 0; i < t->n_topic; ++i) {
-			spl_free(topic_main_buff[i]);
+			spl_free(topic_thrd_buff[i]);
 		}
-		spl_free(topic_main_buff);
+		spl_free(topic_thrd_buff);
 	}
 	/*Send a signal to the waiting thread.*/
 	spl_rel_sem(__simple_log_static__.sem_rwfile);
