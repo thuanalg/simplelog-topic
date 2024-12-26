@@ -927,17 +927,19 @@ void* spl_written_thread_routine(void* lpParam)
 				//	spl_console_log("======================== is_off: %d", (int)is_off);
 				//}
 				if (t->n_topic > 0) {
-					char* p = 0;
-					char* q = 0;
+					char* src = 0;
+					char* dst = 0;
 					for (i = 0; i < t->n_topic; ++i) {
 						for (j = 0; j < t->ncpu; ++j) {
-							p = topic_st_buff[i][j];
-							q = topic_st_buff[i][j];
+							src = topic_st_buff[i][j];
+							dst = topic_main_buff[i][j];
 							spl_mutex_lock(t->arr_mtx[j]);
 							//do {
-								if (MYCASTGEN(p)->pl > 0) {
-									memcpy(MYCASTGEN(p), MYCASTGEN(q), sizeof(generic_dta_st) + MYCASTGEN(p)->pl);
-									MYCASTGEN(p)->pl = 0;
+								if (MYCASTGEN(src)->pl > 0) {
+									int k = MYCASTGEN(src)->pl;
+									spl_console_log("=====================kkkkkkkkkkkkk: %d", k);
+									memcpy(MYCASTGEN(dst), MYCASTGEN(src), sizeof(generic_dta_st) + MYCASTGEN(src)->pl);
+									MYCASTGEN(src)->pl = 0;
 								}
 							//} while (0);
 							spl_mutex_unlock(t->arr_mtx[j]);
@@ -966,14 +968,23 @@ void* spl_written_thread_routine(void* lpParam)
 				}
 				for (i = 0; i < t->n_topic; ++i) {
 					//TO-TEST
-					tmpBuff = (generic_dta_st*)(buffer + (t->buff_size * (i + 1)));
-					k = (int)fwrite(tmpBuff->data, 1, tmpBuff->pl, (FILE*)(t->arr_topic[i].fp));
-					t->arr_topic[i].fizize += k;
+					//tmpBuff = (generic_dta_st*)(buffer + (t->buff_size * (i + 1)));
+					//k = (int)fwrite(tmpBuff->data, 1, tmpBuff->pl, (FILE*)(t->arr_topic[i].fp));
+					//t->arr_topic[i].fizize += k;
+					char* dst = 0;
+					for (j = 0; j < t->ncpu; ++j) {
+						dst = topic_main_buff[i][j];
+						if (MYCASTGEN(dst)->pl > 0) {
+							k = (int)fwrite(MYCASTGEN(dst)->data, 1, MYCASTGEN(dst)->pl, (FILE*)(t->arr_topic[i].fp));
+							MYCASTGEN(dst)->pl = 0;
+							t->arr_topic[i].fizize += k;
+						}
+					}
 
 					//err = SPL_FFLUSH((FILE *)(t->arr_topic[i].fp));
 					SPL_FFLUSH((t->arr_topic[i].fp), err);
 
-					tmpBuff->pl = 0;
+					//tmpBuff->pl = 0;
 					if (err) {
 						spl_console_log("--fflush, ret: %d --\n", err);
 						ret = SPL_LOG_TOPIC_FLUSH;
@@ -1903,7 +1914,7 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 		//tmpBuff->range = tmpBuff->total - sizeof(generic_dta_st);
 		//t->buf = tmpBuff;
 
-		if (!t->arr_topic) {
+		if (!t->arr_topic && t->n_topic > 0) {
 			char* p0 = t->topics;
 			int sz = sizeof(SIMPLE_LOG_TOPIC_ST) * t->n_topic;
 			spl_malloc(sz, t->arr_topic, SIMPLE_LOG_TOPIC_ST);
@@ -1934,7 +1945,8 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 				for (j = 0; j < t->ncpu; ++j) {
 					char* p = 0;
 					generic_dta_st* seg = 0;
-					p = (char*)tmpBuff + j * t->buff_size;
+					int k = j * t->buff_size;
+					p = (char*)tmpBuff + k;
 					seg = (generic_dta_st*)p;
 					seg->total = t->buff_size - SPL_MEMO_PADDING;
 					seg->range = seg->total - sizeof(generic_dta_st);
