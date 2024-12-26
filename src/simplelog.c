@@ -958,9 +958,10 @@ void* spl_written_thread_routine(void* lpParam)
 						dst = dst_topic_thrd_buf[i][j];
 						if (MYCASTGEN(dst)->pl > 0) {
 							k = (int)fwrite(MYCASTGEN(dst)->data, 1, MYCASTGEN(dst)->pl, (FILE*)(t->arr_topic[i].fp));
-							MYCASTGEN(dst)->pl = 0;
 							t->arr_topic[i].fizize += k;
+							MYCASTGEN(dst)->pl = 0;
 						}
+						//MYCASTGEN(dst)->pl = 0;
 					}
 
 					SPL_FFLUSH((t->arr_topic[i].fp), err);

@@ -264,9 +264,8 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 
 
 
-//#define SLPCHECKINDEX(__t__)	
 #define STSPLOGBUFTOPIC(__t__,__i__)							(&(__t__->arr_topic[__i__]))->buf
-#define STSPLOGBUFTOPIC_RANGE(__t__,__i__, __r__)				((generic_dta_st*)((char *)STSPLOGBUFTOPIC(__t__,__i__) + t->buff_size * __i__))
+#define STSPLOGBUFTOPIC_RANGE(__t__,__i__, __r__)				((generic_dta_st*)((char *)STSPLOGBUFTOPIC(__t__,__i__) + t->buff_size * __r__))
 ////////////////hereeeeeeeeeeeeeee
 #define __spl_log_buf_topic_level__(__lv__, __tpic, ___fmttt___, ...)	\
 { \
@@ -275,10 +274,9 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 		;int len = 0;unsigned short r = 0;;const char *pfn = 0;SIMPLE_LOG_ST *t = 0;\
 		;int outlen = 0;;char *pprefmt = 0;; char tnow[SPL_RL_BUF];;;\
 		; __FILLE__(pfn);t = spl_control_obj();\
-		;pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r, &outlen);;r %= t->ncpu;\
+		;pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r, &outlen);;\
 		do\
 		{\
-			/*they are constant.*/\
 			spl_mutex_lock(t->arr_mtx[r]);\
 				do \
 				{\
