@@ -781,11 +781,11 @@ void* spl_written_thread_routine(void* lpParam)
 	int k = 0;
 	SIMPLE_LOG_ST* t = (SIMPLE_LOG_ST*)lpParam;
 	int ret = 0, sz = 0, err = 0;
-	char* buffer = 0;
+	char* thrd_buffer = 0;
 	int total_buf_sz = 0;
 	generic_dta_st* tmpBuff = 0;
 	total_buf_sz = (t->buff_size * (1 + t->n_topic)) * t->ncpu;
-	spl_malloc(total_buf_sz, buffer, char);
+	spl_malloc(total_buf_sz, thrd_buffer, char);
 	register char is_off = 0;
 	register int i = 0, j = 0;
 	char** main_buff = 0;
@@ -806,7 +806,7 @@ void* spl_written_thread_routine(void* lpParam)
 
 	spl_malloc(t->ncpu * sizeof( char*), main_buff, char*);
 	for (i = 0; i < t->ncpu; ++i) {
-		main_buff[i] = buffer + t->buff_size * i;
+		main_buff[i] = thrd_buffer + t->buff_size * i;
 		yyyy = MYCASTGEN(main_buff[i]);
 		int k = 0;
 	}
@@ -824,7 +824,7 @@ void* spl_written_thread_routine(void* lpParam)
 		}
 		spl_malloc(t->n_topic * sizeof(char*), topic_thrd_buff, char**);
 		for (i = 0; i < t->n_topic; ++i) {
-			char* p = buffer + t->buff_size * (1 + i) * t->ncpu;
+			char* p = thrd_buffer + t->buff_size * (1 + i) * t->ncpu;
 			spl_malloc(t->ncpu * sizeof(char*), topic_thrd_buff[i], char*);
 			for (j = 0; j < t->ncpu; ++j) {
 				topic_thrd_buff[i][j] = p + t->buff_size * j;
@@ -837,7 +837,7 @@ void* spl_written_thread_routine(void* lpParam)
 		spl_create_thread(spl_trigger_routine, t);
 	}
 	do {	
-		if (!buffer) {
+		if (!thrd_buffer) {
 			ret = SPL_LOG_TOPIC_BUFF_MEM;
 			break;
 		}
@@ -1016,7 +1016,7 @@ void* spl_written_thread_routine(void* lpParam)
 
 		
 	} while (0);
-	spl_free(buffer);
+	spl_free(thrd_buffer);
 	spl_free(main_buff);
 	spl_free(st_buff);
 	if (t->arr_topic) {
