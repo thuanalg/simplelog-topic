@@ -245,7 +245,7 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 						if(SPLKEYBUF(t, r)->range > SPLKEYBUF(t, r)->pl) {\
 							;memcpy(SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl, pprefmt, outlen);SPLKEYBUF(t, r)->pl += outlen;\
 							;len = snprintf( SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl, (SPLKEYBUF(t, r)->range + SPL_MEMO_PADDING - SPLKEYBUF(t, r)->pl), \
-								___fmttt___"\n", ##__VA_ARGS__); if(len > 0) SPLKEYBUF(t, r)->pl += (len); else  SPLKEYBUF(t, r)->pl -= outlen ;\
+								___fmttt___"\n", ##__VA_ARGS__); if(len > 0) SPLKEYBUF(t, r)->pl += (len); ;\
 							\
 						}\
 					\
@@ -278,8 +278,8 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 		do\
 		{\
 			spl_mutex_lock(t->arr_mtx[r]);\
-				do \
-				{\
+				/*do \
+				{*/\
 					if(t->arr_topic){\
 						if(STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->range > STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl) {\
 							;memcpy(STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->data + STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl, pprefmt, outlen);\
@@ -291,8 +291,8 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 							if(len > 0) STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl += len;\
 						}\
 					}\
-				}\
-				while(0);\
+				/*}\
+				while(0);*/\
 			spl_mutex_unlock(t->arr_mtx[r]);\
 			if(len > 0) break;r++; r%=t->ncpu;;continue;\
 		}\
@@ -313,59 +313,36 @@ fprintf(stdout, __c11fmt__.c_str(), buf, pfn, __FUNCTION__, __LINE__, spl_get_th
 
 
 #define SPLKEYBUF(__t__, __i__)				((generic_dta_st*)( (char*)__t__->buf + (t->buff_size * __i__)))
-#define SPLKEYMTX(__t__, __i__)				(__t__->arr_mtx[__i__])
 
-#define SPLCHECKOFF(__t__)					__t__->off
-#define SPLCHECKBUF(__t__)					__t__->buf
-#define SLPCHECKRANGE(__t__)				((SPLCHECKBUF(__t__)->range > (SPLCHECKBUF(__t__)->pl)) ? (SPLCHECKBUF(__t__)->range - SPLCHECKBUF(__t__)->pl) : 0);
-
-
-//#define __spl_log_buf_level__(__lv__, ___fmttt___, ...)	{if(spl_get_log_levwel() <= (__lv__) )\
-//{std::string __c11fmt__="%s";__c11fmt__+=___fmttt___;__c11fmt__+="\n\n"; const char *__c11fmt_c_str__ = __c11fmt__.c_str();\
-//;SIMPLE_LOG_ST *t = 0;unsigned short r = 0;int len = 0;;const char *pfn = 0;char __isOof = 0; char *pprefmt = 0;\
-// char tnow[SPL_RL_BUF];void *__mtx__ =  spl_get_mtx();;\
-// __FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r);r %= t->ncpu;t = spl_control_obj();\
-//do{\
-//spl_mutex_lock(__mtx__);\
-//	do {\
-//		if(SPLCHECKOFF(t)) { __isOof = 1; break;}\
-//		if(SPLCHECKBUF(t)->range > SPLCHECKBUF(t)->pl) {\
-//			len = snprintf((SPLCHECKBUF(t)->data + SPLCHECKBUF(t)->pl), SPLCHECKBUF(t)->range - SPLCHECKBUF(t)->pl, \
-//				__c11fmt_c_str__, pprefmt, ##__VA_ARGS__);\
-//			if(len > 0) SPLCHECKBUF(t)->pl += (len-1);\
-//		}\
-//	}while(0);\
-//spl_mutex_unlock(__mtx__);\
-//if(len > 0) break;if(__isOof)break;spl_milli_sleep(10);continue;\
-//}\
-//while(1);\
-//spl_rel_sem(spl_get_sem_rwfile()); if(pprefmt != tnow) { free(pprefmt);}}\
-//}
+//#define SPLCHECKOFF(__t__)					__t__->off
+//#define SPLCHECKBUF(__t__)					__t__->buf
 
 #define __spl_log_buf_level__(__lv__, ___fmttt___, ...)	\
 {;;\
 	if(spl_get_log_levwel() <= (__lv__) )\
 	{\
-		;;/*char __isOof = 0;*/ ;\
-		char tnow[SPL_RL_BUF]; char *pprefmt = 0; ;SIMPLE_LOG_ST *t = spl_control_obj();\
-		{std::string __c11fmt__="%s";__c11fmt__+=___fmttt___;__c11fmt__+="\n\n"; const char *__c11fmt_c_str__ = __c11fmt__.c_str();;\
-			\
+		;int outlen = 0;;const char *pfn = 0;/*char __isOof = 0;*/ ;\
+		;;unsigned short r = 0;char tnow[SPL_RL_BUF]; char *pprefmt = 0; ;SIMPLE_LOG_ST *t = spl_control_obj();\
+		;;__FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r, &outlen);;\
+		{\
 			do{\
-				;\
-				int len = 0;;const char *pfn = 0;;unsigned short r = 0;;;\
-				;__FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r);;r %= t->ncpu;\
-				;;\
+				;int len = 0;; \
+				\
+				;;;\
 				spl_mutex_lock(t->arr_mtx[r]);\
 					;\
 						if(SPLKEYBUF(t, r)->range > SPLKEYBUF(t, r)->pl) {\
-							len = snprintf( SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl, SPLKEYBUF(t, r)->range - SPLKEYBUF(t, r)->pl, \
-								__c11fmt_c_str__, pprefmt, ##__VA_ARGS__); if(len > 0) SPLKEYBUF(t, r)->pl += (len -1);\
+							;memcpy(SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl, pprefmt, outlen);SPLKEYBUF(t, r)->pl += outlen;\
+							;len = snprintf( SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl, (SPLKEYBUF(t, r)->range + SPL_MEMO_PADDING - SPLKEYBUF(t, r)->pl), \
+								___fmttt___, ##__VA_ARGS__); if(len > 0) SPLKEYBUF(t, r)->pl += (len);;\
+							;*(SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl) = '\n';SPLKEYBUF(t, r)->pl++;\
 							\
 						}\
 					\
-				spl_mutex_unlock(t->arr_mtx[r]);\
+				spl_mutex_unlock(t->arr_mtx[r]); \
 				\
-				if(len > 0) break;;spl_milli_sleep(10);continue;\
+				if(len > 0) break; r++; r%=t->ncpu;\
+				;spl_console_log("--------------OOoooooooooVERRRRRRRRRRRR---r: %d, len: %d", (int)r, len);continue;\
 			}\
 			while(1);\
 			if(!t->trigger_thread)spl_rel_sem(t->sem_rwfile); if(pprefmt != tnow) { free(pprefmt);}\
@@ -377,42 +354,44 @@ fprintf(stdout, __c11fmt__.c_str(), buf, pfn, __FUNCTION__, __LINE__, spl_get_th
 
 
 
-
-
-
-
-
-#define SLPCHECKINDEX(__t__)	
-#define STSPLOGBUFTOPIC(__t__,__i__)				(&(__t__->arr_topic[__i__]))->buf
-
-
-#define __spl_log_buf_topic_level__(__lv__, __tpic, ___fmttt___, ...)	{ if(spl_get_log_levwel() <= (__lv__) ) \
-{std::string __c11fmt__="%s";__c11fmt__+=___fmttt___;__c11fmt__+="\n\n"; const char *__c11fmt_c_str__ = __c11fmt__.c_str();\
-;unsigned short r = 0;int len = 0;;const char *pfn = 0;SIMPLE_LOG_ST *t = 0;char __isbrf = 0; char *pprefmt = 0;; char tnow[SPL_RL_BUF];; void *__mtx__ =  spl_get_mtx();;\
-; __FILLE__(pfn);t = spl_control_obj();\
-;pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r);;r %= t->ncpu;\
-do{\
-if (__tpic < 0 || ((__tpic + 1) > t->n_topic)){ __isbrf = 1; break;}/*they are constant.*/\
-spl_mutex_lock(__mtx__);\
-	do {\
-		if(SPLCHECKOFF(t)) { __isbrf = 1; break;};\
-		;\
-		if(t->arr_topic){\
-			if(STSPLOGBUFTOPIC(t,__tpic)->range > STSPLOGBUFTOPIC(t,__tpic)->pl) {\
-				len = snprintf(STSPLOGBUFTOPIC(t, __tpic)->data + STSPLOGBUFTOPIC(t, __tpic)->pl, \
-					STSPLOGBUFTOPIC(t,__tpic)->range - STSPLOGBUFTOPIC(t,__tpic)->pl, \
-					__c11fmt_c_str__, pprefmt, ##__VA_ARGS__);\
-				if(len > 0) STSPLOGBUFTOPIC(t,__tpic)->pl += (len-1);\
-			}\
-		}else{__isbrf = 1; break;;}\
+#define STSPLOGBUFTOPIC(__t__,__i__)							(&(__t__->arr_topic[__i__]))->buf
+#define STSPLOGBUFTOPIC_RANGE(__t__,__i__, __r__)				((generic_dta_st*)((char *)STSPLOGBUFTOPIC(__t__,__i__) + t->buff_size * __r__))
+////////////////hereeeeeeeeeeeeeee
+#define __spl_log_buf_topic_level__(__lv__, __tpic, ___fmttt___, ...)	\
+{ \
+	if(spl_get_log_levwel() <= (__lv__) ) \
+	{\
+		;int len = 0;unsigned short r = 0;;const char *pfn = 0;SIMPLE_LOG_ST *t = 0;\
+		;int outlen = 0;;char *pprefmt = 0;; char tnow[SPL_RL_BUF];;;\
+		; __FILLE__(pfn);t = spl_control_obj();\
+		;pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r, &outlen);;\
+		do\
+		{\
+			spl_mutex_lock(t->arr_mtx[r]);\
+				/*do \
+				{*/\
+					if(t->arr_topic){\
+						if(STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->range > STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl) {\
+							;memcpy(STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->data + STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl, pprefmt, outlen);\
+							;STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl += outlen;;\
+							;len = snprintf(STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->data + STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl, \
+								STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->range + SPL_MEMO_PADDING - STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl, \
+								___fmttt___, ##__VA_ARGS__);\
+							;*(SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl) = '\n'; SPLKEYBUF(t, r)->pl++;\
+							;/*spl_console_log("--------------lllllllennnnnnnnnnnnnnnnn---r: %d, len: %d", (int)r, len);*/;\
+							if(len > 0) STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl += len;\
+						}\
+					}\
+				/*}\
+				while(0);*/\
+			spl_mutex_unlock(t->arr_mtx[r]);\
+			if(len > 0) break;r++; r%=t->ncpu;;continue;\
+		}\
+		while(1);\
+		if(!t->trigger_thread)spl_rel_sem(t->sem_rwfile);;if(pprefmt != tnow) { free(pprefmt);}\
 	}\
-	while(0);\
-spl_mutex_unlock(__mtx__);\
-if(len > 0) break;if(__isbrf)break;spl_milli_sleep(10);continue;\
-}\
-while(1);\
-spl_rel_sem(spl_get_sem_rwfile());if(pprefmt != tnow) { free(pprefmt);}}\
 }
+
 
 
 #endif
