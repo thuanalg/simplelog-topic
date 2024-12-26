@@ -15,13 +15,13 @@
 
 void dotest();
 int num_threads = 10;
-int loop_count = 1000 * 1000;
+int loop_count = 100 * 1;
 
 #define		TNUMBEER_OF_THREADS					"--nthread="	
 #define		TCONFIG_FILE						"--cfg="	
 #define		TLOOP_COUNT							"--loopcount="	
 
-int main__(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
 	int ret = 0, i = 0;
 	char cfgpath[1024];
 	for (i = 1; i < argc; ++i) {
@@ -119,7 +119,7 @@ void* posix_thread_routine(void* lpParam) {
 		while (count < loop_count) {
 			spllog(SPL_LOG_INFO, "test log: %d", count);
 			//tpic = (spl_milli_now() % 3);
-			//spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+			spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
 			//splloglib(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "lib");
 			//spllogexe(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
 			//spllognaxyax(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
@@ -133,7 +133,7 @@ void* posix_thread_routine(void* lpParam) {
 	return 0;
 }
 
-int main(int argc, char* argv[]) {
+int main____(int argc, char* argv[]) {
 	int ret = 0;
 	//int ret = spl_init_log((char *)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
 #ifndef UNIX_LINUX
@@ -146,7 +146,7 @@ int main(int argc, char* argv[]) {
 	for (int i = 0; i < count; ++i) {
 		//spl_console_log("spl_milli_sleep ------------------------------ ");
 		spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), 0);
-		//spllog(SPL_LOG_INFO, "test log %d", i);
+		spllog(SPL_LOG_INFO, "test log %d", i);
 	}
 	//spl_milli_sleep( 1000 * 100);
 	spl_finish_log();

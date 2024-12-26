@@ -784,50 +784,54 @@ void* spl_written_thread_routine(void* lpParam)
 	char* thrd_buffer = 0;
 	int total_buf_sz = 0;
 	generic_dta_st* tmpBuff = 0;
-	total_buf_sz = (t->buff_size * (1 + t->n_topic)) * t->ncpu;
-	spl_malloc(total_buf_sz, thrd_buffer, char);
+
 	register char is_off = 0;
 	register int i = 0, j = 0;
-	char** main_buff = 0;
-	char** st_buff = 0;
+	
+	char** main_src_thrd_buf = 0;
+	char** main_dst_thrd_buf = 0;
+	
+	char*** src_topic_thrd_buf = 0;
+	char*** dst_topic_thrd_buf = 0;	
+	
+	total_buf_sz = (t->buff_size * (1 + t->n_topic)) * t->ncpu;
+	spl_malloc(total_buf_sz, thrd_buffer, char);
+	
+	//generic_dta_st* yyyy = 0;
+	//main_dst_thrd_buf
 
-	char*** topic_thrd_buff = 0;
-	char*** topic_st_buff = 0;
-	generic_dta_st* yyyy = 0;
-	//main_buff
-
-	spl_malloc(t->ncpu * sizeof(char*), st_buff, char*);
+	spl_malloc(t->ncpu * sizeof(char*), main_src_thrd_buf, char*);
 	for (i = 0; i < t->ncpu; ++i) {
 		char* p = (char*)t->buf;
-		st_buff[i] = p + t->buff_size * i;
-		//yyyy = MYCASTGEN(st_buff[i]);
+		main_src_thrd_buf[i] = p + t->buff_size * i;
+		//yyyy = MYCASTGEN(main_src_thrd_buf[i]);
 		//int k = 0;
 	}
 
-	spl_malloc(t->ncpu * sizeof( char*), main_buff, char*);
+	spl_malloc(t->ncpu * sizeof( char*), main_dst_thrd_buf, char*);
 	for (i = 0; i < t->ncpu; ++i) {
-		main_buff[i] = thrd_buffer + t->buff_size * i;
-		yyyy = MYCASTGEN(main_buff[i]);
-		int k = 0;
+		main_dst_thrd_buf[i] = thrd_buffer + t->buff_size * i;
+		//yyyy = MYCASTGEN(main_dst_thrd_buf[i]);
+		//int k = 0;
 	}
 	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 	
 	if (t->arr_topic)
 	{
-		spl_malloc(t->n_topic * sizeof(char*), topic_st_buff, char**);
+		spl_malloc(t->n_topic * sizeof(char*), src_topic_thrd_buf, char**);
 		for (i = 0; i < t->n_topic; ++i) {
 			char* p = (char*)t->arr_topic[i].buf;
-			spl_malloc(t->ncpu * sizeof(char*), topic_st_buff[i], char*);
+			spl_malloc(t->ncpu * sizeof(char*), src_topic_thrd_buf[i], char*);
 			for (j = 0; j < t->ncpu; ++j) {
-				topic_st_buff[i][j] = p + t->buff_size * j;
+				src_topic_thrd_buf[i][j] = p + t->buff_size * j;
 			}
 		}
-		spl_malloc(t->n_topic * sizeof(char*), topic_thrd_buff, char**);
+		spl_malloc(t->n_topic * sizeof(char*), dst_topic_thrd_buf, char**);
 		for (i = 0; i < t->n_topic; ++i) {
 			char* p = thrd_buffer + t->buff_size * (1 + i) * t->ncpu;
-			spl_malloc(t->ncpu * sizeof(char*), topic_thrd_buff[i], char*);
+			spl_malloc(t->ncpu * sizeof(char*), dst_topic_thrd_buf[i], char*);
 			for (j = 0; j < t->ncpu; ++j) {
-				topic_thrd_buff[i][j] = p + t->buff_size * j;
+				dst_topic_thrd_buf[i][j] = p + t->buff_size * j;
 			}
 		}
 	}
@@ -882,27 +886,7 @@ void* spl_written_thread_routine(void* lpParam)
 					spl_console_log("--spl_gen_topics, ret: %d --\n", ret);
 					continue;
 				}
-				/*
-				spl_mutex_lock(t->mtx_rw);
-				do {
-					is_off = t->off;
-					//if (t->buf->pl > t->buf->pc) {
-					if (t->buf->pl) {
 
-						memcpy(buffer, t->buf, sizeof(generic_dta_st) + t->buf->pl);
-						t->buf->pl = 0;
-						//t->buf->pl = t->buf->pc = 0;
-					}
-					for (i = 0; i < t->n_topic; ++i) {
-						if (t->arr_topic[i].buf->pl > t->arr_topic[i].buf->pc) {
-							memcpy(buffer + (t->buff_size * (i + 1)), t->arr_topic[i].buf, sizeof(generic_dta_st) + t->arr_topic[i].buf->pl);
-							//t->arr_topic[i].buf->pl = t->arr_topic[i].buf->pc = 0;
-							t->arr_topic[i].buf->pl = 0;
-						}
-					}
-				} while (0);
-				spl_mutex_unlock(t->mtx_rw);
-				*/
 				//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 				if (!is_off) {
 					spl_mutex_lock(t->mtx_rw);
@@ -914,25 +898,23 @@ void* spl_written_thread_routine(void* lpParam)
 				for (i = 0; i < t->ncpu; ++i) {
 					spl_mutex_lock(t->arr_mtx[i]);
 					//do {
-						//yyyy = MYCASTGEN(st_buff[i]);
-						if (MYCASTGEN(st_buff[i])->pl > 0) {
-							int n = MYCASTGEN(st_buff[i])->pl;
-							memcpy(main_buff[i], st_buff[i], sizeof(generic_dta_st) + MYCASTGEN(st_buff[i])->pl);
-							MYCASTGEN(st_buff[i])->pl = 0;
+						//yyyy = MYCASTGEN(main_src_thrd_buf[i]);
+						if (MYCASTGEN(main_src_thrd_buf[i])->pl > 0) {
+							int n = MYCASTGEN(main_src_thrd_buf[i])->pl;
+							memcpy(main_dst_thrd_buf[i], main_src_thrd_buf[i], sizeof(generic_dta_st) + MYCASTGEN(main_src_thrd_buf[i])->pl);
+							MYCASTGEN(main_src_thrd_buf[i])->pl = 0;
 						}
 					//} while (0);
 					spl_mutex_unlock(t->arr_mtx[i]);
 				}
-				//if (is_off) {
-				//	spl_console_log("======================== is_off: %d", (int)is_off);
-				//}
+
 				if (t->n_topic > 0) {
 					char* src = 0;
 					char* dst = 0;
 					for (i = 0; i < t->n_topic; ++i) {
 						for (j = 0; j < t->ncpu; ++j) {
-							src = topic_st_buff[i][j];
-							dst = topic_thrd_buff[i][j];
+							src = src_topic_thrd_buf[i][j];
+							dst = dst_topic_thrd_buf[i][j];
 							spl_mutex_lock(t->arr_mtx[j]);
 							//do {
 								if (MYCASTGEN(src)->pl > 0) {
@@ -948,10 +930,10 @@ void* spl_written_thread_routine(void* lpParam)
 				}
 				//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 				for (i = 0; i < t->ncpu; ++i) {
-					//yyyy = MYCASTGEN(main_buff[i]);
-					if (MYCASTGEN(main_buff[i])->pl > 0) {
-						k = (int)fwrite(MYCASTGEN(main_buff[i])->data, 1, MYCASTGEN(main_buff[i])->pl, t->fp);
-						MYCASTGEN(main_buff[i])->pl = 0;
+					//yyyy = MYCASTGEN(main_dst_thrd_buf[i]);
+					if (MYCASTGEN(main_dst_thrd_buf[i])->pl > 0) {
+						k = (int)fwrite(MYCASTGEN(main_dst_thrd_buf[i])->data, 1, MYCASTGEN(main_dst_thrd_buf[i])->pl, t->fp);
+						MYCASTGEN(main_dst_thrd_buf[i])->pl = 0;
 						sz += k;
 					}
 				}
@@ -973,7 +955,7 @@ void* spl_written_thread_routine(void* lpParam)
 					//t->arr_topic[i].fizize += k;
 					char* dst = 0;
 					for (j = 0; j < t->ncpu; ++j) {
-						dst = topic_thrd_buff[i][j];
+						dst = dst_topic_thrd_buf[i][j];
 						if (MYCASTGEN(dst)->pl > 0) {
 							k = (int)fwrite(MYCASTGEN(dst)->data, 1, MYCASTGEN(dst)->pl, (FILE*)(t->arr_topic[i].fp));
 							MYCASTGEN(dst)->pl = 0;
@@ -1017,18 +999,18 @@ void* spl_written_thread_routine(void* lpParam)
 		
 	} while (0);
 	spl_free(thrd_buffer);
-	spl_free(main_buff);
-	spl_free(st_buff);
+	spl_free(main_dst_thrd_buf);
+	spl_free(main_src_thrd_buf);
 	if (t->arr_topic) {
 		for (i = 0; i < t->n_topic; ++i) {
-			spl_free(topic_st_buff[i]);
+			spl_free(src_topic_thrd_buf[i]);
 		}
-		spl_free(topic_st_buff);
+		spl_free(src_topic_thrd_buf);
 
 		for (i = 0; i < t->n_topic; ++i) {
-			spl_free(topic_thrd_buff[i]);
+			spl_free(dst_topic_thrd_buf[i]);
 		}
-		spl_free(topic_thrd_buff);
+		spl_free(dst_topic_thrd_buf);
 	}
 	/*Send a signal to the waiting thread.*/
 	spl_rel_sem(__simple_log_static__.sem_rwfile);

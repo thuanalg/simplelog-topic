@@ -287,9 +287,9 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 							;memcpy(STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->data + STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl, pprefmt, outlen);\
 							;STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl += outlen;;\
 							;len = snprintf(STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->data + STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl, \
-								STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->range - STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl, \
+								STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->range + SPL_MEMO_PADDING - STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl, \
 								___fmttt___"\n", ##__VA_ARGS__);\
-							;spl_console_log("--------------lllllllennnnnnnnnnnnnnnnn---r: %d, len: %d", (int)r, len);;\
+							;/*spl_console_log("--------------lllllllennnnnnnnnnnnnnnnn---r: %d, len: %d", (int)r, len);*/;\
 							if(len > 0) STSPLOGBUFTOPIC_RANGE(t,__tpic, r)->pl += len;\
 						}\
 					}\
