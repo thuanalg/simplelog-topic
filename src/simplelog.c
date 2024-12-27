@@ -1026,30 +1026,20 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 		_tnow = t;
 		_tnow *= 1000;
 		_tnow += stt.nn;
-		//do {
-		//	spl_mutex_lock(__simple_log_static__.mtx_off);
-		//		do {
-		//
-		//			if (!pre_tnow) {
-		//				break;
-		//			}
-		//			if (_tnow > pre_tnow) {
-		//				_delta = _tnow - pre_tnow;
-		//			}
-		//		} while (0);
-		//		pre_tnow = _tnow;
-		//	spl_mutex_unlock(__simple_log_static__.mtx_off);
-		//} while (0);
-
 		n = snprintf(buff, 20, SPL_FMT_DATE_ADDING, stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day);
 		if (n < 1) {
 			ret = SPL_LOG_PRINTF_ERROR;
 			break;
 		}
-		n = snprintf(buff1, 20, SPL_FMT_HOUR_ADDING, stt.hour, stt.minute, stt.sec);
-		*outlen = snprintf(fmtt, len, "["SPL_FMT_DELT_ADDING"] [%s] [tid:\t %llu]\t[%s:%s:%d]\t",
-			buff, buff1, (unsigned int)stt.nn, spl_get_text(lv), spl_get_threadid(), 
-			filename, funcname, line);
+		//n = snprintf(buff1, 20, SPL_FMT_HOUR_ADDING, stt.hour, stt.minute, stt.sec);
+		//*outlen = snprintf(fmtt, len, "["SPL_FMT_DELT_ADDING"] [%s] [tid:\t %llu]\t[%s:%s:%d]\t",
+		//	buff, buff1, (unsigned int)stt.nn, spl_get_text(lv), spl_get_threadid(), 
+		//	filename, funcname, line);
+		//
+		
+		memcpy(fmtt, "rrrrrrrrrrrrrrrrrrrrrrrrQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ110000000000000000000000000000000000000000000AAAAAA ", 
+				86);
+		*outlen = 86;
 	} while (0);
 	//spl_console_log("---------)))))))))))))))))))))))--------------=========================");
 	return p;
