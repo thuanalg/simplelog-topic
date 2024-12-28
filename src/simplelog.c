@@ -35,7 +35,16 @@
 	#include <semaphore.h>
 	#include <unistd.h>
 	#include <errno.h>
-
+	#include <sys/types.h>
+	#include <sys/stat.h>
+	#include <pthread.h>
+	#include <semaphore.h>
+	#include <unistd.h>
+	#include <sys/mman.h>
+	#include <sys/stat.h> /* For mode constants */
+	#include <fcntl.h> /* For O_* constants */
+	#include <errno.h>
+	
 	#define YEAR_PADDING				1900
 	#define MONTH_PADDING				1
 #endif
