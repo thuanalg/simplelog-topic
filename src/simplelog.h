@@ -216,6 +216,16 @@ extern "C" {
 		unsigned short mod;
 		//HANDLE dummy_lock;
 	} SIMPLE_LOG_ST;
+typedef struct {
+	int outlen ;
+	const char* finame ;
+	const char* fcname;
+	int line;
+	char tnow[SPL_RL_BUF];
+	char *prefmt;
+	int lv;
+	unsigned short r ;
+} FMT_FOR_OUTPUT;
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
 #define __FILLE__(__p__)	do { __p__ = strrchr(__FILE__, '/'); if(__p__) {++__p__;break;} \
@@ -239,6 +249,7 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 {;;\
 	if(spl_get_log_levwel() <= (__lv__) )\
 	{\
+		;FMT_FOR_OUTPUT prefmt;\
 		;int outlen = 0;;const char *pfn = 0;/*char __isOof = 0;*/ ;\
 		;unsigned short r = 0;;char tnow[SPL_RL_BUF]; char *pprefmt = 0; \
 		;SIMPLE_LOG_ST *t = spl_control_obj();;\
@@ -496,6 +507,8 @@ DLL_API_SIMPLE_LOG
 
 DLL_API_SIMPLE_LOG
 	SIMPLE_LOG_ST *spl_control_obj();
+DLL_API_SIMPLE_LOG
+	void spl_prefmt_now(FMT_FOR_OUTPUT* p);
 
 //DLL_API_SIMPLE_LOG
 //	void splLockSpinlock(volatile long* p);
