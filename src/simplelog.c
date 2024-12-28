@@ -117,6 +117,8 @@
 	"%s %s.%.9u"
 #define SPL_FMT_MILL_ADDING \
 	"%s %s.%.9d"
+#define SPL_FMT_DATE_ADDING_X \
+	"\n[%.4d-%.2d-%.2d %.2d:%.2d:%.2d.%.9d] "
 
 #define				SPL_TEXT_UNKNOWN				"U"
 #define				SPL_TEXT_DEBUG					"D"
@@ -1022,8 +1024,39 @@ int spl_simple_log_thread(SIMPLE_LOG_ST* t) {
 	return ret;
 }
 /*===========================================================================================================================*/
-void spl_prefmt_now(FMT_FOR_OUTPUT* p) {
+int spl_prefmt_now(FMT_FOR_OUTPUT* p) {
+	spl_local_time_st stt;
+	int n = 0;
+	int ret = 0;
+	p->outlen = 0;
+	p->prefmt = p->tnow;
+	do {
+		//memset(&stt, 0, sizeof(stt));
+		ret = spl_local_time_now(&stt);
+		if (ret) {
+			break;
+		}
+		(p->r) = (stt.nn % __simple_log_static__.ncpu);
 
+		n = sprintf(p->tnow, SPL_FMT_DATE_ADDING_X,
+			stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day,
+			stt.hour, stt.minute, stt.sec, (unsigned int)stt.nn);
+		if (p->outlen < 1) {
+			ret = SPL_LOG_PRINTF_ERROR;
+			break;
+		}
+
+		p->outlen = n;
+		
+		p->outlen += snprintf(p->tnow + n, SPL_RL_BUF - n, "[%s] [tid:\t %llu]\t[%s:%s:%d]\t",
+			spl_text_label_gb[p->lv % SPL_LOG_PEAK], spl_get_threadid(),
+			p->finame, p->fcname, p->line);
+
+		//		memcpy(fmtt, "-------------------------------------------------------------------------------------------------------------------------------------\
+		//			-----------------------------------------------------------------------------------", 86);
+		//					*outlen = 86;
+	} while (0);
+	return ret;
 }
 /*===========================================================================================================================*/
 char* spl_fmt_now_ext(char* fmtt, int len, int lv, 
@@ -1049,8 +1082,7 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 			ret = (int)SPL_LOG_FMT_NULL_ERROR;
 			break;
 		}
-#define SPL_FMT_DATE_ADDING_X \
-	"\n[%.4d-%.2d-%.2d %.2d:%.2d:%.2d.%.9d] "
+
 		n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X,
 			stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day,
 			stt.hour, stt.minute, stt.sec, (unsigned int)stt.nn);
