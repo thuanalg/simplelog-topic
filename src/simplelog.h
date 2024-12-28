@@ -208,6 +208,8 @@ extern "C" {
 			trigger_thread; /*Use trigger thread or not.*/
 		void	
 			**arr_mtx; /*Use trigger thread or not.*/
+		unsigned short mod;
+		//HANDLE dummy_lock;
 	} SIMPLE_LOG_ST;
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
@@ -233,7 +235,8 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 	if(spl_get_log_levwel() <= (__lv__) )\
 	{\
 		;int outlen = 0;;const char *pfn = 0;/*char __isOof = 0;*/ ;\
-		;;unsigned short r = 0;char tnow[SPL_RL_BUF]; char *pprefmt = 0; ;SIMPLE_LOG_ST *t = spl_control_obj();\
+		;unsigned short r = 0;;char tnow[SPL_RL_BUF]; char *pprefmt = 0; \
+		;SIMPLE_LOG_ST *t = spl_control_obj();;\
 		;;__FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r, &outlen);;\
 		{\
 			do{\
@@ -251,7 +254,9 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 					\
 				spl_mutex_unlock(t->arr_mtx[r]); \
 				\
-				if(len > 0) break; r++; r%=t->ncpu;\
+				if(len > 0) break;\
+				;/*spl_console_log("---------------------------OVERRRRRRRRRRRRRRRRRRR======================, r: %d", (int)r);*/\
+				;r++; r%=t->ncpu;\
 				;;continue;\
 			}\
 			while(1);\
@@ -295,7 +300,9 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 				/*}\
 				while(0);*/\
 			spl_mutex_unlock(t->arr_mtx[r]);\
-			if(len > 0) break;r++; r%=t->ncpu;;continue;\
+			if(len > 0) break;\
+			;\
+			;r++; r%=t->ncpu;;continue;\
 		}\
 		while(1);\
 		if(!t->trigger_thread)spl_rel_sem(t->sem_rwfile);;if(pprefmt != tnow) { free(pprefmt);}\
@@ -484,6 +491,7 @@ DLL_API_SIMPLE_LOG
 
 DLL_API_SIMPLE_LOG
 	SIMPLE_LOG_ST *spl_control_obj();
+
 //DLL_API_SIMPLE_LOG
 //	void splLockSpinlock(volatile long* p);
 //DLL_API_SIMPLE_LOG
