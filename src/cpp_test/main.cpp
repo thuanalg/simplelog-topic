@@ -142,7 +142,7 @@ int main__(int argc, char* argv[]) {
 	ret = spl_init_log((char*)"simplelog.cfg");
 #endif
 	int count = 2;
-	//spl_milli_sleep(1000 * 5);
+	spl_milli_sleep(1000 * 5);
 	for (int i = 0; i < count; ++i) {
 		//spl_console_log("spl_milli_sleep ------------------------------ ");
 		//spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), 0);

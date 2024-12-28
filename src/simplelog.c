@@ -213,6 +213,10 @@ static int
 	spl_create_thread(THREAD_ROUTINE f, void* arg);
 static void*
 	spl_trigger_routine(void* arg);
+static int \
+	spl_del_memory(void* shmm);
+static int 
+	spl_create_memory(void** output, char* shared_key, int size_shared, char isCreating);
 /*===========================================================================================================================*/
 SIMPLE_LOG_ST* spl_control_obj() {
 	//spl_con
@@ -800,7 +804,8 @@ void* spl_written_thread_routine(void* lpParam)
 
 	char* only_buf = 0;
 	generic_dta_st* only_cast = 0;
-	spl_malloc((t->buff_size * t->ncpu), only_buf, char);
+	//spl_malloc((t->buff_size * t->ncpu), only_buf, char);
+	spl_create_memory((void**)&only_buf, "thread_buff_123", (t->buff_size * t->ncpu), 1);
 	only_cast = MYCASTGEN(only_buf);
 	only_cast->total = (t->buff_size * t->ncpu);
 	only_cast->range = only_cast->total - sizeof(generic_dta_st);
@@ -951,7 +956,8 @@ void* spl_written_thread_routine(void* lpParam)
 			}
 			spl_mutex_lock(t->mtx_rw);
 				if (t->buf) {
-					spl_free(t->buf);
+					//spl_free(t->buf);
+					spl_del_memory((void*)t->buf);
 				}
 				for (i = 0; i < t->n_topic; ++i) {
 					if (t->arr_topic[i].buf) {
@@ -971,7 +977,8 @@ void* spl_written_thread_routine(void* lpParam)
 		}
 		spl_free(src_topic_thrd_buf);
 	}
-	spl_free(only_buf);
+	//spl_free(only_buf);
+	spl_del_memory((void *) only_buf);
 	/*Send a signal to the waiting thread.*/
 	spl_rel_sem(__simple_log_static__.sem_rwfile);
 	spl_rel_sem(__simple_log_static__.sem_off);
@@ -1816,7 +1823,11 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 	int total_buf_sz = 0;
 	generic_dta_st* tmpBuff = 0;
 	total_buf_sz = (t->buff_size * t->ncpu) * (1 + t->n_topic) ;
-	spl_malloc(total_buf_sz, buffer, char);
+	//spl_malloc(total_buf_sz, buffer, char);
+	spl_create_memory((void**)&buffer, "mani_buf", total_buf_sz, 1);
+	if (!buffer) {
+		exit(1);
+	}
 	do {
 		if (!buffer) {
 			ret = SPL_LOG_TOPIC_BUFF_MEM;
@@ -1972,6 +1983,67 @@ int spl_create_thread(THREAD_ROUTINE f, void* arg) {
 	}
 #endif
 	return ret;
+}
+/*===========================================================================================================================*/
+
+int spl_del_memory(void* shmm) {
+	int ret = 0;
+	int isWell = 0;
+	isWell = UnmapViewOfFile(shmm);
+	if (!isWell) {
+		spl_console_log("UnmapViewOfFile error: %d", (int)GetLastError());
+		ret = SPL_LOG_SHM_CREATE_UNMAP;
+	}
+	return ret;
+}
+/*===========================================================================================================================*/
+int spl_create_memory(void** output, char* shared_key, int size_shared, char isCreating) {
+	int ret = 0;
+	char* p = 0;
+	do {
+		HANDLE hMapFile = 0;
+		char* p = 0;
+		if (!output) {
+			ret = SPL_LOG_SHM_CREATE_NULL;
+			break;
+		}
+		if (isCreating) {
+			hMapFile = CreateFileMappingA(
+				INVALID_HANDLE_VALUE,    // use paging file
+				NULL,                    // default security
+				PAGE_READWRITE,          // read/write access
+				0,                       // maximum object size (high-order DWORD)
+				size_shared,                // maximum object size (low-order DWORD)
+				shared_key);                 // name of mapping object
+
+			if (!hMapFile) {
+				fprintf(stdout, "Cannot create SHM. error: %d\n", (int)GetLastError());
+				ret = 1;
+				break;
+			}
+		}
+		else {
+			hMapFile = OpenFileMappingA(
+				FILE_MAP_ALL_ACCESS, 0, shared_key);
+			if (!hMapFile) {
+				ret = 2;
+				fprintf(stdout, "Cannot open SHM. error: %d\n", (int)GetLastError());
+				break;
+			}
+		}
+		if (ret) {
+			break;
+		}
+		p = (char*)MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, size_shared);
+		if (!p) {
+			ret = 3;
+			fprintf(stdout, "Cannot MapViewOfFile. error: %d\n", (int)GetLastError());
+			break;
+		}
+		memset(p, 0, size_shared);
+		*output = (void*)p;
+	} while (0);
+	return ret = 0;
 }
 /*===========================================================================================================================*/
 #ifndef UNIX_LINUX
