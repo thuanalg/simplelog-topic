@@ -804,7 +804,9 @@ void* spl_written_thread_routine(void* lpParam)
 
 	char* only_buf = 0;
 	generic_dta_st* only_cast = 0;
+	k = 3;
 	spl_malloc((t->buff_size * t->ncpu), only_buf, char);
+	//spl_malloc((t->buff_size * 3), only_buf, char);
 	//spl_create_memory((void**)&only_buf, "thread_buff_123", (t->buff_size * t->ncpu), 1);
 	only_cast = MYCASTGEN(only_buf);
 	only_cast->total = (t->buff_size * t->ncpu);
@@ -897,6 +899,7 @@ void* spl_written_thread_routine(void* lpParam)
 					spl_mutex_unlock(t->arr_mtx[i]);
 				}
 				//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+				//if (only_cast->pl > 0) {
 				if (only_cast->pl > 0) {
 					k = (int)fwrite(only_cast->data, 1, only_cast->pl, t->fp);
 					only_cast->pl = 0;
