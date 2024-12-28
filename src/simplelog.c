@@ -219,6 +219,15 @@ SIMPLE_LOG_ST* spl_control_obj() {
 	return (SIMPLE_LOG_ST*)&__simple_log_static__;
 }
 /*===========================================================================================================================*/
+static const char* spl_text_label_gb[SPL_LOG_PEAK] = {
+	"A",
+	"D",
+	"I",
+	"W",
+	"E",
+	"F",
+};
+/*===========================================================================================================================*/
 int spl_local_time_now(spl_local_time_st*stt) {
 	int ret = 0;
 #ifndef UNIX_LINUX
@@ -1000,15 +1009,10 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 	char* p = fmtt;
 	int ret = 0;
 	spl_local_time_st stt;
-	static LLU pre_tnow = 0;
-	LLU _tnow = 0;
-	LLU _delta = 0;
 	int n = 0;
 	char buff[20], buff1[20];
-	memset(buff, 0, 20);
-	memset(buff1, 0, 20);
-	//spl_console_log("-----------------------=========================");
-	time_t t = time(0);
+	//memset(buff, 0, sizeof(buff));
+	memset(buff1, 0, sizeof(buff1));
 	do {
 		memset(&stt, 0, sizeof(stt));
 		ret = spl_local_time_now(&stt);
@@ -1022,24 +1026,20 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 			ret = (int)SPL_LOG_FMT_NULL_ERROR;
 			break;
 		}
-
-		_tnow = t;
-		_tnow *= 1000;
-		_tnow += stt.nn;
-		n = snprintf(buff, 20, SPL_FMT_DATE_ADDING, stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day);
+#define SPL_FMT_DATE_ADDING_X \
+	"\n[%.4d-%.2d-%.2d %.2d:%.2d:%.2d.%.9d] "
+		n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X,
+			stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day,
+			stt.hour, stt.minute, stt.sec, (unsigned int)stt.nn);
 		if (n < 1) {
 			ret = SPL_LOG_PRINTF_ERROR;
 			break;
 		}
-		//n = snprintf(buff1, 20, SPL_FMT_HOUR_ADDING, stt.hour, stt.minute, stt.sec);
-		//*outlen = snprintf(fmtt, len, "["SPL_FMT_DELT_ADDING"] [%s] [tid:\t %llu]\t[%s:%s:%d]\t",
-		//	buff, buff1, (unsigned int)stt.nn, spl_get_text(lv), spl_get_threadid(), 
-		//	filename, funcname, line);
-		//
+		*outlen = n;
+		*outlen += snprintf(fmtt + n , len -n , "[%s] [tid:\t %llu]\t[%s:%s:%d]\t",
+			spl_text_label_gb[lv% SPL_LOG_PEAK], spl_get_threadid(),
+			filename, funcname, line);
 		
-		memcpy(fmtt, "rrrrrrrrrrrrrrrrrrrrrrrrQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ110000000000000000000000000000000000000000000AAAAAA ", 
-				86);
-		*outlen = 86;
 	} while (0);
 	//spl_console_log("---------)))))))))))))))))))))))--------------=========================");
 	return p;

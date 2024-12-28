@@ -245,7 +245,7 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 						if(SPLKEYBUF(t, r)->range > SPLKEYBUF(t, r)->pl) {\
 							;memcpy(SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl, pprefmt, outlen);SPLKEYBUF(t, r)->pl += outlen;\
 							;len = snprintf( SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl, (SPLKEYBUF(t, r)->range + SPL_MEMO_PADDING - SPLKEYBUF(t, r)->pl), \
-								___fmttt___"\n", ##__VA_ARGS__); if(len > 0) SPLKEYBUF(t, r)->pl += (len); ;\
+								___fmttt___, ##__VA_ARGS__); if(len > 0) SPLKEYBUF(t, r)->pl += (len); ;\
 							\
 						}\
 					\
@@ -287,7 +287,7 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 							;STSPLOGBUFTOPIC_RANGE(t, tpp, r)->pl += outlen;;\
 							;len = snprintf(STSPLOGBUFTOPIC_RANGE(t,tpp, r)->data + STSPLOGBUFTOPIC_RANGE(t,tpp, r)->pl, \
 								STSPLOGBUFTOPIC_RANGE(t, tpp, r)->range + SPL_MEMO_PADDING - STSPLOGBUFTOPIC_RANGE(t, tpp, r)->pl, \
-								___fmttt___"\n", ##__VA_ARGS__);\
+								___fmttt___, ##__VA_ARGS__);\
 							;/*spl_console_log("--------------lllllllennnnnnnnnnnnnnnnn---r: %d, len: %d", (int)r, len);*/;\
 							if(len > 0) STSPLOGBUFTOPIC_RANGE(t, tpp, r)->pl += len;\
 						}\
