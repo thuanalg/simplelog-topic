@@ -2052,31 +2052,31 @@ int spl_create_memory(void** output, char* shared_key, int size_shared, char isC
 			break;
 		}
 #else
-//		int hMapFile = 0
-//		int err = 0;
-//		hMapFile = shm_open(shared_key, SPL_LOG_UNIX_CREATE_MODE, SPL_LOG_UNIX__SHARED_MODE);
-//		if (hMapFile > 0) {
-//			break;
-//		}
-//		hMapFile = shm_open(shared_key, SPL_LOG_UNIX_OPEN_MODE, SPL_LOG_UNIX__SHARED_MODE);
-//		if (hMapFile < 1) {
-//			spl_console_log("SPL_LOG_SHM_UNIX_OPEN option creating");
-//			ret = SPL_LOG_SHM_UNIX_OPEN;
-//			break;
-//		}
-//		err = ftruncate(hMapFile, size_shared);
-//		if (err) {
-//			spl_console_log("SPL_LOG_SHM_UNIX_TRUNC");
-//			ret = SPL_LOG_SHM_UNIX_TRUNC;
-//			break;
-//		}
-//		p = (char*)mmap(0, size_shared, SPL_LOG_UNIX_PROT_FLAGS, MAP_SHARED, hMapFile, 0);
-//		if (p == MAP_FAILED || p == 0) {
-//			ret = SPL_LOG_SHM_UNIX_MAP_FAILED;
-//			spl_console_log("SPL_LOG_SHM_UNIX_MAP_FAILED");
-//			p = 0;
-//			break;
-//		}
+		int hMapFile = 0
+		int err = 0;
+		hMapFile = shm_open(shared_key, SPL_LOG_UNIX_CREATE_MODE, SPL_LOG_UNIX__SHARED_MODE);
+		if (hMapFile > 0) {
+			break;
+		}
+		hMapFile = shm_open(shared_key, SPL_LOG_UNIX_OPEN_MODE, SPL_LOG_UNIX__SHARED_MODE);
+		if (hMapFile < 1) {
+			spl_console_log("SPL_LOG_SHM_UNIX_OPEN option creating");
+			ret = SPL_LOG_SHM_UNIX_OPEN;
+			break;
+		}
+		err = ftruncate(hMapFile, size_shared);
+		if (err) {
+			spl_console_log("SPL_LOG_SHM_UNIX_TRUNC");
+			ret = SPL_LOG_SHM_UNIX_TRUNC;
+			break;
+		}
+		p = (char*)mmap(0, size_shared, SPL_LOG_UNIX_PROT_FLAGS, MAP_SHARED, hMapFile, 0);
+		if (p == MAP_FAILED || p == 0) {
+			ret = SPL_LOG_SHM_UNIX_MAP_FAILED;
+			spl_console_log("SPL_LOG_SHM_UNIX_MAP_FAILED");
+			p = 0;
+			break;
+		}
 #endif
 		memset(p, 0, size_shared);
 		*output = (void*)p;
