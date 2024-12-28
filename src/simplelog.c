@@ -1067,9 +1067,9 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 int spl_fmt_now(char* fmtt, int len) {
 	int ret = 0;
 	spl_local_time_st stt;
-	static LLU pre_tnow = 0;
+	//static LLU pre_tnow = 0;
 	LLU _tnow = 0;
-	LLU _delta = 0;
+	//LLU _delta = 0;
 	int n = 0; 
 	char buff[20], buff1[20];
 	memset(buff, 0, 20);
