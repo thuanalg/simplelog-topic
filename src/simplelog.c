@@ -2061,7 +2061,7 @@ int spl_create_memory(void** output, char* shared_key, int size_shared, char isC
 			break;
 		}
 #else
-		int hMapFile = 0
+		int hMapFile = 0;
 		int err = 0;
 		hMapFile = shm_open(shared_key, SPL_LOG_UNIX_CREATE_MODE, SPL_LOG_UNIX__SHARED_MODE);
 		if (hMapFile > 0) {
