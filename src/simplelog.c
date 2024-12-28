@@ -1047,21 +1047,21 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 		}
 #define SPL_FMT_DATE_ADDING_X \
 	"\n[%.4d-%.2d-%.2d %.2d:%.2d:%.2d.%.9d] "
-		//n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X,
-		//	stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day,
-		//	stt.hour, stt.minute, stt.sec, (unsigned int)stt.nn);
-		//if (n < 1) {
-		//	ret = SPL_LOG_PRINTF_ERROR;
-		//	break;
-		//}
-		//*outlen = n;
-		//*outlen += snprintf(fmtt + n , len - n , "[%s] [tid:\t %llu]\t[%s:%s:%d]\t",
-		//	spl_text_label_gb[lv%SPL_LOG_PEAK], spl_get_threadid(),
-		//	filename, funcname, line);
+		n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X,
+			stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day,
+			stt.hour, stt.minute, stt.sec, (unsigned int)stt.nn);
+		if (n < 1) {
+			ret = SPL_LOG_PRINTF_ERROR;
+			break;
+		}
+		*outlen = n;
+		*outlen += snprintf(fmtt + n , len - n , "[%s] [tid:\t %llu]\t[%s:%s:%d]\t",
+			spl_text_label_gb[lv%SPL_LOG_PEAK], spl_get_threadid(),
+			filename, funcname, line);
 		
-		memcpy(fmtt, "-------------------------------------------------------------------------------------------------------------------------------------\
------------------------------------------------------------------------------------", 86);
-		*outlen = 86;
+//		memcpy(fmtt, "-------------------------------------------------------------------------------------------------------------------------------------\
+//			-----------------------------------------------------------------------------------", 86);
+//					*outlen = 86;
 	} while (0);
 	//spl_console_log("---------)))))))))))))))))))))))--------------=========================");
 	return p;

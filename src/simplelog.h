@@ -239,10 +239,10 @@ fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUN
 {;;\
 	if(spl_get_log_levwel() <= (__lv__) )\
 	{\
-		;int outlen = 0;;const char *pfn = 0;/*char __isOof = 0;*/ ;\
+		;int outlen = 0;;/*const char *pfn = 0*/;/*char __isOof = 0;*/ ;\
 		;unsigned short r = 0;;char tnow[SPL_RL_BUF]; char *pprefmt = 0; \
 		;SIMPLE_LOG_ST *t = spl_control_obj();;\
-		;;__FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r, &outlen);;\
+		;;/*__FILLE__(pfn)*/;pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, __FILE__, __FUNCTION__, __LINE__, &r, &outlen);;\
 		{\
 			do{\
 				;int len = 0;; \
