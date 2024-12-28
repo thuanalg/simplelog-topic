@@ -1010,9 +1010,9 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 	int ret = 0;
 	spl_local_time_st stt;
 	int n = 0;
-	char buff[20], buff1[20];
+	//char buff[20], buff1[20];
 	//memset(buff, 0, sizeof(buff));
-	memset(buff1, 0, sizeof(buff1));
+	//memset(buff1, 0, sizeof(buff1));
 	do {
 		memset(&stt, 0, sizeof(stt));
 		ret = spl_local_time_now(&stt);
@@ -1036,8 +1036,8 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 			break;
 		}
 		*outlen = n;
-		*outlen += snprintf(fmtt + n , len -n , "[%s] [tid:\t %llu]\t[%s:%s:%d]\t",
-			spl_text_label_gb[lv% SPL_LOG_PEAK], spl_get_threadid(),
+		*outlen += snprintf(fmtt + n , len - n , "[%s] [tid:\t %llu]\t[%s:%s:%d]\t",
+			spl_text_label_gb[lv%SPL_LOG_PEAK], spl_get_threadid(),
 			filename, funcname, line);
 		
 	} while (0);
