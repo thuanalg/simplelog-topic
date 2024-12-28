@@ -804,8 +804,8 @@ void* spl_written_thread_routine(void* lpParam)
 
 	char* only_buf = 0;
 	generic_dta_st* only_cast = 0;
-	//spl_malloc((t->buff_size * t->ncpu), only_buf, char);
-	spl_create_memory((void**)&only_buf, "thread_buff_123", (t->buff_size * t->ncpu), 1);
+	spl_malloc((t->buff_size * t->ncpu), only_buf, char);
+	//spl_create_memory((void**)&only_buf, "thread_buff_123", (t->buff_size * t->ncpu), 1);
 	only_cast = MYCASTGEN(only_buf);
 	only_cast->total = (t->buff_size * t->ncpu);
 	only_cast->range = only_cast->total - sizeof(generic_dta_st);
@@ -956,8 +956,8 @@ void* spl_written_thread_routine(void* lpParam)
 			}
 			spl_mutex_lock(t->mtx_rw);
 				if (t->buf) {
-					//spl_free(t->buf);
-					spl_del_memory((void*)t->buf);
+					spl_free(t->buf);
+					//spl_del_memory((void*)t->buf);
 				}
 				for (i = 0; i < t->n_topic; ++i) {
 					if (t->arr_topic[i].buf) {
@@ -977,8 +977,8 @@ void* spl_written_thread_routine(void* lpParam)
 		}
 		spl_free(src_topic_thrd_buf);
 	}
-	//spl_free(only_buf);
-	spl_del_memory((void *) only_buf);
+	spl_free(only_buf);
+	//spl_del_memory((void *) only_buf);
 	/*Send a signal to the waiting thread.*/
 	spl_rel_sem(__simple_log_static__.sem_rwfile);
 	spl_rel_sem(__simple_log_static__.sem_off);
@@ -1823,8 +1823,8 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 	int total_buf_sz = 0;
 	generic_dta_st* tmpBuff = 0;
 	total_buf_sz = (t->buff_size * t->ncpu) * (1 + t->n_topic) ;
-	//spl_malloc(total_buf_sz, buffer, char);
-	spl_create_memory((void**)&buffer, "mani_buf", total_buf_sz, 1);
+	spl_malloc(total_buf_sz, buffer, char);
+	//spl_create_memory((void**)&buffer, "mani_buf", total_buf_sz, 1);
 	if (!buffer) {
 		exit(1);
 	}
@@ -1989,18 +1989,26 @@ int spl_create_thread(THREAD_ROUTINE f, void* arg) {
 int spl_del_memory(void* shmm) {
 	int ret = 0;
 	int isWell = 0;
+#ifndef UNIX_LINUX
 	isWell = UnmapViewOfFile(shmm);
 	if (!isWell) {
 		spl_console_log("UnmapViewOfFile error: %d", (int)GetLastError());
 		ret = SPL_LOG_SHM_CREATE_UNMAP;
 	}
+#else
+#endif
 	return ret;
 }
 /*===========================================================================================================================*/
+#define SPL_LOG_UNIX__SHARED_MODE					(S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)	
+#define SPL_LOG_UNIX_CREATE_MODE					(O_CREAT | O_RDWR | O_EXCL)	
+#define SPL_LOG_UNIX_OPEN_MODE						(O_RDWR | O_EXCL)	
+#define SPL_LOG_UNIX_PROT_FLAGS						(PROT_READ | PROT_WRITE | PROT_EXEC)
 int spl_create_memory(void** output, char* shared_key, int size_shared, char isCreating) {
 	int ret = 0;
 	char* p = 0;
 	do {
+#ifndef UNIX_LINUX
 		HANDLE hMapFile = 0;
 		char* p = 0;
 		if (!output) {
@@ -2040,8 +2048,36 @@ int spl_create_memory(void** output, char* shared_key, int size_shared, char isC
 			fprintf(stdout, "Cannot MapViewOfFile. error: %d\n", (int)GetLastError());
 			break;
 		}
+#else
+//		int hMapFile = 0
+//		int err = 0;
+//		hMapFile = shm_open(shared_key, SPL_LOG_UNIX_CREATE_MODE, SPL_LOG_UNIX__SHARED_MODE);
+//		if (hMapFile > 0) {
+//			break;
+//		}
+//		hMapFile = shm_open(shared_key, SPL_LOG_UNIX_OPEN_MODE, SPL_LOG_UNIX__SHARED_MODE);
+//		if (hMapFile < 1) {
+//			spl_console_log("SPL_LOG_SHM_UNIX_OPEN option creating");
+//			ret = SPL_LOG_SHM_UNIX_OPEN;
+//			break;
+//		}
+//		err = ftruncate(hMapFile, size_shared);
+//		if (err) {
+//			spl_console_log("SPL_LOG_SHM_UNIX_TRUNC");
+//			ret = SPL_LOG_SHM_UNIX_TRUNC;
+//			break;
+//		}
+//		p = (char*)mmap(0, size_shared, SPL_LOG_UNIX_PROT_FLAGS, MAP_SHARED, hMapFile, 0);
+//		if (p == MAP_FAILED || p == 0) {
+//			ret = SPL_LOG_SHM_UNIX_MAP_FAILED;
+//			spl_console_log("SPL_LOG_SHM_UNIX_MAP_FAILED");
+//			p = 0;
+//			break;
+//		}
+#endif
 		memset(p, 0, size_shared);
 		*output = (void*)p;
+
 	} while (0);
 	return ret = 0;
 }
