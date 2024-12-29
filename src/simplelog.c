@@ -118,7 +118,7 @@
 #define SPL_FMT_MILL_ADDING \
 	"%s %s.%.9d"
 #define SPL_FMT_DATE_ADDING_X \
-	"\n[%.4d-%.2d-%.2d %.2d:%.2d:%.2d.%.9d] "
+	"\n[%.4d-%.2d-%.2d %.2d:%.2d:%.2d.%.9d] ["
 
 #define				SPL_TEXT_UNKNOWN				"U"
 #define				SPL_TEXT_DEBUG					"D"
@@ -241,6 +241,15 @@ static const char* spl_text_label_gb[SPL_LOG_PEAK] = {
 	"W",
 	"E",
 	"F",
+};
+
+static const char spl_text_gb_c[SPL_LOG_PEAK] = {
+	'A',
+	'D',
+	'I',
+	'W',
+	'E',
+	'F',
 };
 /*===========================================================================================================================*/
 int spl_local_time_now(spl_local_time_st*stt) {
@@ -1025,37 +1034,36 @@ int spl_simple_log_thread(SIMPLE_LOG_ST* t) {
 }
 /*===========================================================================================================================*/
 int spl_prefmt_now(FMT_FOR_OUTPUT* p) {
-	spl_local_time_st stt;
-	int n = 0;
 	int ret = 0;
-	p->outlen = 0;
-	p->prefmt = p->tnow;
-	do {
-		//memset(&stt, 0, sizeof(stt));
-		ret = spl_local_time_now(&stt);
-		if (ret) {
-			break;
-		}
-		(p->r) = (stt.nn % __simple_log_static__.ncpu);
-
-		n = sprintf(p->tnow, SPL_FMT_DATE_ADDING_X,
-			stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day,
-			stt.hour, stt.minute, stt.sec, (unsigned int)stt.nn);
-		if (p->outlen < 1) {
-			ret = SPL_LOG_PRINTF_ERROR;
-			break;
-		}
-
-		p->outlen = n;
-		
-		p->outlen += snprintf(p->tnow + n, SPL_RL_BUF - n, "[%s] [tid:\t %llu]\t[%s:%s:%d]\t",
-			spl_text_label_gb[p->lv % SPL_LOG_PEAK], spl_get_threadid(),
-			p->finame, p->fcname, p->line);
-
-		//		memcpy(fmtt, "-------------------------------------------------------------------------------------------------------------------------------------\
-		//			-----------------------------------------------------------------------------------", 86);
-		//					*outlen = 86;
-	} while (0);
+	//spl_local_time_st stt;
+	//int n = 0;
+	//
+	//p->outlen = 0;
+	//p->prefmt = p->tnow;
+	//do {
+	//	//memset(&stt, 0, sizeof(stt));
+	//	ret = spl_local_time_now(&stt);
+	//	if (ret) {
+	//		break;
+	//	}
+	//	(p->r) = (stt.nn % __simple_log_static__.ncpu);
+	//
+	//	n = sprintf(p->tnow, SPL_FMT_DATE_ADDING_X,
+	//		stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day,
+	//		stt.hour, stt.minute, stt.sec, (unsigned int)stt.nn, 
+	//		spl_text_label_gb[p->lv % SPL_LOG_PEAK], spl_get_threadid());
+	//	if (p->outlen < 1) {
+	//		ret = SPL_LOG_PRINTF_ERROR;
+	//		break;
+	//	}
+	//	p->outlen = n;
+	//	p->outlen += snprintf(p->tnow + n, SPL_RL_BUF - n, "\t[%s:%s:%d]\t",
+	//		p->finame, p->fcname, p->line);
+	//
+	//	//		memcpy(fmtt, "-------------------------------------------------------------------------------------------------------------------------------------\
+	//	//			-----------------------------------------------------------------------------------", 86);
+	//	//					*outlen = 86;
+	//} while (0);
 	return ret;
 }
 /*===========================================================================================================================*/
@@ -1066,9 +1074,6 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 	int ret = 0;
 	spl_local_time_st stt;
 	int n = 0;
-	//char buff[20], buff1[20];
-	//memset(buff, 0, sizeof(buff));
-	//memset(buff1, 0, sizeof(buff1));
 	do {
 		memset(&stt, 0, sizeof(stt));
 		ret = spl_local_time_now(&stt);
@@ -1078,10 +1083,6 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 		if (r) {
 			*r = (stt.nn  % __simple_log_static__.ncpu);
 		}
-		if (!fmtt) {
-			ret = (int)SPL_LOG_FMT_NULL_ERROR;
-			break;
-		}
 
 		n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X,
 			stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day,
@@ -1090,10 +1091,13 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 			ret = SPL_LOG_PRINTF_ERROR;
 			break;
 		}
-		*outlen = n;
-		*outlen += snprintf(fmtt + n , len - n , "[%s] [tid:\t %llu]\t[%s:%s:%d]\t",
-			spl_text_label_gb[lv%SPL_LOG_PEAK], spl_get_threadid(),
+		fmtt[n++] = spl_text_gb_c[lv % SPL_LOG_PEAK];
+#define HHHHHHHHHHH		"] [tid:\t%llu]\t"
+		n += sprintf(fmtt + n, HHHHHHHHHHH, spl_get_threadid());
+		
+		n += snprintf(fmtt + n , len - n , "[%s:%s:%d]\t",
 			filename, funcname, line);
+		*outlen = n;
 		
 //		memcpy(fmtt, "-------------------------------------------------------------------------------------------------------------------------------------\
 //			-----------------------------------------------------------------------------------", 86);

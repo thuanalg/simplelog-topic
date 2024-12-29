@@ -133,7 +133,7 @@ void* posix_thread_routine(void* lpParam) {
 	return 0;
 }
 
-int main__(int argc, char* argv[]) {
+int __main(int argc, char* argv[]) {
 	int ret = 0;
 	//int ret = spl_init_log((char *)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
 #ifndef UNIX_LINUX
