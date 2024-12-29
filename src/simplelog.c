@@ -1096,10 +1096,18 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 		n += 8;
 		#define HHHHHHHHHHH		"%llu]\t"
 		n += sprintf(fmtt + n, HHHHHHHHHHH, spl_get_threadid());
-		
-		n += snprintf(fmtt + n , len - n, "[%s:%s:%d]\t",
+		*outlen += snprintf(fmtt + n , len - n, "[%s:%s:%d]\t",
 			filename, funcname, line);
-		*outlen = n;
+		if (*outlen > len) {
+			p = (char*)malloc(*outlen + 1);
+			if (!p) {
+				spl_console_log("Malloc error");
+			}
+			memcpy(p, fmtt, n);
+			*outlen = n;
+			*outlen += sprintf(p + n, "[%s:%s:%d]\t",
+				filename, funcname, line);
+		}
 		
 //		memcpy(fmtt, "-------------------------------------------------------------------------------------------------------------------------------------\
 //			-----------------------------------------------------------------------------------", 86);
