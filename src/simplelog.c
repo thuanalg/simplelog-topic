@@ -1102,6 +1102,8 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 		*outlen = n;
 		*outlen += snprintf(fmtt + n , len - n, "[%s:%s:%d]\t",
 			filename, funcname, line);
+		//*outlen += snprintf(fmtt + n, len - n, "[%s:%s:%d] [r: %d]\t",
+		//	filename, funcname, line, (int)*r);
 		if (*outlen > len) {
 			spl_malloc((*outlen + 1), p, char);
 			if (!p) {
@@ -1109,6 +1111,8 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 			}
 			memcpy(p, fmtt, n);
 			*outlen = n;
+			//*outlen += sprintf(p + n, "[%s:%s:%d] [r: %d]\t",
+			//	filename, funcname, line, (int)*r);
 			*outlen += sprintf(p + n, "[%s:%s:%d]\t",
 				filename, funcname, line);
 		}
