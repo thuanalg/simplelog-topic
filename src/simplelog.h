@@ -48,6 +48,7 @@ extern "C" {
 #define					SPL_LOG_FATAL					5
 #define					SPL_LOG_PEAK					6
 
+//#define					SPL_RL_BUF						50
 #define					SPL_RL_BUF						256
 
 #ifndef  UNIX_LINUX
@@ -240,6 +241,13 @@ __p__ = __FILE__;} while(0);
 		fprintf(stdout, __c11fmt__.c_str(), buf, pfn, __FUNCTION__, __LINE__, spl_get_threadid(), ##__VA_ARGS__);}
 #endif
 
+#define spl_malloc(__nn__, __obj__, __type__) { (__obj__) = (__type__*) malloc(__nn__); if(__obj__) \
+	{spl_console_log("Malloc: 0x%p\n", (__obj__)); memset((void*)(__obj__), 0, (__nn__));} \
+	else {spl_console_log("Malloc: error.\n");}} 
+
+#define spl_free(__obj__) \
+	{ spl_console_log("Free: 0x:%p.\n", (__obj__)); free(__obj__); ; (__obj__) = 0;} 
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
 #define SPLKEYBUF(__t__, __i__)				((generic_dta_st*)( (char*)__t__->buf + (t->buff_size * __i__)))
@@ -274,7 +282,7 @@ __p__ = __FILE__;} while(0);
 				;;continue;\
 			}\
 			while(1);\
-			if(!t->trigger_thread)spl_rel_sem(t->sem_rwfile); if(pprefmt != tnow) { free(pprefmt);}\
+			if(!t->trigger_thread)spl_rel_sem(t->sem_rwfile); if(pprefmt != tnow) { spl_free(pprefmt);}\
 		}\
 	}\
 }
@@ -317,7 +325,7 @@ __p__ = __FILE__;} while(0);
 			;r++; r%=t->ncpu;;continue;\
 		}\
 		while(1);\
-		if(!t->trigger_thread)spl_rel_sem(t->sem_rwfile);;if(pprefmt != tnow) { free(pprefmt);}\
+		if(!t->trigger_thread)spl_rel_sem(t->sem_rwfile);;if(pprefmt != tnow) { spl_free(pprefmt);}\
 	}\
 }
 

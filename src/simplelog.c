@@ -51,12 +51,12 @@
 
 /*===========================================================================================================================*/
 
-#define spl_malloc(__nn__, __obj__, __type__) { (__obj__) = (__type__*) malloc(__nn__); if(__obj__) \
-	{spl_console_log("Malloc: 0x%p\n", (__obj__)); memset((void*)(__obj__), 0, (__nn__));} \
-	else {spl_console_log("Malloc: error.\n");}} 
-
-#define spl_free(__obj__) \
-	{ spl_console_log("Free: 0x:%p.\n", (__obj__)); free(__obj__); ; (__obj__) = 0;} 
+//#define spl_malloc(__nn__, __obj__, __type__) { (__obj__) = (__type__*) malloc(__nn__); if(__obj__) \
+//	{spl_console_log("Malloc: 0x%p\n", (__obj__)); memset((void*)(__obj__), 0, (__nn__));} \
+//	else {spl_console_log("Malloc: error.\n");}} 
+//
+//#define spl_free(__obj__) \
+//	{ spl_console_log("Free: 0x:%p.\n", (__obj__)); free(__obj__); ; (__obj__) = 0;} 
 
 #define SPL_FCLOSE(__fp__, __n) { if(__fp__){ (__n) = fclose((FILE*)(__fp__)) ; if(__n) { spl_fclose_err(__n, __fp__); } \
 	else { spl_console_log("Close FILE 0x%p DONE.", (__fp__));;(__fp__) = 0;;}}}
@@ -119,6 +119,8 @@
 	"%s %s.%.9d"
 #define SPL_FMT_DATE_ADDING_X \
 	"\n[%.4d-%.2d-%.2d %.2d:%.2d:%.2d.%.9d] ["
+#define HHHHHHHHHHH		\
+	"%llu]\t"
 
 #define				SPL_TEXT_UNKNOWN				"U"
 #define				SPL_TEXT_DEBUG					"D"
@@ -251,6 +253,7 @@ static const char spl_text_gb_c[SPL_LOG_PEAK] = {
 	'E',
 	'F',
 };
+
 /*===========================================================================================================================*/
 int spl_local_time_now(spl_local_time_st*stt) {
 	int ret = 0;
@@ -1094,13 +1097,13 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 		fmtt[n++] = spl_text_gb_c[lv % SPL_LOG_PEAK];
 		memcpy(fmtt + n, "] [tid:\t", 8);
 		n += 8;
-		#define HHHHHHHHHHH		"%llu]\t"
+		
 		n += sprintf(fmtt + n, HHHHHHHHHHH, spl_get_threadid());
 		*outlen = n;
 		*outlen += snprintf(fmtt + n , len - n, "[%s:%s:%d]\t",
 			filename, funcname, line);
 		if (*outlen > len) {
-			p = (char*)malloc(*outlen + 1);
+			spl_malloc((*outlen + 1), p, char);
 			if (!p) {
 				spl_console_log("Malloc error");
 			}
