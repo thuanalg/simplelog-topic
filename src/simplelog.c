@@ -1074,35 +1074,37 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 	int ret = 0;
 	spl_local_time_st stt;
 	int n = 0;
-	do {
-		memset(&stt, 0, sizeof(stt));
+	//do {
+		//memset(&stt, 0, sizeof(stt));
 		ret = spl_local_time_now(&stt);
 		if (ret) {
-			break;
+			return ret;
 		}
-		if (r) {
+		//if (r) {
 			*r = (stt.nn  % __simple_log_static__.ncpu);
-		}
+		//}
 
 		n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X,
 			stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day,
 			stt.hour, stt.minute, stt.sec, (unsigned int)stt.nn);
 		if (n < 1) {
 			ret = SPL_LOG_PRINTF_ERROR;
-			break;
+			return ret;
 		}
 		fmtt[n++] = spl_text_gb_c[lv % SPL_LOG_PEAK];
-#define HHHHHHHHHHH		"] [tid:\t%llu]\t"
+		memcpy(fmtt + n, "] [tid:\t", 8);
+		n += 8;
+		#define HHHHHHHHHHH		"%llu]\t"
 		n += sprintf(fmtt + n, HHHHHHHHHHH, spl_get_threadid());
 		
-		n += snprintf(fmtt + n , len - n , "[%s:%s:%d]\t",
+		n += sprintf(fmtt + n , "[%s:%s:%d]\t",
 			filename, funcname, line);
 		*outlen = n;
 		
 //		memcpy(fmtt, "-------------------------------------------------------------------------------------------------------------------------------------\
 //			-----------------------------------------------------------------------------------", 86);
 //					*outlen = 86;
-	} while (0);
+	//} while (0);
 	//spl_console_log("---------)))))))))))))))))))))))--------------=========================");
 	return p;
 }
