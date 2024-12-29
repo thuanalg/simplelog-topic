@@ -1080,9 +1080,9 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 	//do {
 		//memset(&stt, 0, sizeof(stt));
 		ret = spl_local_time_now(&stt);
-		//if (ret) {
-		//	return 0;
-		//}
+		if (ret) {
+			return p;
+		}
 		//if (r) {
 			*r = (stt.nn  % __simple_log_static__.ncpu);
 		//}
@@ -1092,7 +1092,7 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 			stt.hour, stt.minute, stt.sec, (unsigned int)stt.nn);
 		if (n < 1) {
 			ret = SPL_LOG_PRINTF_ERROR;
-			return ret;
+			return p;
 		}
 		fmtt[n++] = spl_text_gb_c[lv % SPL_LOG_PEAK];
 		memcpy(fmtt + n, "] [tid:\t", 8);
