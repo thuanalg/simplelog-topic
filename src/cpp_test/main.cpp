@@ -146,7 +146,7 @@ int __main(int argc, char* argv[]) {
 	for (int i = 0; i < count; ++i) {
 		//spl_console_log("spl_milli_sleep ------------------------------ ");
 		//spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), 0);
-		spllog(SPL_LOG_INFO, "test log test log %d", i);
+		spllog(SPL_LOG_INFO, "test log test log log %d", i);
 	}
 	//spl_milli_sleep( 1000 * 100);
 	spl_finish_log();
