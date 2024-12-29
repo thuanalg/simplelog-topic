@@ -1097,7 +1097,7 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 		#define HHHHHHHHHHH		"%llu]\t"
 		n += sprintf(fmtt + n, HHHHHHHHHHH, spl_get_threadid());
 		
-		n += sprintf(fmtt + n , "[%s:%s:%d]\t",
+		n += snprintf(fmtt + n , len - n, "[%s:%s:%d]\t",
 			filename, funcname, line);
 		*outlen = n;
 		
