@@ -213,7 +213,7 @@ extern "C" {
 			trigger_thread; /*Use trigger thread or not.*/
 		void	
 			**arr_mtx; /*Use trigger thread or not.*/
-		unsigned short mod;
+		//unsigned short mod;
 		//HANDLE dummy_lock;
 	} SIMPLE_LOG_ST;
 typedef struct {
@@ -240,7 +240,7 @@ __p__ = __FILE__;} while(0);
 		fprintf(stdout, __c11fmt__.c_str(), buf, pfn, __FUNCTION__, __LINE__, spl_get_threadid(), ##__VA_ARGS__);}
 #endif
 
-
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
 #define SPLKEYBUF(__t__, __i__)				((generic_dta_st*)( (char*)__t__->buf + (t->buff_size * __i__)))
 #define __spl_log_buf_level__(__lv__, ___fmttt___, ...)	\
