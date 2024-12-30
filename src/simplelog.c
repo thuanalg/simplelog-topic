@@ -130,6 +130,7 @@
 #define				SPL_TEXT_ERROR					"E"
 #define				SPL_TEXT_FATAL					"F"
 
+#define				SPL_MILLION						1000000
 
 
 #define MYCASTGEN(__t__)	((generic_dta_st*)__t__)
@@ -281,7 +282,7 @@ int spl_local_time_now(spl_local_time_st*stt) {
 		stt->minute = (unsigned char)lt.wMinute;
 		stt->sec = (unsigned char)lt.wSecond;
 		//stt->ms = (unsigned int)lt.wMilliseconds;
-		stt->nn = (unsigned int)lt.wMilliseconds * 1000000 + counter.QuadPart%1000000;
+		stt->nn = (unsigned int)lt.wMilliseconds * SPL_MILLION + counter.QuadPart % SPL_MILLION;
 #else
 /* https://linux.die.net/man/3/localtime*/
 /* https://linux.die.net/man/3/clock_gettime*/
