@@ -4,106 +4,98 @@
 #include <string.h>
 #include <time.h>
 #ifndef UNIX_LINUX
-	#include <Windows.h>
-	DWORD WINAPI win32_thread_routine(LPVOID lpParam);
-	#define FOLDER_PATH				"C:/Users/DEll/Desktop/logoutput/"
+
+#include <Windows.h>
+DWORD WINAPI win32_thread_routine(LPVOID lpParam);
 #else
-#	include <unistd.h>
-	#include <pthread.h>
-	void * posix_thread_routine(void* lpParam);
-	#define FOLDER_PATH				""
+#include <unistd.h>
+#include <pthread.h>
+void* posix_thread_routine(void* lpParam);
 #endif // !UNIX_LINUX
 
-
 void dotest();
-void* main_mtx = 0;
-int off_process = 0;
-int set_off_process(int val) {
-	int ret = 0;
-	spl_mutex_lock(main_mtx);
-	do {
-		off_process = val;
-	} while (0);
-	spl_mutex_unlock(main_mtx);
-	return ret;
-}
+int num_threads = 10;
+int loop_count = 1000 * 1000;
 
-int get_off_process() {
-	int ret = 0;
-	spl_mutex_lock(main_mtx);
-	do {
-		ret = off_process;
-	} while (0);
-	spl_mutex_unlock(main_mtx);
-	return ret;
-}
+#define		TNUMBEER_OF_THREADS					"--nthread="	
+#define		TCONFIG_FILE						"--cfg="	
+#define		TLOOP_COUNT							"--loopcount="	
 
-int number = 2;
 int main(int argc, char* argv[]) {
-	int n = 0, ret = 0, i = 0;
-	main_mtx = spl_mutex_create();
-	if (argc > 1) {
-		n = sscanf(argv[1], "%d", &number);
-	}
-	spl_console_log("Main thread.\n");
-	char pathcfg[1024];
-	char* path = "simplelog.cfg";
-	char nowfmt[64];
-	snprintf(pathcfg, 1024, path);
-	n = strlen(pathcfg);
-	for (i = 0; i < n; ++i) {
-		if (pathcfg[i] == '\\') {
-			pathcfg[i] = '/';
+	int ret = 0, i = 0;
+	char cfgpath[1024];
+	for (i = 1; i < argc; ++i) {
+		if (strstr(argv[i], TNUMBEER_OF_THREADS) == argv[i]) {
+			ret = sscanf(argv[i], TNUMBEER_OF_THREADS"%d", &num_threads);
+			continue;
+		}
+		if (strstr(argv[i], TLOOP_COUNT) == argv[i]) {
+			ret = sscanf(argv[i], TLOOP_COUNT"%d", &loop_count);
+			continue;
 		}
 	}
-	ret = spl_init_log(FOLDER_PATH"simplelog.cfg");
-	if (ret) {
-		spl_console_log("spl_init_log ret: %d", ret);
-		exit(1);
-	}
-	spl_fmt_now(nowfmt, 64);
-	spllog(SPL_LOG_INFO, "%s", "<<-->> Wait for loop.");
-	n = 0;
-	dotest();
-	while (1) {
-		FILE* fp = 0;
-		spl_sleep(30);
-		spllog(SPL_LOG_INFO, "%s", "<<-->> Wait for loop.");
-		fp = fopen(FOLDER_PATH"trigger.txt", "r");
-		if (fp) {
-			fclose(fp);
-			break;
-		}
+#ifndef UNIX_LINUX
+	snprintf(cfgpath, 1024, "C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
+#else
+	snprintf(cfgpath, 1024, "simplelog.cfg");
+#endif
+	ret = spl_init_log(cfgpath);
 
-	}
-	spllog(SPL_LOG_INFO, "%s", "<<-->> End of loop.");
-	set_off_process(1);
-	spl_sleep(1);
-	spl_console_log("--Main close--");
+	spl_console_log("====================Main close: Start.\n");
+	dotest();
+	spl_console_log("==================Main close: End.\n");
 	spl_finish_log();
-	//spl_sleep(1000);
-	spl_console_log("--Main close--");
-	/*
-//	SPL_pthread_mutex_destroy(__simple_log_static__.mtx, err);// n
-//	spl_free(__simple_log_static__.mtx);
-//Linux need to be careful here.
-*/
 	return EXIT_SUCCESS;
 }
 void dotest() {
 	int i = 0;
 #ifndef UNIX_LINUX
 
-	DWORD dwThreadId = 0;
-	HANDLE hThread = 0;
-	for (i = 0; i < number; ++i) {
-		hThread = CreateThread(NULL, 0, win32_thread_routine, 0, 0, &dwThreadId);
+	DWORD* dwpThreadId = 0, dwEvent = 0;
+	HANDLE* hpThread = 0;
+
+	dwpThreadId = (DWORD*)malloc(num_threads * sizeof(DWORD));
+	if (!dwpThreadId) {
+		exit(1);
 	}
+	memset(dwpThreadId, 0, num_threads * sizeof(DWORD));
+
+	hpThread = (HANDLE*)malloc(num_threads * sizeof(HANDLE));
+	if (!hpThread) {
+		exit(1);
+	}
+	memset(hpThread, 0, num_threads * sizeof(HANDLE));
+
+	for (i = 0; i < num_threads; ++i) {
+		hpThread[i] = CreateThread(NULL, 0, win32_thread_routine, 0, 0, (dwpThreadId + i));
+	}
+	//https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitformultipleobjects
+	//https://learn.microsoft.com/en-us/windows/win32/sync/waiting-for-multiple-objects
+	dwEvent = WaitForMultipleObjects(
+		num_threads,           // number of objects in array
+		hpThread,				// array of objects
+		TRUE,					// wait for any object
+		INFINITE);				// five-second wait
+	free(dwpThreadId);
+	free(hpThread);
 #else
-	pthread_t idd = 0;
-	for (i = 0; i < number; ++i) {
-		int err = pthread_create(&idd, 0, posix_thread_routine, 0);
+	//https://man7.org/linux/man-pages/man3/pthread_create.3.html
+	pthread_t* pidds = 0;
+	pidds = (pthread_t*)malloc(num_threads * sizeof(pthread_t));
+	if (!pidds) {
+		exit(1);
 	}
+	for (i = 0; i < num_threads; ++i) {
+		int err = pthread_create(pidds + i, 0, posix_thread_routine, 0);
+	}
+	for (i = 0; i < num_threads; i++) {
+		int s = pthread_join(pidds[i], 0);
+		if (s != 0) {
+			spl_console_log("pthread_join error.\n");
+		}
+	}
+	free(pidds);
+
 #endif
 }
 
@@ -113,28 +105,43 @@ void dotest() {
 #define spllogexe(__level__, __fmt__, ...)					spllogtopic(__level__, 2, __fmt__, ##__VA_ARGS__);
 #define spllognaxyax(__level__, __fmt__, ...)				spllogtopic(__level__, 3, __fmt__, ##__VA_ARGS__);
 #define spllogsksgn(__level__, __fmt__, ...)				spllogtopic(__level__, 4, __fmt__, ##__VA_ARGS__);
-
+//https://github.com/gabime/spdlog, 10 thread
 #ifndef UNIX_LINUX
-DWORD WINAPI win32_thread_routine(LPVOID lpParam)
+DWORD WINAPI win32_thread_routine(LPVOID lpParam) {
 #else
-void* posix_thread_routine(void* lpParam) 
+void* posix_thread_routine(void* lpParam) {
 #endif // !UNIX_LINUX
-{
 	int k = 0;
 	int tpic = 0;
-	while (1) {
-		k = get_off_process();
-		if (k) {
-			break;
-		}
-		spllog(SPL_LOG_INFO, "test log: %llu", (LLU)time(0));
-		tpic = (spl_milli_now() % 3);
-		spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
-		splloglib(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
-		spllogexe(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
-		spllognaxyax(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
-		spllogsksgn(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
-		spl_sleep(1);
+	//while (1) {
+	int count = 0;
+
+	while (count < loop_count) {
+		spllog(SPL_LOG_INFO, "My test log : %d", count);
+		//tpic = (spl_milli_now() % 3);
+		//spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+		//splloglib(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "lib");
+		//spllogexe(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+		//spllognaxyax(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+		//spllogsksgn(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+		//spl_sleep(1);
+		++count;
 	}
+	//spl_console_log("Main close: End.\n");
+	//break;
+//}
 	return 0;
 }
+
+//int __main(int argc, char* argv[]) {
+//	//int ret = spl_init_log((char *)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
+//	int ret = spl_init_log((char*)"simplelog.cfg");
+//	int count = 10;
+//	int i = 0;
+//	for (i = 0; i < count; ++i) {
+//		spllog(SPL_LOG_INFO, "test log : %d", i);
+//		spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sys");
+//	}
+//	spl_finish_log();
+//	return 0;
+//}
