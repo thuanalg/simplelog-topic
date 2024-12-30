@@ -1099,35 +1099,35 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 			*r = (stt.nn  % __simple_log_static__.ncpu);
 		//}
 
-		//n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X" [%c] [tid:\t%llu] ",
-		//	stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day,
-		//	stt.hour, stt.minute, stt.sec, (int)stt.nn, spl_text_gb_c[lv % SPL_LOG_PEAK], spl_get_threadid());
-		//if (n < 1) {
-		//	ret = SPL_LOG_PRINTF_ERROR;
-		//	return p;
-		//}
-		//*outlen = n;
-		//
-		////*outlen += snprintf(fmtt + n, len - n, "[%s:%s:%d] [r: %d]\t",
-		////	filename, funcname, line, (int)*r);
-		//*outlen += snprintf(fmtt + n, SPL_RL_BUF - n, "[%s:%s:%d]\t",
-		//	filename, funcname, line);
-		//if (*outlen > len) {
-		//	spl_malloc((*outlen + 1), p, char);
-		//	if (!p) {
-		//		exit(1);
-		//	}
-		//	memcpy(p, fmtt, n);
-		//	*outlen = n;
-		//	//*outlen += sprintf(p + n, "[%s:%s:%d] [r: %d]\t",
-		//	//	filename, funcname, line, (int)*r);
-		//	*outlen += snprintf(fmtt + n, SPL_RL_BUF - n, "[%s:%s:%d]\t",
-		//		filename, funcname, line);
-		//}
+		n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X" [%c] [tid\t%llu]\t",
+			stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day,
+			stt.hour, stt.minute, stt.sec, (int)stt.nn, spl_text_gb_c[lv % SPL_LOG_PEAK], spl_get_threadid());
+		if (n < 1) {
+			ret = SPL_LOG_PRINTF_ERROR;
+			return p;
+		}
+		*outlen = n;
 		
-		memcpy(fmtt, "-------------------------------------------------------------------------------------------------------------------------------------\
-			-----------------------------------------------------------------------------------", 86);
-		*outlen = 86;
+		//*outlen += snprintf(fmtt + n, len - n, "[%s:%s:%d] [r: %d]\t",
+		//	filename, funcname, line, (int)*r);
+		*outlen += snprintf(fmtt + n, SPL_RL_BUF - n, "[%s:%s:%d]\t",
+			filename, funcname, line);
+		if (*outlen > len) {
+			spl_malloc((*outlen + 1), p, char);
+			if (!p) {
+				exit(1);
+			}
+			memcpy(p, fmtt, n);
+			*outlen = n;
+			//*outlen += sprintf(p + n, "[%s:%s:%d] [r: %d]\t",
+			//	filename, funcname, line, (int)*r);
+			*outlen += snprintf(fmtt + n, SPL_RL_BUF - n, "[%s:%s:%d]\t",
+				filename, funcname, line);
+		}
+		
+		//memcpy(fmtt, "-------------------------------------------------------------------------------------------------------------------------------------\
+		//	-----------------------------------------------------------------------------------", 86);
+		//	*outlen = 86;
 	//} while (0);
 	return p;
 }
