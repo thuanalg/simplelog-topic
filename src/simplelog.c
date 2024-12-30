@@ -1107,57 +1107,6 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 	//} while (0);
 	return p;
 }
-/*===========================================================================================================================*/
-//int spl_fmt_now(char* fmtt, int len) {
-//	int ret = 0;
-//	spl_local_time_st stt;
-//	LLU _tnow = 0;
-//	int n = 0; 
-//	char buff[20], buff1[20];
-//	memset(buff, 0, 20);
-//	memset(buff1, 0, 20);	
-//
-//	time_t t = time(0);
-//	do {
-//		memset(&stt, 0, sizeof(stt));
-//		ret = spl_local_time_now(&stt);
-//		if (ret) {
-//			break;
-//		}
-//		if (!fmtt) {
-//			ret = (int) SPL_LOG_FMT_NULL_ERROR;
-//			break;
-//		}
-//		
-//		_tnow = t;
-//		_tnow *= 1000;
-//		_tnow += stt.nn;
-//		//do {
-//		//	spl_mutex_lock(__simple_log_static__.mtx_off);
-//		//		do {
-//		//
-//		//			if (!pre_tnow) {
-//		//				break;
-//		//			}
-//		//			if (_tnow > pre_tnow) {
-//		//				_delta = _tnow - pre_tnow;
-//		//			}
-//		//		} while (0);
-//		//		pre_tnow = _tnow;
-//		//	spl_mutex_unlock(__simple_log_static__.mtx_off);
-//		//} while (0);
-//
-//		n = snprintf(buff, 20, SPL_FMT_DATE_ADDING, stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day);
-//		if (n < 1) {
-//			ret = SPL_LOG_PRINTF_ERROR;
-//			break;
-//		}
-//		n = snprintf(buff1, 20, SPL_FMT_HOUR_ADDING, stt.hour, stt.minute, stt.sec);
-//		n = snprintf(fmtt, len, SPL_FMT_DELT_ADDING, buff, buff1, (unsigned int)stt.nn);
-//
-//	} while (0);
-//	return ret;
-//}
 
 /*===========================================================================================================================*/
 int spl_fmmt_now(char* fmtt, int len) {
@@ -1390,49 +1339,7 @@ int spl_finish_log() {
 	memset(&__simple_log_static__, 0, sizeof(__simple_log_static__));
 	return ret;
 }
-///*===========================================================================================================================*/
-//#define STSPLOG						(&__simple_log_static__)
-//#define STSPLOGBUF					STSPLOG->buf
-//char* spl_get_buf(int* n, int** ppl) {
-//	//SIMPLE_LOG_ST* t = &__simple_log_static__;
-//	//char* ret = 0;
-//	//if (t->buf) {
-//		//if (n && ppl) {
-//	if (STSPLOG->off) {
-//		return 0;
-//	}
-//			(*n) = (STSPLOGBUF->total > sizeof(generic_dta_st) + STSPLOGBUF->pl + 2048) ? (STSPLOGBUF->total - (sizeof(generic_dta_st) + STSPLOGBUF->pl)) : 0;
-//			//ret = t->buf->data;
-//			if (!(*n)) {
-//				return 0;
-//			}
-//			(*ppl) = &(STSPLOGBUF->pl);
-//			return STSPLOGBUF->data;
-//		//}
-//	//}
-//	return 0;
-//}
-///*===========================================================================================================================*/
-//char* spl_get_buf_ext(int* n, int** ppl, char *isOff) {
-//	//SIMPLE_LOG_ST* t = &__simple_log_static__;
-//	//char* ret = 0;
-//	//if (t->buf) {
-//		//if (n && ppl) {
-//	if (STSPLOG->off) {
-//		*isOff = 1;
-//		return 0;
-//	}
-//	(*n) = (STSPLOGBUF->range > (STSPLOGBUF->pl + 2048)) ? (STSPLOGBUF->total - STSPLOGBUF->pl) : 0;
-//	//ret = t->buf->data;
-//	if (!(*n)) {
-//		return 0;
-//	}
-//	(*ppl) = &(STSPLOGBUF->pl);
-//	return STSPLOGBUF->data;
-//	//}
-////}
-//	return 0;
-//}
+
 /*===========================================================================================================================*/
 /*https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createdirectorya*/
 int spl_folder_sup(char* folder, spl_local_time_st* lctime, char* year_month) {
@@ -1744,60 +1651,7 @@ spl_gen_topics(SIMPLE_LOG_ST* t) {
 	} while (0);
 	return ret;
 }
-///*===========================================================================================================================*/
-//#define STSPLOGBUFTOPIC(__i__)				(&(STSPLOG->arr_topic[i]))->buf
-//char*
-//spl_get_buf_topic(int* n, int** ppl, int i) {
-//	//SIMPLE_LOG_ST* tg = &__simple_log_static__;
-//	//char* ret = 0;
-//	//do {
-//		if (STSPLOG->off) {
-//			return 0;
-//		}
-//		if (i < 0 || ((i + 1) > STSPLOG->n_topic)) {
-//			return spl_get_buf(n, ppl);
-//			//break;
-//		}
-//		if (STSPLOG->arr_topic) {
-//			//SIMPLE_LOG_TOPIC_ST* obj = &(STSPLOG->arr_topic[i]);
-//			//if (n && ppl) {
-//				*n = (STSPLOGBUFTOPIC(i)->total > sizeof(generic_dta_st) + STSPLOGBUFTOPIC(i)->pl) ? 
-//					(STSPLOGBUFTOPIC(i)->total - (sizeof(generic_dta_st) + STSPLOGBUFTOPIC(i)->pl)) : 0;
-//				//ret = obj->buf->data;
-//				(*ppl) = &(STSPLOGBUFTOPIC(i)->pl);
-//				return STSPLOGBUFTOPIC(i)->data;
-//			//}
-//		}
-//	//} while (0);
-//	return 0;
-//}
-///*===========================================================================================================================*/
-//char*
-//spl_get_buf_topic_ext(int* n, int** ppl, int i, char *isOOf) {
-//	//SIMPLE_LOG_ST* tg = &__simple_log_static__;
-//	//char* ret = 0;
-//	//do {
-//	if (STSPLOG->off) {
-//		*isOOf = 1;
-//		return 0;
-//	}
-//	if (i < 0 || ((i + 1) > STSPLOG->n_topic)) {
-//		return spl_get_buf_ext(n, ppl, isOOf);
-//		//break;
-//	}
-//	if (STSPLOG->arr_topic) {
-//		//SIMPLE_LOG_TOPIC_ST* obj = &(STSPLOG->arr_topic[i]);
-//		//if (n && ppl) {
-//		*n = (STSPLOGBUFTOPIC(i)->range > (STSPLOGBUFTOPIC(i)->pl + 2048)) ?
-//			(STSPLOGBUFTOPIC(i)->total - (STSPLOGBUFTOPIC(i)->pl)) : 0;
-//		//ret = obj->buf->data;
-//		(*ppl) = &(STSPLOGBUFTOPIC(i)->pl);
-//		return STSPLOGBUFTOPIC(i)->data;
-//		//}
-//	}
-//	//} while (0);
-//	return 0;
-//}
+
 /*===========================================================================================================================*/
 LLU
 spl_milli_now() {
