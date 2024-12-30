@@ -1099,7 +1099,7 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 			*r = (stt.nn  % __simple_log_static__.ncpu);
 		//}
 
-		n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X" [%c] [tid\t%llu]\t",
+		n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X"[%c] [tid\t%llu]\t",
 			stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day,
 			stt.hour, stt.minute, stt.sec, (int)stt.nn, spl_text_gb_c[lv % SPL_LOG_PEAK], spl_get_threadid());
 		if (n < 1) {
