@@ -149,59 +149,59 @@ extern "C" {
 	typedef
 		struct __SIMPLE_LOG_TOPIC_ST__ {
 		int
-			index; /*Index of a topic*/
+			index;						/*Index of a topic*/
 		char
-			topic[SPL_TOPIC_SIZE]; /*Name of topic*/
+			topic[SPL_TOPIC_SIZE];		/*Name of topic*/
 		generic_dta_st*
-			buf; /*Buff for writing*/
+			buf;						/*Buff for writing*/
 		int
-			fizize; /*Size of file.*/
+			fizize;						/*Size of file.*/
 		void*
-			fp; /*File stream.*/
+			fp;							/*File stream.*/
 	} SIMPLE_LOG_TOPIC_ST;
 
 	typedef
 		struct __SIMPLE_LOG_ST__ {
 		int
-			llevel; /*Level of log.*/
+			llevel;						/*Level of log.*/
 		int
-			file_limit_size; /*Limitation of each log file. No nead SYNC.*/
+			file_limit_size;			/*Limitation of each log file. No nead SYNC.*/
 		int
-			buff_size; /*Buffer size for each buffer. No nead SYNC.*/
+			buff_size;					/*Buffer size for each buffer. No nead SYNC.*/
 		int
-			index; /*Index of default log, not in a topic. No nead SYNC.*/
+			index;						/*Index of default log, not in a topic. No nead SYNC.*/
 		char
-			folder[1024]; /*Path of genera folder. No nead SYNC.*/
+			folder[1024];				/*Path of genera folder. No nead SYNC.*/
 		char
-			off; /*Must be sync*/
+			off;						/*Must be sync*/
 		void*
-			mtx_rw; /*mtx: Need to close handle*/
+			mtx_rw;						/*mtx: Need to close handle*/
 		void*
-			sem_rwfile; /*sem_rwfile: Need to close handle*/
+			sem_rwfile;					/*sem_rwfile: Need to close handle*/
 		void*
-			sem_off; /*sem_off: Need to close handle*/
+			sem_off;					/*sem_off: Need to close handle*/
 		spl_local_time_st
-			lc_time_now; /*lc_time: Need to sync, free*/
+			lc_time_now;				/*lc_time: Need to sync, free*/
 		FILE*
-			fp; /*fp: Need to close*/
+			fp;							/*fp: Need to close*/
 		generic_dta_st*
-			buf; /*buf: Must be sync, free*/
+			buf;						/*buf: Must be sync, free*/
 		char*
-			topics; /*topics: topics string. Must be freed */
+			topics;						/*topics: topics string. Must be freed */
 		int
-			n_topic; /*Number of topics, SIMPLE_LOG_TOPIC_ST.*/
+			n_topic;					/*Number of topics, SIMPLE_LOG_TOPIC_ST.*/
 		SIMPLE_LOG_TOPIC_ST*
-			arr_topic; /*List od topics: SIMPLE_LOG_TOPIC_ST*.*/
+			arr_topic;					/*List od topics: SIMPLE_LOG_TOPIC_ST*.*/
 		int
-			renew; /*In a thread of logger, NO NEED SYNC.*/
+			renew;						/*In a thread of logger, NO NEED SYNC.*/
 		char
-			path_template[1024]; /*In a thread of logger, NO NEED SYNC.*/
+			path_template[1024];		/*In a thread of logger, NO NEED SYNC.*/
 		int
-			ncpu; /*Number of CPU.*/
+			ncpu;						/*Number of CPU.*/
 		int
-			trigger_thread; /*Use trigger thread or not.*/
+			trigger_thread;				/*Use trigger thread or not.*/
 		void	
-			**arr_mtx; /*Use trigger thread or not.*/
+			**arr_mtx;					/*Use trigger thread or not.*/
 	} SIMPLE_LOG_ST;
 /*
 typedef struct __FMT_FOR_OUTPUT__ {
