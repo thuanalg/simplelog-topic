@@ -307,7 +307,6 @@ int spl_local_time_now(spl_local_time_st*stt) {
 		stt->hour = lt->tm_hour;
 		stt->minute = lt->tm_min;
 		stt->sec = lt->tm_sec;
-		//stt->ms = (nanosec.tv_nsec/1000000);
 		stt->nn = (nanosec.tv_nsec);
 #endif
 	} while (0);
@@ -1886,7 +1885,7 @@ spl_milli_now() {
 		if (err) {
 			break;
 		}
-		ret = t0 * 1000 + (nanosec.tv_nsec / 1000000);
+		ret = t0 * 1000 + (nanosec.tv_nsec / SPL_MILLION);
 #endif	
 	} while (0);
 	return ret;
@@ -1896,11 +1895,6 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 	int ret = 0;
 	char path[1024];
 	int i = 0;
-	//LLU cszize = 0;
-	//spl_local_time_st lt, * plt = 0;;
-	//char fmt_file_name[64];
-	//int ferr = 0;
-	//char yearmonth[16];
 	char* buffer = 0;
 	int total_buf_sz = 0;
 	generic_dta_st* tmpBuff = 0;
@@ -1923,10 +1917,6 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 			tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
 			tmpBuff->range = tmpBuff->total - sizeof(generic_dta_st);
 		}
-		//tmpBuff = (generic_dta_st*)buffer;
-		//tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
-		//tmpBuff->range = tmpBuff->total - sizeof(generic_dta_st);
-		//t->buf = tmpBuff;
 
 		if (!t->arr_topic && t->n_topic > 0) {
 			char* p0 = t->topics;
@@ -1965,11 +1955,6 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 					seg->total = t->buff_size - SPL_MEMO_PADDING;
 					seg->range = seg->total - sizeof(generic_dta_st);
 				}
-
-				//tmpBuff = (generic_dta_st*)(buffer + (( i + 1) * t->buff_size));
-				//tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
-				//tmpBuff->range = tmpBuff->total - sizeof(generic_dta_st);
-				
 			}
 			if (ret) {
 				break;
@@ -2018,17 +2003,13 @@ spl_fflush_err(int terr, void* ffp) {
 }
 /*===========================================================================================================================*/
 #ifndef UNIX_LINUX
-// Hàm để lấy khóa Spinlock
 void splLockSpinlock(volatile long* p) {
 	while (InterlockedCompareExchange(p, 1, 0) != 0) {
-		// Vòng lặp chờ (busy wait)
-		// Đợi cho đến khi spinlock được giải phóng (giá trị spinlock = 0)
 	}
 }
 
-// Hàm để giải phóng Spinlock
 void splUnlockSpinlock(volatile long* p) {
-	InterlockedExchange(p, 0); // Giải phóng Spinlock
+	InterlockedExchange(p, 0); 
 }
 #else
 #endif
