@@ -48,6 +48,11 @@
 	
 	#define YEAR_PADDING				1900
 	#define MONTH_PADDING				1
+
+	#define SPL_LOG_UNIX__SHARED_MODE					(S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)	
+	#define SPL_LOG_UNIX_CREATE_MODE					(O_CREAT | O_RDWR | O_EXCL)	
+	#define SPL_LOG_UNIX_OPEN_MODE						(O_RDWR | O_EXCL)	
+	#define SPL_LOG_UNIX_PROT_FLAGS						(PROT_READ | PROT_WRITE | PROT_EXEC)
 #endif
 
 /*===========================================================================================================================*/
@@ -2063,10 +2068,7 @@ int spl_del_memory(void* shmm) {
 	return ret;
 }
 /*===========================================================================================================================*/
-#define SPL_LOG_UNIX__SHARED_MODE					(S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)	
-#define SPL_LOG_UNIX_CREATE_MODE					(O_CREAT | O_RDWR | O_EXCL)	
-#define SPL_LOG_UNIX_OPEN_MODE						(O_RDWR | O_EXCL)	
-#define SPL_LOG_UNIX_PROT_FLAGS						(PROT_READ | PROT_WRITE | PROT_EXEC)
+
 int spl_create_memory(void** output, char* shared_key, int size_shared, char isCreating) {
 	int ret = 0;
 	char* p = 0;
