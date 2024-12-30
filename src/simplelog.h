@@ -348,8 +348,8 @@ DLL_API_SIMPLE_LOG int
 DLL_API_SIMPLE_LOG int									
 	spl_get_log_levwel();
 
-DLL_API_SIMPLE_LOG int									
-	spl_fmt_now(char* fmtt, int len);
+//DLL_API_SIMPLE_LOG int									
+//	spl_fmt_now(char* fmtt, int len);
 
 DLL_API_SIMPLE_LOG char *
 	spl_fmt_now_ext(char* fmtt, int len, int lv, 
