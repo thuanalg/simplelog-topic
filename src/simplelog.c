@@ -286,7 +286,6 @@ int spl_local_time_now(spl_local_time_st*stt) {
 		stt->hour = (unsigned char)lt.wHour;
 		stt->minute = (unsigned char)lt.wMinute;
 		stt->sec = (unsigned char)lt.wSecond;
-		//stt->ms = (unsigned int)lt.wMilliseconds;
 		stt->nn = (unsigned int)lt.wMilliseconds * SPL_MILLION + counter.QuadPart % SPL_MILLION;
 #else
 /* https://linux.die.net/man/3/localtime*/
@@ -388,20 +387,12 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 		if (strcmp(key, SPLOG_BUFF_SIZE) == 0) {
 			int n = 0;
 			int sz = 0;
-			//char* p = 0;
 			sz = sscanf(buff, "%d", &n);
 			if (n < 1 || sz < 1) {
 				ret = SPL_LOG_BUFF_SIZE_ERROR;
 				break;
 			}
 			__simple_log_static__.buff_size = n;
-			//spl_malloc(n, p, char);
-			//if (!p) {
-			//	ret = SPL_LOG_MEM_MALLOC_ERROR;
-			//	break;
-			//}
-			//__simple_log_static__.buf = (generic_dta_st *) p;
-			//__simple_log_static__.buf->total = n -1;
 			break;
 		}
 		if (strcmp(key, SPLOG_ROT_SIZE) == 0) {
@@ -421,7 +412,6 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 			char* p = 0;
 			n = (int)strlen(buff);
 			if (n < 1) {
-				//ret = SPL_LOG_TOPIC_EMPTY;
 				break;
 			}
 			ret = spl_stdz_topics(buff, &n, &count, &p);
@@ -440,11 +430,6 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 			if (__simple_log_static__.ncpu < 1) {
 				__simple_log_static__.ncpu = 1;
 			}
-			//__simple_log_static__.arr_mtx
-			//#ifndef  UNIX_LINUX
-			//__simple_log_static__.arr_mtx
-			//#else
-			//#endif /*! UNIX_LINUX */ 
 			break;
 		}
 		if (strcmp(key, SPLOG_TRIGGER) == 0) {
