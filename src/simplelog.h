@@ -13,6 +13,7 @@
 *		<2024-Dec-20>
 *		<2024-Dec-22>
 *		<2024-Dec-23>
+*		<2024-Dec-30>
 * Decription:
 *		The (only) main header file to export 3 APIs: [spl_init_log, spllog, spllogtopic, spl_finish_log].
 */
@@ -21,7 +22,6 @@
 #define ___SIMPLE_LOG__
 #include <stdio.h>
 #include <string.h>
-//#include "simplelog_config.h"
 /*strrchr*/
 
 #ifndef SPL_USING_SPIN_LOCK
@@ -119,20 +119,15 @@ extern "C" {
 	typedef
 		struct __GENERIC_DATA__ {
 		int
-			total;
-		/*Total size*/
+			total; /*Total size*/
 		int
-			range;
-		/*Total size*/
+			range; /*Total size*/
 		int
-			pc;
-		/*Point to the current*/
+			pc; /*Point to the current*/
 		int
-			pl;
-		/*Point to the last*/
+			pl; /*Point to the last*/
 		char
-			data[0];
-		/*Generic data */
+			data[0]; /*Generic data */
 	} generic_dta_st;
 
 #define spl_uchar			unsigned char
@@ -154,20 +149,15 @@ extern "C" {
 	typedef
 		struct __SIMPLE_LOG_TOPIC_ST__ {
 		int
-			index;
-		/*Index of a topic*/
+			index; /*Index of a topic*/
 		char
-			topic[SPL_TOPIC_SIZE];
-		/*Name of topic*/
+			topic[SPL_TOPIC_SIZE]; /*Name of topic*/
 		generic_dta_st*
-			buf;
-		/*Buff for writing*/
+			buf; /*Buff for writing*/
 		int
-			fizize;
-		/*Size of file.*/
+			fizize; /*Size of file.*/
 		void*
-			fp;
-		/*File stream.*/
+			fp; /*File stream.*/
 	} SIMPLE_LOG_TOPIC_ST;
 
 	typedef
@@ -186,8 +176,6 @@ extern "C" {
 			off; /*Must be sync*/
 		void*
 			mtx_rw; /*mtx: Need to close handle*/
-//	void*
-//		mtx_off; /*mtx_off: Need to close handle*/
 		void*
 			sem_rwfile; /*sem_rwfile: Need to close handle*/
 		void*
