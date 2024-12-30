@@ -328,11 +328,8 @@ int spl_set_off(int isoff) {
 	
 	if (isoff) {
 		int errCode = 0;
-		//spl_milli_sleep( 1000);
 		spl_rel_sem(__simple_log_static__.sem_rwfile);
 #ifndef UNIX_LINUX
-		//spl_milli_sleep(100 * 1000);
-		//errCode = (int) WaitForSingleObject(__simple_log_static__.sem_off, 3 * 1000);
 		errCode = (int) WaitForSingleObject(__simple_log_static__.sem_off, INFINITE);
 #else
 		errCode = SPL_sem_wait(__simple_log_static__.sem_off);
@@ -341,18 +338,8 @@ int spl_set_off(int isoff) {
 	}
 	return ret;
 }
-/*===========================================================================================================================*/
-//int spl_get_off() {
-//	int ret = 0;
-//	spl_mutex_lock(__simple_log_static__.mtx_off);
-//	do {
-//		ret = __simple_log_static__.off;
-//	} while (0);
-//	spl_mutex_unlock(__simple_log_static__.mtx_off);
-//	return ret;
-//}
-/*===========================================================================================================================*/
 
+/*===========================================================================================================================*/
 int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 	int ret = SPL_NO_ERROR;
 	do {
