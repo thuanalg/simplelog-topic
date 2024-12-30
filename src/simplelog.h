@@ -119,15 +119,15 @@ extern "C" {
 	typedef
 		struct __GENERIC_DATA__ {
 		int
-			total; /*Total size*/
+			total;						/*Total size*/
 		int
-			range; /*Total size*/
+			range;						/*Total size*/
 		int
-			pc; /*Point to the current*/
+			pc;							/*Point to the current*/
 		int
-			pl; /*Point to the last*/
+			pl;							/*Point to the last*/
 		char
-			data[0]; /*Generic data */
+			data[0];					/*Generic data */
 	} generic_dta_st;
 
 #define spl_uchar			unsigned char
@@ -140,7 +140,7 @@ extern "C" {
 		spl_uchar	hour;
 		spl_uchar	minute;
 		spl_uchar	sec;
-		spl_uint	nn;						/*Nanosecond*/
+		spl_uint	nn;					/*Nanosecond*/
 	} spl_local_time_st;
 
 #define				SPL_TOPIC_SIZE					32
