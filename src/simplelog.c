@@ -118,7 +118,7 @@
 #define SPL_FMT_MILL_ADDING \
 	"%s %s.%.9d"
 #define SPL_FMT_DATE_ADDING_X \
-	"\n[%.4d-%.2d-%.2d %.2d:%.2d:%.2d.%.9d] ["
+	"\n[%.4d-%.2d-%.2d %.2d:%.2d:%.2d.%.9d] "
 #define HHHHHHHHHHH		\
 	"%llu]\t"
 
@@ -860,7 +860,10 @@ void* spl_written_thread_routine(void* lpParam)
 	if (t->trigger_thread > 0) {
 		spl_create_thread(spl_trigger_routine, t);
 	}
-	do {	
+	do {
+		if (is_off) {
+			break;
+		}
 		if (!t) {
 			exit(1);
 		}
@@ -871,17 +874,8 @@ void* spl_written_thread_routine(void* lpParam)
 		if (!t->mtx_rw) {
 			exit(1);
 		}
-		if (is_off) {
-			break;
-		}
 		while (1) {
 			if (is_off) {
-				spl_milli_sleep(t->trigger_thread * 2);
-				spl_rel_sem(__simple_log_static__.sem_rwfile);
-				is_off++;
-				if (is_off > 5) {
-					
-				}
 				break;
 			}
 #ifndef UNIX_LINUX
@@ -922,7 +916,6 @@ void* spl_written_thread_routine(void* lpParam)
 					spl_mutex_unlock(t->arr_mtx[i]);
 				}
 				//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-				//if (only_cast->pl > 0) {
 				if (only_cast->pl > 0) {
 					k = (int)fwrite(only_cast->data, 1, only_cast->pl, t->fp);
 					only_cast->pl = 0;
@@ -930,7 +923,6 @@ void* spl_written_thread_routine(void* lpParam)
 					SPL_FFLUSH((t->fp), err);
 				}
 				if (err) {
-					//TO-TEST
 					ret = SPL_LOG_TOPIC_FLUSH;
 					spl_console_log("--fflush, ret: %d --\n", err);
 					break;
@@ -1036,39 +1028,59 @@ int spl_simple_log_thread(SIMPLE_LOG_ST* t) {
 	return ret;
 }
 /*===========================================================================================================================*/
-int spl_prefmt_now(FMT_FOR_OUTPUT* p) {
+/*
+char *spl_prefmt_now(FMT_FOR_OUTPUT* pp) {
 	int ret = 0;
-	//spl_local_time_st stt;
-	//int n = 0;
-	//
-	//p->outlen = 0;
-	//p->prefmt = p->tnow;
+	spl_local_time_st stt;
+	int n = 0;
+	char* p = pp->tnow;
+	pp->outlen = 0;
 	//do {
-	//	//memset(&stt, 0, sizeof(stt));
-	//	ret = spl_local_time_now(&stt);
-	//	if (ret) {
-	//		break;
-	//	}
-	//	(p->r) = (stt.nn % __simple_log_static__.ncpu);
-	//
-	//	n = sprintf(p->tnow, SPL_FMT_DATE_ADDING_X,
-	//		stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day,
-	//		stt.hour, stt.minute, stt.sec, (unsigned int)stt.nn, 
-	//		spl_text_label_gb[p->lv % SPL_LOG_PEAK], spl_get_threadid());
-	//	if (p->outlen < 1) {
-	//		ret = SPL_LOG_PRINTF_ERROR;
-	//		break;
-	//	}
-	//	p->outlen = n;
-	//	p->outlen += snprintf(p->tnow + n, SPL_RL_BUF - n, "\t[%s:%s:%d]\t",
-	//		p->finame, p->fcname, p->line);
-	//
-	//	//		memcpy(fmtt, "-------------------------------------------------------------------------------------------------------------------------------------\
-	//	//			-----------------------------------------------------------------------------------", 86);
-	//	//					*outlen = 86;
-	//} while (0);
-	return ret;
+	ret = spl_local_time_now(&stt);
+	if (ret) {
+		return p;
+	}
+	//if (r) {
+	pp->r = (stt.nn % __simple_log_static__.ncpu);
+	//}
+
+	n = sprintf(p, SPL_FMT_DATE_ADDING_X,
+		stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day,
+		stt.hour, stt.minute, stt.sec, (unsigned int)stt.nn);
+	if (n < 1) {
+		ret = SPL_LOG_PRINTF_ERROR;
+		return p;
+	}
+	p[n++] = spl_text_gb_c[pp->lv % SPL_LOG_PEAK];
+	memcpy(p + n, "] [tid:\t", 8);
+	n += 8;
+
+	n += sprintf(p + n, HHHHHHHHHHH, spl_get_threadid());
+	pp->outlen = n;
+	pp->outlen += snprintf(p + n, SPL_RL_BUF - n, "[%s:%s:%d]\t",
+		pp->finame, pp->fcname, pp->line);
+	//*outlen += snprintf(fmtt + n, len - n, "[%s:%s:%d] [r: %d]\t",
+	//	filename, funcname, line, (int)*r);
+	if (pp->outlen > SPL_RL_BUF) {
+		spl_malloc((pp->outlen + 1), p, char);
+		if (!p) {
+			spl_console_log("Malloc error");
+		}
+		memcpy(p, pp->tnow, n);
+		pp->outlen = n;
+		//*outlen += sprintf(p + n, "[%s:%s:%d] [r: %d]\t",
+		//	filename, funcname, line, (int)*r);
+		pp->outlen += sprintf(p + n, "[%s:%s:%d]\t",
+			pp->finame, pp->fcname, pp->line);
+	}
+
+	//		memcpy(fmtt, "-------------------------------------------------------------------------------------------------------------------------------------\
+	//			-----------------------------------------------------------------------------------", 86);
+	//					*outlen = 86;
+		//} while (0);
+	return p;
 }
+*/
 /*===========================================================================================================================*/
 char* spl_fmt_now_ext(char* fmtt, int len, int lv, 
 	const char* filename, const char* funcname, int  line, unsigned short *r, int *outlen)
@@ -1087,23 +1099,19 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 			*r = (stt.nn  % __simple_log_static__.ncpu);
 		//}
 
-		n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X,
+		n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X" [%c] [tid:\t%llu] ",
 			stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day,
-			stt.hour, stt.minute, stt.sec, (unsigned int)stt.nn);
+			stt.hour, stt.minute, stt.sec, (int)stt.nn, spl_text_gb_c[lv % SPL_LOG_PEAK], spl_get_threadid());
 		if (n < 1) {
 			ret = SPL_LOG_PRINTF_ERROR;
 			return p;
 		}
-		fmtt[n++] = spl_text_gb_c[lv % SPL_LOG_PEAK];
-		memcpy(fmtt + n, "] [tid:\t", 8);
-		n += 8;
-		
-		n += sprintf(fmtt + n, HHHHHHHHHHH, spl_get_threadid());
 		*outlen = n;
-		*outlen += snprintf(fmtt + n , len - n, "[%s:%s:%d]\t",
-			filename, funcname, line);
+
 		//*outlen += snprintf(fmtt + n, len - n, "[%s:%s:%d] [r: %d]\t",
 		//	filename, funcname, line, (int)*r);
+		*outlen += snprintf(fmtt + n, SPL_RL_BUF - n, "[%s:%s:%d]\t",
+			filename, funcname, line);
 		if (*outlen > len) {
 			spl_malloc((*outlen + 1), p, char);
 			if (!p) {
@@ -1113,7 +1121,7 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 			*outlen = n;
 			//*outlen += sprintf(p + n, "[%s:%s:%d] [r: %d]\t",
 			//	filename, funcname, line, (int)*r);
-			*outlen += sprintf(p + n, "[%s:%s:%d]\t",
+			*outlen += snprintf(fmtt + n, SPL_RL_BUF - n, "[%s:%s:%d]\t",
 				filename, funcname, line);
 		}
 		

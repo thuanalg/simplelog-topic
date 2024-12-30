@@ -214,10 +214,9 @@ extern "C" {
 			trigger_thread; /*Use trigger thread or not.*/
 		void	
 			**arr_mtx; /*Use trigger thread or not.*/
-		//unsigned short mod;
-		//HANDLE dummy_lock;
 	} SIMPLE_LOG_ST;
-typedef struct {
+/*
+typedef struct __FMT_FOR_OUTPUT__ {
 	int outlen ;
 	const char* finame ;
 	const char* fcname;
@@ -227,6 +226,7 @@ typedef struct {
 	int lv;
 	unsigned short r ;
 } FMT_FOR_OUTPUT;
+*/
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
 #define __FILLE__(__p__)	do { __p__ = strrchr(__FILE__, '/'); if(__p__) {++__p__;break;} \
@@ -375,8 +375,6 @@ DLL_API_SIMPLE_LOG int
 	spl_mutex_unlock(void* mtx);
 DLL_API_SIMPLE_LOG int									
 	spl_set_off(int );
-//DLL_API_SIMPLE_LOG int									
-//	spl_get_off();
 DLL_API_SIMPLE_LOG void*								
 	spl_get_mtx();
 DLL_API_SIMPLE_LOG void*								
@@ -415,13 +413,10 @@ DLL_API_SIMPLE_LOG
 
 DLL_API_SIMPLE_LOG
 	SIMPLE_LOG_ST *spl_control_obj();
-DLL_API_SIMPLE_LOG
-	int spl_prefmt_now(FMT_FOR_OUTPUT* p);
 
 //DLL_API_SIMPLE_LOG
-//	void splLockSpinlock(volatile long* p);
-//DLL_API_SIMPLE_LOG
-//	void splUnlockSpinlock(volatile long* p);
+//	char *spl_prefmt_now(FMT_FOR_OUTPUT* p);
+//
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
 #ifdef __cplusplus
