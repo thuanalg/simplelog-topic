@@ -344,17 +344,11 @@ DLL_API_SIMPLE_LOG int
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 DLL_API_SIMPLE_LOG int									
 	spl_set_log_levwel(int val);
-
 DLL_API_SIMPLE_LOG int									
 	spl_get_log_levwel();
-
-//DLL_API_SIMPLE_LOG int									
-//	spl_fmt_now(char* fmtt, int len);
-
 DLL_API_SIMPLE_LOG char *
 	spl_fmt_now_ext(char* fmtt, int len, int lv, 
 		const char *filename, const char* funcname, int  line, unsigned short* r, int *);
-
 DLL_API_SIMPLE_LOG int									
 	spl_fmmt_now(char* fmtt, int len);
 DLL_API_SIMPLE_LOG int									
@@ -371,34 +365,16 @@ DLL_API_SIMPLE_LOG LLU
 	spl_get_threadid();
 DLL_API_SIMPLE_LOG int									
 	spl_rel_sem(void* sem);
-//DLL_API_SIMPLE_LOG const char*							
-//	spl_get_text(int lev);
-
-//DLL_API_SIMPLE_LOG char *								
-//	spl_get_buf(int* n, int** ppl);
-//DLL_API_SIMPLE_LOG char *								
-//	spl_get_buf_ext(int* n, int** ppl, char*);
-//DLL_API_SIMPLE_LOG char*
-//	spl_get_buf_topic(int* n, int** ppl, int );
-
-DLL_API_SIMPLE_LOG char*
-	spl_get_buf_topic_ext(int* n, int** ppl, int, char *isoff);
-
-
 DLL_API_SIMPLE_LOG 
 	void* spl_mutex_create();
 DLL_API_SIMPLE_LOG
 	void spl_sleep(unsigned  int);
-
 DLL_API_SIMPLE_LOG
 	void spl_milli_sleep(unsigned  int);
-
 DLL_API_SIMPLE_LOG
 	int spl_standardize_path(char* fname);
-
 DLL_API_SIMPLE_LOG
 	LLU spl_milli_now();
-
 DLL_API_SIMPLE_LOG
 	SIMPLE_LOG_ST *spl_control_obj();
 
