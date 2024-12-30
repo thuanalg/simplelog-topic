@@ -541,13 +541,6 @@ spl_init_log( char *pathcfg)
 		}
 		__simple_log_static__.mtx_rw = obj;
 
-		//obj = spl_mutex_create();
-		//if (!obj) {
-		//	ret = SPL_ERROR_CREATE_MUTEX;
-		//	break;
-		//}
-		//__simple_log_static__.mtx_off = obj;
-		
 		obj = spl_sem_create(1);
 		if (!obj) {
 			ret = SPL_ERROR_CREATE_SEM;
@@ -618,18 +611,15 @@ void** spl_mutex_create_arr(int n) {
 		if (n < 1) {
 			return ret;
 		}
-		//ret = (void**)malloc(sizeof(void*) * n);
 		spl_malloc(sizeof(void*) * n, ret, void*);
 		for (i = 0; i < n; ++i) {
 #ifndef UNIX_LINUX
 #ifndef SPL_USING_SPIN_LOCK
 			ret[i] = (void*)CreateMutexA(0, 0, 0);
-			//SPL_CloseHandle(ret[i]);
 #else
 			volatile long* tmp = 0;
 			spl_malloc(sizeof(volatile long), tmp, volatile long);
 			ret[i] = (void*)tmp;
-			//spl_free(ret[i]);
 #endif
 #else
 #ifndef SPL_USING_SPIN_LOCK
@@ -687,7 +677,6 @@ void* spl_sem_create(int ini) {
 #ifndef UNIX_LINUX
 		ret = CreateSemaphoreA(0, 0, ini, 0);
 #else
-		//ret = malloc(sizeof(sem_t));
 		spl_malloc(sizeof(sem_t), ret, void);
 		if (!ret) {
 			break;
@@ -718,7 +707,6 @@ int spl_mutex_lock(void* obj) {
 			break;
 		}
 	#else
-		//splLockSpinlock(obj);
 		SplLockSpinlock(obj);
 	#endif
 #else
@@ -752,7 +740,6 @@ int spl_mutex_unlock(void* obj) {
 			break;
 		}
 	#else
-		//splUnlockSpinlock(obj);
 		SplUnlockSpinlock(obj);
 	#endif
 #else
@@ -875,8 +862,6 @@ void* spl_written_thread_routine(void* lpParam)
 			SPL_sem_wait(t->sem_rwfile);
 #endif
 			do{
-				//off = spl_get_off();
-
 				ret = spl_gen_file(t, &sz, t->file_limit_size, &(t->index));
 				if (ret) {
 					spl_console_log("--spl_gen_file, ret: %d --\n", ret);
@@ -1126,9 +1111,7 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 int spl_fmt_now(char* fmtt, int len) {
 	int ret = 0;
 	spl_local_time_st stt;
-	//static LLU pre_tnow = 0;
 	LLU _tnow = 0;
-	//LLU _delta = 0;
 	int n = 0; 
 	char buff[20], buff1[20];
 	memset(buff, 0, 20);
@@ -1246,7 +1229,6 @@ int spl_gen_file(SIMPLE_LOG_ST* t, int *sz, int limit, int *index) {
 				spl_standardize_path(path);
 				spl_standardize_path(t->path_template);
 				
-				//t->fp = fopen(path, "a+");
 				FFOPEN(t->fp, path, "a+");
 				if (!t->fp) {
 					ret = SPL_LOG_OPEN_FILE_ERROR;
@@ -1369,49 +1351,7 @@ int spl_rel_sem(void *sem) {
 	} while (0);
 	return ret;
 }
-/*===========================================================================================================================*/
 
-const char* spl_get_text(int lev) {
-	const char* val = SPL_TEXT_UNKNOWN;
-	static const char* spl_text_label[SPL_LOG_PEAK] = {
-		"A",
-		"D",
-		"I",
-		"W",
-		"E",
-		"F",
-	};
-	do {
-		if (lev < SPL_LOG_BASE) {
-			break;
-		}
-		if (lev > SPL_LOG_FATAL) {
-			break;
-		}
-		val = spl_text_label[lev];
-		//if (lev == SPL_LOG_DEBUG) {
-		//	val = SPL_TEXT_DEBUG;
-		//	break;
-		//}
-		//if (lev == SPL_LOG_INFO) {
-		//	val = SPL_TEXT_INFO;
-		//	break;
-		//}
-		//if (lev == SPL_LOG_WARNING) {
-		//	val = SPL_TEXT_WARN;
-		//	break;
-		//}
-		//if (lev == SPL_LOG_ERROR) {
-		//	val = SPL_TEXT_ERROR;
-		//	break;
-		//}
-		//if (lev == SPL_LOG_FATAL) {
-		//	val = SPL_TEXT_FATAL;
-		//	break;
-		//}
-	} while(0);
-	return val;
-}
 /*===========================================================================================================================*/
 int spl_finish_log() {
 	int ret = 0; 
@@ -1450,49 +1390,49 @@ int spl_finish_log() {
 	memset(&__simple_log_static__, 0, sizeof(__simple_log_static__));
 	return ret;
 }
-/*===========================================================================================================================*/
-#define STSPLOG						(&__simple_log_static__)
-#define STSPLOGBUF					STSPLOG->buf
-char* spl_get_buf(int* n, int** ppl) {
-	//SIMPLE_LOG_ST* t = &__simple_log_static__;
-	//char* ret = 0;
-	//if (t->buf) {
-		//if (n && ppl) {
-	if (STSPLOG->off) {
-		return 0;
-	}
-			(*n) = (STSPLOGBUF->total > sizeof(generic_dta_st) + STSPLOGBUF->pl + 2048) ? (STSPLOGBUF->total - (sizeof(generic_dta_st) + STSPLOGBUF->pl)) : 0;
-			//ret = t->buf->data;
-			if (!(*n)) {
-				return 0;
-			}
-			(*ppl) = &(STSPLOGBUF->pl);
-			return STSPLOGBUF->data;
-		//}
-	//}
-	return 0;
-}
-/*===========================================================================================================================*/
-char* spl_get_buf_ext(int* n, int** ppl, char *isOff) {
-	//SIMPLE_LOG_ST* t = &__simple_log_static__;
-	//char* ret = 0;
-	//if (t->buf) {
-		//if (n && ppl) {
-	if (STSPLOG->off) {
-		*isOff = 1;
-		return 0;
-	}
-	(*n) = (STSPLOGBUF->range > (STSPLOGBUF->pl + 2048)) ? (STSPLOGBUF->total - STSPLOGBUF->pl) : 0;
-	//ret = t->buf->data;
-	if (!(*n)) {
-		return 0;
-	}
-	(*ppl) = &(STSPLOGBUF->pl);
-	return STSPLOGBUF->data;
-	//}
+///*===========================================================================================================================*/
+//#define STSPLOG						(&__simple_log_static__)
+//#define STSPLOGBUF					STSPLOG->buf
+//char* spl_get_buf(int* n, int** ppl) {
+//	//SIMPLE_LOG_ST* t = &__simple_log_static__;
+//	//char* ret = 0;
+//	//if (t->buf) {
+//		//if (n && ppl) {
+//	if (STSPLOG->off) {
+//		return 0;
+//	}
+//			(*n) = (STSPLOGBUF->total > sizeof(generic_dta_st) + STSPLOGBUF->pl + 2048) ? (STSPLOGBUF->total - (sizeof(generic_dta_st) + STSPLOGBUF->pl)) : 0;
+//			//ret = t->buf->data;
+//			if (!(*n)) {
+//				return 0;
+//			}
+//			(*ppl) = &(STSPLOGBUF->pl);
+//			return STSPLOGBUF->data;
+//		//}
+//	//}
+//	return 0;
 //}
-	return 0;
-}
+///*===========================================================================================================================*/
+//char* spl_get_buf_ext(int* n, int** ppl, char *isOff) {
+//	//SIMPLE_LOG_ST* t = &__simple_log_static__;
+//	//char* ret = 0;
+//	//if (t->buf) {
+//		//if (n && ppl) {
+//	if (STSPLOG->off) {
+//		*isOff = 1;
+//		return 0;
+//	}
+//	(*n) = (STSPLOGBUF->range > (STSPLOGBUF->pl + 2048)) ? (STSPLOGBUF->total - STSPLOGBUF->pl) : 0;
+//	//ret = t->buf->data;
+//	if (!(*n)) {
+//		return 0;
+//	}
+//	(*ppl) = &(STSPLOGBUF->pl);
+//	return STSPLOGBUF->data;
+//	//}
+////}
+//	return 0;
+//}
 /*===========================================================================================================================*/
 /*https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createdirectorya*/
 int spl_folder_sup(char* folder, spl_local_time_st* lctime, char* year_month) {
@@ -1804,60 +1744,60 @@ spl_gen_topics(SIMPLE_LOG_ST* t) {
 	} while (0);
 	return ret;
 }
-/*===========================================================================================================================*/
-#define STSPLOGBUFTOPIC(__i__)				(&(STSPLOG->arr_topic[i]))->buf
-char*
-spl_get_buf_topic(int* n, int** ppl, int i) {
-	//SIMPLE_LOG_ST* tg = &__simple_log_static__;
-	//char* ret = 0;
-	//do {
-		if (STSPLOG->off) {
-			return 0;
-		}
-		if (i < 0 || ((i + 1) > STSPLOG->n_topic)) {
-			return spl_get_buf(n, ppl);
-			//break;
-		}
-		if (STSPLOG->arr_topic) {
-			//SIMPLE_LOG_TOPIC_ST* obj = &(STSPLOG->arr_topic[i]);
-			//if (n && ppl) {
-				*n = (STSPLOGBUFTOPIC(i)->total > sizeof(generic_dta_st) + STSPLOGBUFTOPIC(i)->pl) ? 
-					(STSPLOGBUFTOPIC(i)->total - (sizeof(generic_dta_st) + STSPLOGBUFTOPIC(i)->pl)) : 0;
-				//ret = obj->buf->data;
-				(*ppl) = &(STSPLOGBUFTOPIC(i)->pl);
-				return STSPLOGBUFTOPIC(i)->data;
-			//}
-		}
-	//} while (0);
-	return 0;
-}
-/*===========================================================================================================================*/
-char*
-spl_get_buf_topic_ext(int* n, int** ppl, int i, char *isOOf) {
-	//SIMPLE_LOG_ST* tg = &__simple_log_static__;
-	//char* ret = 0;
-	//do {
-	if (STSPLOG->off) {
-		*isOOf = 1;
-		return 0;
-	}
-	if (i < 0 || ((i + 1) > STSPLOG->n_topic)) {
-		return spl_get_buf_ext(n, ppl, isOOf);
-		//break;
-	}
-	if (STSPLOG->arr_topic) {
-		//SIMPLE_LOG_TOPIC_ST* obj = &(STSPLOG->arr_topic[i]);
-		//if (n && ppl) {
-		*n = (STSPLOGBUFTOPIC(i)->range > (STSPLOGBUFTOPIC(i)->pl + 2048)) ?
-			(STSPLOGBUFTOPIC(i)->total - (STSPLOGBUFTOPIC(i)->pl)) : 0;
-		//ret = obj->buf->data;
-		(*ppl) = &(STSPLOGBUFTOPIC(i)->pl);
-		return STSPLOGBUFTOPIC(i)->data;
-		//}
-	}
-	//} while (0);
-	return 0;
-}
+///*===========================================================================================================================*/
+//#define STSPLOGBUFTOPIC(__i__)				(&(STSPLOG->arr_topic[i]))->buf
+//char*
+//spl_get_buf_topic(int* n, int** ppl, int i) {
+//	//SIMPLE_LOG_ST* tg = &__simple_log_static__;
+//	//char* ret = 0;
+//	//do {
+//		if (STSPLOG->off) {
+//			return 0;
+//		}
+//		if (i < 0 || ((i + 1) > STSPLOG->n_topic)) {
+//			return spl_get_buf(n, ppl);
+//			//break;
+//		}
+//		if (STSPLOG->arr_topic) {
+//			//SIMPLE_LOG_TOPIC_ST* obj = &(STSPLOG->arr_topic[i]);
+//			//if (n && ppl) {
+//				*n = (STSPLOGBUFTOPIC(i)->total > sizeof(generic_dta_st) + STSPLOGBUFTOPIC(i)->pl) ? 
+//					(STSPLOGBUFTOPIC(i)->total - (sizeof(generic_dta_st) + STSPLOGBUFTOPIC(i)->pl)) : 0;
+//				//ret = obj->buf->data;
+//				(*ppl) = &(STSPLOGBUFTOPIC(i)->pl);
+//				return STSPLOGBUFTOPIC(i)->data;
+//			//}
+//		}
+//	//} while (0);
+//	return 0;
+//}
+///*===========================================================================================================================*/
+//char*
+//spl_get_buf_topic_ext(int* n, int** ppl, int i, char *isOOf) {
+//	//SIMPLE_LOG_ST* tg = &__simple_log_static__;
+//	//char* ret = 0;
+//	//do {
+//	if (STSPLOG->off) {
+//		*isOOf = 1;
+//		return 0;
+//	}
+//	if (i < 0 || ((i + 1) > STSPLOG->n_topic)) {
+//		return spl_get_buf_ext(n, ppl, isOOf);
+//		//break;
+//	}
+//	if (STSPLOG->arr_topic) {
+//		//SIMPLE_LOG_TOPIC_ST* obj = &(STSPLOG->arr_topic[i]);
+//		//if (n && ppl) {
+//		*n = (STSPLOGBUFTOPIC(i)->range > (STSPLOGBUFTOPIC(i)->pl + 2048)) ?
+//			(STSPLOGBUFTOPIC(i)->total - (STSPLOGBUFTOPIC(i)->pl)) : 0;
+//		//ret = obj->buf->data;
+//		(*ppl) = &(STSPLOGBUFTOPIC(i)->pl);
+//		return STSPLOGBUFTOPIC(i)->data;
+//		//}
+//	}
+//	//} while (0);
+//	return 0;
+//}
 /*===========================================================================================================================*/
 LLU
 spl_milli_now() {

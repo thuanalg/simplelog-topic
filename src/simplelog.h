@@ -371,15 +371,15 @@ DLL_API_SIMPLE_LOG LLU
 	spl_get_threadid();
 DLL_API_SIMPLE_LOG int									
 	spl_rel_sem(void* sem);
-DLL_API_SIMPLE_LOG const char*							
-	spl_get_text(int lev);
-DLL_API_SIMPLE_LOG char *								
-	spl_get_buf(int* n, int** ppl);
-DLL_API_SIMPLE_LOG char *								
-	spl_get_buf_ext(int* n, int** ppl, char*);
+//DLL_API_SIMPLE_LOG const char*							
+//	spl_get_text(int lev);
 
-DLL_API_SIMPLE_LOG char*
-	spl_get_buf_topic(int* n, int** ppl, int );
+//DLL_API_SIMPLE_LOG char *								
+//	spl_get_buf(int* n, int** ppl);
+//DLL_API_SIMPLE_LOG char *								
+//	spl_get_buf_ext(int* n, int** ppl, char*);
+//DLL_API_SIMPLE_LOG char*
+//	spl_get_buf_topic(int* n, int** ppl, int );
 
 DLL_API_SIMPLE_LOG char*
 	spl_get_buf_topic_ext(int* n, int** ppl, int, char *isoff);
