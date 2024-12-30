@@ -1077,8 +1077,8 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 	int ret = 0;
 	spl_local_time_st stt;
 	int n = 0;
+	*outlen = 0;
 	//do {
-		//memset(&stt, 0, sizeof(stt));
 		ret = spl_local_time_now(&stt);
 		if (ret) {
 			return p;
@@ -1121,7 +1121,6 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 //			-----------------------------------------------------------------------------------", 86);
 //					*outlen = 86;
 	//} while (0);
-	//spl_console_log("---------)))))))))))))))))))))))--------------=========================");
 	return p;
 }
 /*===========================================================================================================================*/
