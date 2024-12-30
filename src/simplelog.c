@@ -243,14 +243,6 @@ SIMPLE_LOG_ST* spl_control_obj() {
 	return (SIMPLE_LOG_ST*)&__simple_log_static__;
 }
 /*===========================================================================================================================*/
-static const char* spl_text_label_gb[SPL_LOG_PEAK] = {
-	"A",
-	"D",
-	"I",
-	"W",
-	"E",
-	"F",
-};
 
 static const char spl_text_gb_c[SPL_LOG_PEAK] = {
 	'A',
