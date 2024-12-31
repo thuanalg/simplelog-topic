@@ -33,7 +33,7 @@ Microsoft Graphics Hybrid: Not Supported
  DirectX Database Version: 1.0.8
            DxDiag Version: 10.00.19041.5198 64bit Unicode	
 #---------------------------------------------------------------------------------------------------------------------
-Spdlog 01
+Spdlog 01 (first round)
 [2024-12-31 12:09:31.073] [A] [info] [example.cpp:log_messages:432] [Threadid 27896] test log: 0
 [2024-12-31 12:10:39.742] [A] [info] [example.cpp:log_messages:432] [Threadid 1712] test log: 999999
 Time:68.7s
@@ -55,7 +55,7 @@ File size: 1,003,798 KB
 
 
 
-simple-topic 02
+simple-topic 02 (second round)
 [2024-12-31 12:16:29.432020954] [I] [tid	22556]	[main.c:win32_thread_routine:120] My test log : 999989
 [2024-12-31 12:16:14.267375570] [I] [tid	16552]	[main.c:win32_thread_routine:120] My test log : 8
 Time:  15.2 s
@@ -69,7 +69,7 @@ File size: 999,892 KB
 
 
 
-simple-topic 01
+simple-topic 01 (third round)
 [2024-12-31 12:25:56.739093439] [I] [tid	14632]	[main.c:win32_thread_routine:120] My test log : 999982
 [2024-12-31 12:25:41.459293235] [I] [tid	4804]	[main.c:win32_thread_routine:120] My test log : 0
 Time:  15.25 s
