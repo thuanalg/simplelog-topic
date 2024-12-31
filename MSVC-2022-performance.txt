@@ -1,10 +1,10 @@
 #---------------------------------------------------------------------------------------------------------------------
 Spdlog test file: https://github.com/thuanalg/simplelog-topic/blob/main/src/spd_example.cpp
 
-simple-topic: https://github.com/thuanalg/simplelog-topic/blob/main/src/c_test/main.c
+simplelog-topic: https://github.com/thuanalg/simplelog-topic/blob/main/src/c_test/main.c
 	configred file: https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog-win64-msvc-2022.cfg
 	
-Environtmant for both:
+Environment for both:
 	- MSVC 2022, ISO C++14, Standard
 	- Windows 10, 64bit
 	- 10 threads
@@ -42,7 +42,7 @@ File size: 1,002,822KB
 
 
 
-simple-topic 01 (first round)
+simplelog-topic 01 (first round)
 [2024-12-31 12:13:37.635052569] [I] [tid	19036]	[main.c:win32_thread_routine:120] My test log : 999999
 [2024-12-31 12:13:22.435044250] [I] [tid	28696]	[main.c:win32_thread_routine:120] My test log : 2
 Time: 15.2s
@@ -56,7 +56,7 @@ File size: 1,003,798 KB
 
 
 
-simple-topic 02 (second round)
+simplelog-topic 02 (second round)
 [2024-12-31 12:16:29.432020954] [I] [tid	22556]	[main.c:win32_thread_routine:120] My test log : 999989
 [2024-12-31 12:16:14.267375570] [I] [tid	16552]	[main.c:win32_thread_routine:120] My test log : 8
 Time:  15.17 s
@@ -70,11 +70,11 @@ File size: 999,892 KB
 
 
 
-simple-topic 01 (third round)
+simplelog-topic 01 (third round)
 [2024-12-31 12:25:56.739093439] [I] [tid	14632]	[main.c:win32_thread_routine:120] My test log : 999982
 [2024-12-31 12:25:41.459293235] [I] [tid	4804]	[main.c:win32_thread_routine:120] My test log : 0
 Time:  15.25 s
 File size: 1,011,611 KB
 #---------------------------------------------------------------------------------------------------------------------
 Conclusion:
-	This environtment, simple-topic is 4 TIMES faster than spdlog.
+	This environment, simplelog-topic is 4 TIMES faster than spdlog.
