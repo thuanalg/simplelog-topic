@@ -1,0 +1,51 @@
+Env: Linux centos09 Virtual Box Machine
+	- 10 threads
+	- 10 million records
+spdlog tested file: https://github.com/thuanalg/simplelog-topic/blob/main/src/spd_example.cpp
+simplelog-topic, run with command "simpplelog_cpp_direct_sample"
+spdlog tested file: https://github.com/thuanalg/simplelog-topic/blob/main/src/cpp_test/main.cpp
+#---------------------------------------------------------------------------------------------------------------------
+Spdlog 01 (first round)
+[2024-12-31 17:57:42.421] [A] [info] [example.cpp:log_messages:432] [Threadid 140501474862656] test log: 999999
+[2024-12-31 17:57:27.542] [A] [info] [example.cpp:log_messages:432] [Threadid 140501483255360] test log: 0
+Time:15.1s
+File size: 1118888900(bytes)
+
+
+
+simplelog-topic 01 (first round)
+[2024-12-31 17:57:00.772414424] [I] [tid        140453441676864]        [main.cpp:posix_thread_routine:121] test log test log test log: 999997
+[2024-12-31 17:56:45.151496715] [I] [tid        140453483640384]        [main.cpp:posix_thread_routine:121] test log test log test log: 8
+Time: 15.6s
+File size: 1288888900(bytes)
+#---------------------------------------------------------------------------------------------------------------------
+Spdlog 02  (second round)
+[2024-12-31 18:03:51.193] [A] [info] [example.cpp:log_messages:432] [Threadid 140220171265600] test log: 999999
+[2024-12-31 18:03:36.354] [A] [info] [example.cpp:log_messages:432] [Threadid 140220305503808] test log: 0
+Time: 14.8s
+File size: 1118888900(bytes)
+
+
+
+simplelog-topic 02 (second round)
+[2024-12-31 18:06:00.514986434] [I] [tid        140252597720640]        [main.cpp:posix_thread_routine:121] test log test log test log: 999999
+[2024-12-31 18:05:44.895784385] [I] [tid        140252625901120]        [main.cpp:posix_thread_routine:121] test log test log test log: 4
+Time:  15.7 s
+File size: 1288888900 (bytes)
+#---------------------------------------------------------------------------------------------------------------------
+Spdlog 03 (third round)
+[2024-12-31 18:09:21.943] [A] [info] [example.cpp:log_messages:432] [Threadid 139672959305280] test log: 999999
+[2024-12-31 18:09:07.022] [A] [info] [example.cpp:log_messages:432] [Threadid 139672984483392] test log: 0
+Time: 14.9s
+File size: 1118888900(bytes)
+
+
+
+simplelog-topic 03 (third round)
+[2024-12-31 18:11:04.361593929] [I] [tid        140197203535424]        [main.cpp:posix_thread_routine:121] test log test log test log: 999952
+[2024-12-31 18:10:48.601215255] [I] [tid        140197256894016]        [main.cpp:posix_thread_routine:121] test log test log test log: 7
+Time:  15.7 s
+File size: 1288888900 (bytes)
+#---------------------------------------------------------------------------------------------------------------------
+Conclusion:
+	This environment, spdlog is 0.75 (~5%) second faster than simplelog-topic.
