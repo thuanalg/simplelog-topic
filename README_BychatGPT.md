@@ -41,8 +41,8 @@ One of the core objectives of SimpleLog-Topic is to provide exceptional **perfor
 
 2. **Linux Performance Benchmark (10 Threads and 10 Million Records):**
 
-   - **SimpleLog-Topic:** **16 seconds**
-   - **spdlog:** **16 seconds**
+   - **SimpleLog-Topic:** **15-16 seconds**
+   - **spdlog:** **15 seconds** (https://github.com/thuanalg/simplelog-topic/blob/main/LinuxCentOs09.txt)
 
    On **Linux**, both SimpleLog-Topic and spdlog performed similarly, completing the test in **16 seconds**. This consistency across platforms demonstrates that SimpleLog-Topic provides **reliable performance** in both Windows and Linux environments.
 
