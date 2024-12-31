@@ -3,6 +3,6 @@
 [2024-12-31 15:21:33.145233074] [I] [tid	20188]	[main.c:win32_thread_routine:120] My test log : 99999994
 [2024-12-31 14:48:50.090606645] [I] [tid	21180]	[main.c:win32_thread_routine:120] My test log : 30
 33 minutes and 17 second = 1997 second
-105,588,888,900 (byte)
+98.3 GB (105,588,985,856 bytes)
 
 simple_c_example.exe --nthread=10 --loopcount=100000000
