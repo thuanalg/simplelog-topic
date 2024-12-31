@@ -1,6 +1,0 @@
-C:/z/simplelog-topic/win32/CMakeFiles/simpleloglib.dir
-C:/z/simplelog-topic/win32/CMakeFiles/simple_c_example.dir
-C:/z/simplelog-topic/win32/CMakeFiles/simple_cpp_example.dir
-C:/z/simplelog-topic/win32/CMakeFiles/simple_cpp_example_direct.dir
-C:/z/simplelog-topic/win32/CMakeFiles/ALL_BUILD.dir
-C:/z/simplelog-topic/win32/CMakeFiles/ZERO_CHECK.dir
