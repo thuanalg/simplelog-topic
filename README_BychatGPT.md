@@ -34,7 +34,7 @@ One of the core objectives of SimpleLog-Topic is to provide exceptional **perfor
 
 1. **MSVC 2022 with 10 Threads and 10 Million Records:**
 
-   - **SimpleLog-Topic:** **16 seconds**
+   - **SimpleLog-Topic:** **16 seconds** (https://github.com/thuanalg/simplelog-topic/blob/main/MSVC-2022-performance.txt)
    - **spdlog:** **66 seconds**
 
    In this test, **SimpleLog-Topic** logged **10 million records** in just **16 seconds**, compared to **66 seconds** taken by **spdlog**. This demonstrates **4x faster performance** in multithreaded environments, showing that SimpleLog-Topic efficiently manages logging tasks without unnecessary performance bottlenecks.
