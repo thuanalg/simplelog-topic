@@ -14,6 +14,7 @@
 *		<2024-Dec-20>
 *		<2024-Dec-22>
 *		<2024-Dec-23>
+*		<2024-Dec-30>
 * Decription:													
 *		The (only) main file to implement simple log.
 */
@@ -47,6 +48,11 @@
 	
 	#define YEAR_PADDING				1900
 	#define MONTH_PADDING				1
+
+	#define SPL_LOG_UNIX__SHARED_MODE					(S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)	
+	#define SPL_LOG_UNIX_CREATE_MODE					(O_CREAT | O_RDWR | O_EXCL)	
+	#define SPL_LOG_UNIX_OPEN_MODE						(O_RDWR | O_EXCL)	
+	#define SPL_LOG_UNIX_PROT_FLAGS						(PROT_READ | PROT_WRITE | PROT_EXEC)
 #endif
 
 /*===========================================================================================================================*/
@@ -129,6 +135,7 @@
 #define				SPL_TEXT_ERROR					"E"
 #define				SPL_TEXT_FATAL					"F"
 
+#define				SPL_MILLION						1000000
 
 
 #define MYCASTGEN(__t__)	((generic_dta_st*)__t__)
@@ -236,14 +243,6 @@ SIMPLE_LOG_ST* spl_control_obj() {
 	return (SIMPLE_LOG_ST*)&__simple_log_static__;
 }
 /*===========================================================================================================================*/
-static const char* spl_text_label_gb[SPL_LOG_PEAK] = {
-	"A",
-	"D",
-	"I",
-	"W",
-	"E",
-	"F",
-};
 
 static const char spl_text_gb_c[SPL_LOG_PEAK] = {
 	'A',
@@ -279,8 +278,7 @@ int spl_local_time_now(spl_local_time_st*stt) {
 		stt->hour = (unsigned char)lt.wHour;
 		stt->minute = (unsigned char)lt.wMinute;
 		stt->sec = (unsigned char)lt.wSecond;
-		//stt->ms = (unsigned int)lt.wMilliseconds;
-		stt->nn = (unsigned int)lt.wMilliseconds * 1000000 + counter.QuadPart%1000000;
+		stt->nn = (unsigned int)lt.wMilliseconds * SPL_MILLION + counter.QuadPart % SPL_MILLION;
 #else
 /* https://linux.die.net/man/3/localtime*/
 /* https://linux.die.net/man/3/clock_gettime*/
@@ -305,7 +303,6 @@ int spl_local_time_now(spl_local_time_st*stt) {
 		stt->hour = lt->tm_hour;
 		stt->minute = lt->tm_min;
 		stt->sec = lt->tm_sec;
-		//stt->ms = (nanosec.tv_nsec/1000000);
 		stt->nn = (nanosec.tv_nsec);
 #endif
 	} while (0);
@@ -331,11 +328,8 @@ int spl_set_off(int isoff) {
 	
 	if (isoff) {
 		int errCode = 0;
-		//spl_milli_sleep( 1000);
 		spl_rel_sem(__simple_log_static__.sem_rwfile);
 #ifndef UNIX_LINUX
-		//spl_milli_sleep(100 * 1000);
-		//errCode = (int) WaitForSingleObject(__simple_log_static__.sem_off, 3 * 1000);
 		errCode = (int) WaitForSingleObject(__simple_log_static__.sem_off, INFINITE);
 #else
 		errCode = SPL_sem_wait(__simple_log_static__.sem_off);
@@ -344,18 +338,8 @@ int spl_set_off(int isoff) {
 	}
 	return ret;
 }
-/*===========================================================================================================================*/
-//int spl_get_off() {
-//	int ret = 0;
-//	spl_mutex_lock(__simple_log_static__.mtx_off);
-//	do {
-//		ret = __simple_log_static__.off;
-//	} while (0);
-//	spl_mutex_unlock(__simple_log_static__.mtx_off);
-//	return ret;
-//}
-/*===========================================================================================================================*/
 
+/*===========================================================================================================================*/
 int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 	int ret = SPL_NO_ERROR;
 	do {
@@ -382,20 +366,12 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 		if (strcmp(key, SPLOG_BUFF_SIZE) == 0) {
 			int n = 0;
 			int sz = 0;
-			//char* p = 0;
 			sz = sscanf(buff, "%d", &n);
 			if (n < 1 || sz < 1) {
 				ret = SPL_LOG_BUFF_SIZE_ERROR;
 				break;
 			}
 			__simple_log_static__.buff_size = n;
-			//spl_malloc(n, p, char);
-			//if (!p) {
-			//	ret = SPL_LOG_MEM_MALLOC_ERROR;
-			//	break;
-			//}
-			//__simple_log_static__.buf = (generic_dta_st *) p;
-			//__simple_log_static__.buf->total = n -1;
 			break;
 		}
 		if (strcmp(key, SPLOG_ROT_SIZE) == 0) {
@@ -415,7 +391,6 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 			char* p = 0;
 			n = (int)strlen(buff);
 			if (n < 1) {
-				//ret = SPL_LOG_TOPIC_EMPTY;
 				break;
 			}
 			ret = spl_stdz_topics(buff, &n, &count, &p);
@@ -434,11 +409,6 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 			if (__simple_log_static__.ncpu < 1) {
 				__simple_log_static__.ncpu = 1;
 			}
-			//__simple_log_static__.arr_mtx
-			//#ifndef  UNIX_LINUX
-			//__simple_log_static__.arr_mtx
-			//#else
-			//#endif /*! UNIX_LINUX */ 
 			break;
 		}
 		if (strcmp(key, SPLOG_TRIGGER) == 0) {
@@ -550,13 +520,6 @@ spl_init_log( char *pathcfg)
 		}
 		__simple_log_static__.mtx_rw = obj;
 
-		//obj = spl_mutex_create();
-		//if (!obj) {
-		//	ret = SPL_ERROR_CREATE_MUTEX;
-		//	break;
-		//}
-		//__simple_log_static__.mtx_off = obj;
-		
 		obj = spl_sem_create(1);
 		if (!obj) {
 			ret = SPL_ERROR_CREATE_SEM;
@@ -627,18 +590,15 @@ void** spl_mutex_create_arr(int n) {
 		if (n < 1) {
 			return ret;
 		}
-		//ret = (void**)malloc(sizeof(void*) * n);
 		spl_malloc(sizeof(void*) * n, ret, void*);
 		for (i = 0; i < n; ++i) {
 #ifndef UNIX_LINUX
 #ifndef SPL_USING_SPIN_LOCK
 			ret[i] = (void*)CreateMutexA(0, 0, 0);
-			//SPL_CloseHandle(ret[i]);
 #else
 			volatile long* tmp = 0;
 			spl_malloc(sizeof(volatile long), tmp, volatile long);
 			ret[i] = (void*)tmp;
-			//spl_free(ret[i]);
 #endif
 #else
 #ifndef SPL_USING_SPIN_LOCK
@@ -696,7 +656,6 @@ void* spl_sem_create(int ini) {
 #ifndef UNIX_LINUX
 		ret = CreateSemaphoreA(0, 0, ini, 0);
 #else
-		//ret = malloc(sizeof(sem_t));
 		spl_malloc(sizeof(sem_t), ret, void);
 		if (!ret) {
 			break;
@@ -727,7 +686,6 @@ int spl_mutex_lock(void* obj) {
 			break;
 		}
 	#else
-		//splLockSpinlock(obj);
 		SplLockSpinlock(obj);
 	#endif
 #else
@@ -761,7 +719,6 @@ int spl_mutex_unlock(void* obj) {
 			break;
 		}
 	#else
-		//splUnlockSpinlock(obj);
 		SplUnlockSpinlock(obj);
 	#endif
 #else
@@ -884,8 +841,6 @@ void* spl_written_thread_routine(void* lpParam)
 			SPL_sem_wait(t->sem_rwfile);
 #endif
 			do{
-				//off = spl_get_off();
-
 				ret = spl_gen_file(t, &sz, t->file_limit_size, &(t->index));
 				if (ret) {
 					spl_console_log("--spl_gen_file, ret: %d --\n", ret);
@@ -1131,59 +1086,6 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 	//} while (0);
 	return p;
 }
-/*===========================================================================================================================*/
-int spl_fmt_now(char* fmtt, int len) {
-	int ret = 0;
-	spl_local_time_st stt;
-	//static LLU pre_tnow = 0;
-	LLU _tnow = 0;
-	//LLU _delta = 0;
-	int n = 0; 
-	char buff[20], buff1[20];
-	memset(buff, 0, 20);
-	memset(buff1, 0, 20);	
-
-	time_t t = time(0);
-	do {
-		memset(&stt, 0, sizeof(stt));
-		ret = spl_local_time_now(&stt);
-		if (ret) {
-			break;
-		}
-		if (!fmtt) {
-			ret = (int) SPL_LOG_FMT_NULL_ERROR;
-			break;
-		}
-		
-		_tnow = t;
-		_tnow *= 1000;
-		_tnow += stt.nn;
-		//do {
-		//	spl_mutex_lock(__simple_log_static__.mtx_off);
-		//		do {
-		//
-		//			if (!pre_tnow) {
-		//				break;
-		//			}
-		//			if (_tnow > pre_tnow) {
-		//				_delta = _tnow - pre_tnow;
-		//			}
-		//		} while (0);
-		//		pre_tnow = _tnow;
-		//	spl_mutex_unlock(__simple_log_static__.mtx_off);
-		//} while (0);
-
-		n = snprintf(buff, 20, SPL_FMT_DATE_ADDING, stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day);
-		if (n < 1) {
-			ret = SPL_LOG_PRINTF_ERROR;
-			break;
-		}
-		n = snprintf(buff1, 20, SPL_FMT_HOUR_ADDING, stt.hour, stt.minute, stt.sec);
-		n = snprintf(fmtt, len, SPL_FMT_DELT_ADDING, buff, buff1, (unsigned int)stt.nn);
-
-	} while (0);
-	return ret;
-}
 
 /*===========================================================================================================================*/
 int spl_fmmt_now(char* fmtt, int len) {
@@ -1255,7 +1157,6 @@ int spl_gen_file(SIMPLE_LOG_ST* t, int *sz, int limit, int *index) {
 				spl_standardize_path(path);
 				spl_standardize_path(t->path_template);
 				
-				//t->fp = fopen(path, "a+");
 				FFOPEN(t->fp, path, "a+");
 				if (!t->fp) {
 					ret = SPL_LOG_OPEN_FILE_ERROR;
@@ -1378,49 +1279,7 @@ int spl_rel_sem(void *sem) {
 	} while (0);
 	return ret;
 }
-/*===========================================================================================================================*/
 
-const char* spl_get_text(int lev) {
-	const char* val = SPL_TEXT_UNKNOWN;
-	static const char* spl_text_label[SPL_LOG_PEAK] = {
-		"A",
-		"D",
-		"I",
-		"W",
-		"E",
-		"F",
-	};
-	do {
-		if (lev < SPL_LOG_BASE) {
-			break;
-		}
-		if (lev > SPL_LOG_FATAL) {
-			break;
-		}
-		val = spl_text_label[lev];
-		//if (lev == SPL_LOG_DEBUG) {
-		//	val = SPL_TEXT_DEBUG;
-		//	break;
-		//}
-		//if (lev == SPL_LOG_INFO) {
-		//	val = SPL_TEXT_INFO;
-		//	break;
-		//}
-		//if (lev == SPL_LOG_WARNING) {
-		//	val = SPL_TEXT_WARN;
-		//	break;
-		//}
-		//if (lev == SPL_LOG_ERROR) {
-		//	val = SPL_TEXT_ERROR;
-		//	break;
-		//}
-		//if (lev == SPL_LOG_FATAL) {
-		//	val = SPL_TEXT_FATAL;
-		//	break;
-		//}
-	} while(0);
-	return val;
-}
 /*===========================================================================================================================*/
 int spl_finish_log() {
 	int ret = 0; 
@@ -1459,49 +1318,7 @@ int spl_finish_log() {
 	memset(&__simple_log_static__, 0, sizeof(__simple_log_static__));
 	return ret;
 }
-/*===========================================================================================================================*/
-#define STSPLOG						(&__simple_log_static__)
-#define STSPLOGBUF					STSPLOG->buf
-char* spl_get_buf(int* n, int** ppl) {
-	//SIMPLE_LOG_ST* t = &__simple_log_static__;
-	//char* ret = 0;
-	//if (t->buf) {
-		//if (n && ppl) {
-	if (STSPLOG->off) {
-		return 0;
-	}
-			(*n) = (STSPLOGBUF->total > sizeof(generic_dta_st) + STSPLOGBUF->pl + 2048) ? (STSPLOGBUF->total - (sizeof(generic_dta_st) + STSPLOGBUF->pl)) : 0;
-			//ret = t->buf->data;
-			if (!(*n)) {
-				return 0;
-			}
-			(*ppl) = &(STSPLOGBUF->pl);
-			return STSPLOGBUF->data;
-		//}
-	//}
-	return 0;
-}
-/*===========================================================================================================================*/
-char* spl_get_buf_ext(int* n, int** ppl, char *isOff) {
-	//SIMPLE_LOG_ST* t = &__simple_log_static__;
-	//char* ret = 0;
-	//if (t->buf) {
-		//if (n && ppl) {
-	if (STSPLOG->off) {
-		*isOff = 1;
-		return 0;
-	}
-	(*n) = (STSPLOGBUF->range > (STSPLOGBUF->pl + 2048)) ? (STSPLOGBUF->total - STSPLOGBUF->pl) : 0;
-	//ret = t->buf->data;
-	if (!(*n)) {
-		return 0;
-	}
-	(*ppl) = &(STSPLOGBUF->pl);
-	return STSPLOGBUF->data;
-	//}
-//}
-	return 0;
-}
+
 /*===========================================================================================================================*/
 /*https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createdirectorya*/
 int spl_folder_sup(char* folder, spl_local_time_st* lctime, char* year_month) {
@@ -1813,60 +1630,7 @@ spl_gen_topics(SIMPLE_LOG_ST* t) {
 	} while (0);
 	return ret;
 }
-/*===========================================================================================================================*/
-#define STSPLOGBUFTOPIC(__i__)				(&(STSPLOG->arr_topic[i]))->buf
-char*
-spl_get_buf_topic(int* n, int** ppl, int i) {
-	//SIMPLE_LOG_ST* tg = &__simple_log_static__;
-	//char* ret = 0;
-	//do {
-		if (STSPLOG->off) {
-			return 0;
-		}
-		if (i < 0 || ((i + 1) > STSPLOG->n_topic)) {
-			return spl_get_buf(n, ppl);
-			//break;
-		}
-		if (STSPLOG->arr_topic) {
-			//SIMPLE_LOG_TOPIC_ST* obj = &(STSPLOG->arr_topic[i]);
-			//if (n && ppl) {
-				*n = (STSPLOGBUFTOPIC(i)->total > sizeof(generic_dta_st) + STSPLOGBUFTOPIC(i)->pl) ? 
-					(STSPLOGBUFTOPIC(i)->total - (sizeof(generic_dta_st) + STSPLOGBUFTOPIC(i)->pl)) : 0;
-				//ret = obj->buf->data;
-				(*ppl) = &(STSPLOGBUFTOPIC(i)->pl);
-				return STSPLOGBUFTOPIC(i)->data;
-			//}
-		}
-	//} while (0);
-	return 0;
-}
-/*===========================================================================================================================*/
-char*
-spl_get_buf_topic_ext(int* n, int** ppl, int i, char *isOOf) {
-	//SIMPLE_LOG_ST* tg = &__simple_log_static__;
-	//char* ret = 0;
-	//do {
-	if (STSPLOG->off) {
-		*isOOf = 1;
-		return 0;
-	}
-	if (i < 0 || ((i + 1) > STSPLOG->n_topic)) {
-		return spl_get_buf_ext(n, ppl, isOOf);
-		//break;
-	}
-	if (STSPLOG->arr_topic) {
-		//SIMPLE_LOG_TOPIC_ST* obj = &(STSPLOG->arr_topic[i]);
-		//if (n && ppl) {
-		*n = (STSPLOGBUFTOPIC(i)->range > (STSPLOGBUFTOPIC(i)->pl + 2048)) ?
-			(STSPLOGBUFTOPIC(i)->total - (STSPLOGBUFTOPIC(i)->pl)) : 0;
-		//ret = obj->buf->data;
-		(*ppl) = &(STSPLOGBUFTOPIC(i)->pl);
-		return STSPLOGBUFTOPIC(i)->data;
-		//}
-	}
-	//} while (0);
-	return 0;
-}
+
 /*===========================================================================================================================*/
 LLU
 spl_milli_now() {
@@ -1884,7 +1648,7 @@ spl_milli_now() {
 		if (err) {
 			break;
 		}
-		ret = t0 * 1000 + (nanosec.tv_nsec / 1000000);
+		ret = t0 * 1000 + (nanosec.tv_nsec / SPL_MILLION);
 #endif	
 	} while (0);
 	return ret;
@@ -1894,11 +1658,6 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 	int ret = 0;
 	char path[1024];
 	int i = 0;
-	//LLU cszize = 0;
-	//spl_local_time_st lt, * plt = 0;;
-	//char fmt_file_name[64];
-	//int ferr = 0;
-	//char yearmonth[16];
 	char* buffer = 0;
 	int total_buf_sz = 0;
 	generic_dta_st* tmpBuff = 0;
@@ -1921,10 +1680,6 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 			tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
 			tmpBuff->range = tmpBuff->total - sizeof(generic_dta_st);
 		}
-		//tmpBuff = (generic_dta_st*)buffer;
-		//tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
-		//tmpBuff->range = tmpBuff->total - sizeof(generic_dta_st);
-		//t->buf = tmpBuff;
 
 		if (!t->arr_topic && t->n_topic > 0) {
 			char* p0 = t->topics;
@@ -1963,11 +1718,6 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 					seg->total = t->buff_size - SPL_MEMO_PADDING;
 					seg->range = seg->total - sizeof(generic_dta_st);
 				}
-
-				//tmpBuff = (generic_dta_st*)(buffer + (( i + 1) * t->buff_size));
-				//tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
-				//tmpBuff->range = tmpBuff->total - sizeof(generic_dta_st);
-				
 			}
 			if (ret) {
 				break;
@@ -2016,17 +1766,13 @@ spl_fflush_err(int terr, void* ffp) {
 }
 /*===========================================================================================================================*/
 #ifndef UNIX_LINUX
-// Hàm để lấy khóa Spinlock
 void splLockSpinlock(volatile long* p) {
 	while (InterlockedCompareExchange(p, 1, 0) != 0) {
-		// Vòng lặp chờ (busy wait)
-		// Đợi cho đến khi spinlock được giải phóng (giá trị spinlock = 0)
 	}
 }
 
-// Hàm để giải phóng Spinlock
 void splUnlockSpinlock(volatile long* p) {
-	InterlockedExchange(p, 0); // Giải phóng Spinlock
+	InterlockedExchange(p, 0); 
 }
 #else
 #endif
@@ -2080,10 +1826,7 @@ int spl_del_memory(void* shmm) {
 	return ret;
 }
 /*===========================================================================================================================*/
-#define SPL_LOG_UNIX__SHARED_MODE					(S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)	
-#define SPL_LOG_UNIX_CREATE_MODE					(O_CREAT | O_RDWR | O_EXCL)	
-#define SPL_LOG_UNIX_OPEN_MODE						(O_RDWR | O_EXCL)	
-#define SPL_LOG_UNIX_PROT_FLAGS						(PROT_READ | PROT_WRITE | PROT_EXEC)
+
 int spl_create_memory(void** output, char* shared_key, int size_shared, char isCreating) {
 	int ret = 0;
 	char* p = 0;
