@@ -99,7 +99,7 @@ This tool is a **tribute to his legacy**—a small way to express **gratitude** 
 
 **SimpleLog-Topic** isn't just about logging—it's about building a better, more efficient foundation for your application, with a tool that allows you to focus on what's important: your core functionality.
 
-**Open-Source on GitHub**  
+**Open-Source on GitHub**  (https://github.com/thuanalg/simplelog-topic/)
 SimpleLog-Topic is open-source and available on GitHub. Feel free to contribute, modify, or integrate it into your projects, and be part of a community that values **simplicity**, **performance**, and the principles of **Unix**.
 
 ---
