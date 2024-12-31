@@ -65,19 +65,19 @@
 //	{ spl_console_log("Free: 0x:%p.\n", (__obj__)); free(__obj__); ; (__obj__) = 0;} 
 
 #define SPL_FCLOSE(__fp__, __n) { if(__fp__){ (__n) = fclose((FILE*)(__fp__)) ; if(__n) { spl_fclose_err(__n, __fp__); } \
-	else { spl_console_log("Close FILE 0x%p DONE.", (__fp__));;(__fp__) = 0;;}}}
+	else { /*spl_console_log("Close FILE 0x%p DONE.", (__fp__));;(__fp__) = 0;*/;}}}
 
 #define SPL_FFLUSH(__fp__, __n) { if(__fp__){ (__n) = fflush((FILE*)(__fp__)) ; if(__n) { spl_fflush_err(__n, __fp__); }}}
 
 #define FFOPEN(__fp, __path, __mode) \
-	{ (__fp) = fopen((__path), (__mode));spl_console_log("Open FILE error code: 0x%p, %s.\n", (__fp), (__fp) ? "DONE": "FAILED"); }
+	{ (__fp) = fopen((__path), (__mode)); if(!(__fp)) spl_console_log("Open FILE error code: 0x%p, %s.\n", (__fp), (__fp) ? "DONE": "FAILED"); }
 
 #define FFTELL(__fp)						ftell((FILE*)(__fp))
 #define FFSEEK(__fp, __a, __b)				fseek((FILE*)(__fp), (__a), (__b))
 
 #ifndef UNIX_LINUX
 	#define SPL_CloseHandle(__obj) \
-		{ int bl = CloseHandle((__obj)); spl_console_log("CloseHandle %s", bl ? "DONE": "ERROR");}
+		{ int bl = CloseHandle((__obj)); if(!bl) spl_console_log("CloseHandle %s", bl ? "DONE": "ERROR");}
 #else
 	#define SPL_sem_wait(__obj) \
 		sem_wait((sem_t*)(__obj))
@@ -334,7 +334,9 @@ int spl_set_off(int isoff) {
 #else
 		errCode = SPL_sem_wait(__simple_log_static__.sem_off);
 #endif
+#ifdef SPL_SHOW_CONSOLE
 		spl_console_log("------- errCode: %d\n", (int)errCode);
+#endif
 	}
 	return ret;
 }
@@ -383,7 +385,10 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 				break;
 			}
 			__simple_log_static__.file_limit_size = n;
-			spl_console_log("__simple_log_static__.file_limit_size: %d.\n", __simple_log_static__.file_limit_size);
+#ifdef SPL_SHOW_CONSOLE
+			spl_console_log("__simple_log_static__.file_limit_size: %d.\n", 
+				__simple_log_static__.file_limit_size);
+#endif
 			break;
 		}
 		if (strcmp(key, SPLOG_TOPIC) == 0) {
@@ -418,7 +423,9 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 			break;
 		}
 		if (strcmp(key, SPLOG_END_CFG) == 0) {
+#ifdef SPL_SHOW_CONSOLE
 			spl_console_log("End configuration.\n");
+#endif
 			if (isEnd) {
 				*isEnd = 1;
 			}
@@ -477,7 +484,9 @@ spl_init_log( char *pathcfg)
 						size_t k = 0; 
 						k =  strlen(node);
 						p = (buf + k);
+#ifdef SPL_SHOW_CONSOLE
 						spl_console_log("Find out the keyword: [%s] value [%s].", node, p);
+#endif
 						ret = spl_init_log_parse(p, node, &isEnd);
 						break;
 					}
@@ -540,7 +549,6 @@ spl_init_log( char *pathcfg)
 			break;
 		}
 	} while (0);
-	spl_console_log("------------------------- ret: %d-----------------------------", ret);
 	if (fp) {
 		SPL_FCLOSE(fp,ret);
 	}
@@ -827,7 +835,7 @@ void* spl_written_thread_routine(void* lpParam)
 		if (!t->sem_rwfile) {
 			exit(1);
 		}
-		spl_console_log("Semaphore: 0x%p.\n", t->sem_rwfile);
+		//spl_console_log("Semaphore: 0x%p.\n", t->sem_rwfile);
 		if (!t->mtx_rw) {
 			exit(1);
 		}

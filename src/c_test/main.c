@@ -41,9 +41,9 @@ int main(int argc, char* argv[]) {
 #endif
 	ret = spl_init_log(cfgpath);
 
-	spl_console_log("====================Main close: Start.\n");
+	spl_console_log("====================Start.\n");
 	dotest();
-	spl_console_log("==================Main close: End.\n");
+	spl_console_log("==================End.\n");
 	spl_finish_log();
 	return EXIT_SUCCESS;
 }
@@ -79,7 +79,7 @@ void dotest() {
 	free(dwpThreadId);
 	free(hpThread);
 #else
-	//https://man7.org/linux/man-pages/man3/pthread_create.3.html
+	//https://man7.org/linux/man-pages/man3/pthread_create.3.htG830ml
 	pthread_t* pidds = 0;
 	pidds = (pthread_t*)malloc(num_threads * sizeof(pthread_t));
 	if (!pidds) {

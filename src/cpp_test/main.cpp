@@ -41,9 +41,9 @@ int main(int argc, char* argv[]) {
 #endif
 	ret = spl_init_log(cfgpath);
 
-	spl_console_log("====================Main close: Start.\n");
+	spl_console_log("====================Start.\n");
 	dotest();
-	spl_console_log("==================Main close: End.\n");
+	spl_console_log("==================End.\n");
 	spl_finish_log();
 	return EXIT_SUCCESS;
 }
