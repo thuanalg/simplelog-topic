@@ -59,7 +59,7 @@ One of the core objectives of SimpleLog-Topic is to provide exceptional **perfor
   SimpleLog-Topic is designed to minimize latency in logging, even when the system is under heavy load. Whether you’re dealing with **real-time systems** or large volumes of logs, SimpleLog-Topic ensures fast log writing with minimal delay.
 
 - **Low Memory Usage:**  
-  The library is optimized to use **minimal memory**. Memory buffers are dynamically adjusted based on the available system resources, allowing SimpleLog-Topic to be used in **resource-constrained embedded systems** without consuming unnecessary memory.
+  The library is optimized to use **minimal memory**. Memory buffers are dynamically adjusted based on the available system resources, allowing SimpleLog-Topic to be used in **resource-constrained embedded systems** without consuming unnecessary memory.(https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg)
 
 - **Asynchronous Logging Support:**  
   SimpleLog-Topic offers **asynchronous logging** capabilities, allowing logs to be written in the background without blocking the main application flow. This ensures that logging does not interfere with the critical performance of the application.
