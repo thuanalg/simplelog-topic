@@ -1,0 +1,77 @@
+#---------------------------------------------------------------------------------------------------------------------
+Spdlog test file: https://github.com/thuanalg/simplelog-topic/blob/main/src/spd_example.cpp
+
+simple-topic: https://github.com/thuanalg/simplelog-topic/blob/main/src/c_test/main.c
+	configred file: https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg
+	
+Environtmant for both:
+	- MSVC 2022, ISO C++14, Standard
+	- Windows 10, 64bit
+------------------
+System Information
+------------------
+      Time of this report: 12/31/2024, 12:37:06
+             Machine name: DESKTOP-C1R7H0U
+               Machine Id: {E3AEBCFB-0191-4437-994B-EC3128028876}
+         Operating System: Windows 10 Home 64-bit (10.0, Build 19045) (19041.vb_release.191206-1406)
+                 Language: English (Regional Setting: English)
+      System Manufacturer: Gigabyte Technology Co., Ltd.
+             System Model: Z87M-D3H
+                     BIOS: F9 (type: UEFI)
+                Processor: Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz (8 CPUs), ~3.4GHz
+                   Memory: 16384MB RAM
+      Available OS Memory: 16272MB RAM
+                Page File: 10589MB used, 8113MB available
+              Windows Dir: C:\Windows
+          DirectX Version: DirectX 12
+      DX Setup Parameters: Not found
+         User DPI Setting: 96 DPI (100 percent)
+       System DPI Setting: 96 DPI (100 percent)
+          DWM DPI Scaling: Disabled
+                 Miracast: Available, with HDCP
+Microsoft Graphics Hybrid: Not Supported
+ DirectX Database Version: 1.0.8
+           DxDiag Version: 10.00.19041.5198 64bit Unicode	
+#---------------------------------------------------------------------------------------------------------------------
+Spdlog 01
+[2024-12-31 12:09:31.073] [A] [info] [example.cpp:log_messages:432] [Threadid 27896] test log: 0
+[2024-12-31 12:10:39.742] [A] [info] [example.cpp:log_messages:432] [Threadid 1712] test log: 999999
+Time:68.7s
+File size: 1,002,822KB
+
+
+
+simple-topic 01 (first round)
+[2024-12-31 12:13:37.635052569] [I] [tid	19036]	[main.c:win32_thread_routine:120] My test log : 999999
+[2024-12-31 12:13:22.435044250] [I] [tid	28696]	[main.c:win32_thread_routine:120] My test log : 2
+Time: 15.2s
+File size: 1,013,564 KB
+#---------------------------------------------------------------------------------------------------------------------
+Spdlog 02  (second round)
+[2024-12-31 12:21:07.207] [A] [info] [example.cpp:log_messages:432] [Threadid 9504] test log: 999999
+[2024-12-31 12:19:57.690] [A] [info] [example.cpp:log_messages:432] [Threadid 27504] test log: 0
+Time: 69s
+File size: 1,003,798 KB
+
+
+
+simple-topic 02
+[2024-12-31 12:16:29.432020954] [I] [tid	22556]	[main.c:win32_thread_routine:120] My test log : 999989
+[2024-12-31 12:16:14.267375570] [I] [tid	16552]	[main.c:win32_thread_routine:120] My test log : 8
+Time:  15.2 s
+File size: 1,012,587 KB
+#---------------------------------------------------------------------------------------------------------------------
+Spdlog 03 (third round)
+[2024-12-31 12:29:38.088] [A] [info] [example.cpp:log_messages:432] [Threadid 18868] test log: 999999
+[2024-12-31 12:28:30.020] [A] [info] [example.cpp:log_messages:432] [Threadid 9172] test log: 0
+Time: 68s
+File size: 999,892 KB
+
+
+
+simple-topic 01
+[2024-12-31 12:25:56.739093439] [I] [tid	14632]	[main.c:win32_thread_routine:120] My test log : 999982
+[2024-12-31 12:25:41.459293235] [I] [tid	4804]	[main.c:win32_thread_routine:120] My test log : 0
+Time:  15.25 s
+File size: 1,011,611 KB
+#---------------------------------------------------------------------------------------------------------------------
