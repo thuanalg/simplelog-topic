@@ -49,7 +49,7 @@ One of the core objectives of SimpleLog-Topic is to provide exceptional **perfor
 3. **Large-Scale Logging Test (1 Billion Records, 10 Threads):**
 
    - **Time Taken:** **36 minutes and 3 seconds** (**2163 seconds**)
-   - **Log Size:** **113 GB** or refer to another case: (https://github.com/thuanalg/simplelog-topic/blob/main/One_Billion_records.txt)
+   - **Log Size:** **113 GB** or refer to another case: (https://github.com/thuanalg/simplelog-topic/blob/main/One_Billion_records-performance.txt)
 
    In an extreme scenario, SimpleLog-Topic processed **1 billion records** across **10 threads**, generating **113 GB of log data** in just **36 minutes**. This performance indicates that SimpleLog-Topic can scale to handle **massive volumes** of log data, making it suitable for both **high-frequency** and **large-scale logging** applications.
 
