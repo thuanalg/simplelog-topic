@@ -3,7 +3,7 @@ Env: Linux centos09 Virtual Box Machine
 	- 10 million records
 spdlog tested file: https://github.com/thuanalg/simplelog-topic/blob/main/src/spd_example.cpp
 simplelog-topic, run with command "simpplelog_cpp_direct_sample"
-	- spdlog tested file: https://github.com/thuanalg/simplelog-topic/blob/main/src/cpp_test/main.cpp
+	- simplelog-topic tested file: https://github.com/thuanalg/simplelog-topic/blob/main/src/cpp_test/main.cpp
 	- Configured file: https://github.com/thuanalg/simplelog-topic/blob/main/src/linux/simplelog.cfg
 #---------------------------------------------------------------------------------------------------------------------
 Spdlog 01 (first round)
