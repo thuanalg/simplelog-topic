@@ -4,7 +4,7 @@ Env: Linux centos09 Virtual Box Machine
 spdlog tested file: https://github.com/thuanalg/simplelog-topic/blob/main/src/spd_example.cpp
 simplelog-topic, run with command "simpplelog_cpp_direct_sample"
 	- simplelog-topic tested file: https://github.com/thuanalg/simplelog-topic/blob/main/src/cpp_test/main.cpp
-	- Configured file: https://github.com/thuanalg/simplelog-topic/blob/main/src/linux/simplelog.cfg
+	- Configured file: https://github.com/thuanalg/simplelog-topic/blob/main/src/linux/simplelog-VM-CentOsS9-64bit.cfg
 #---------------------------------------------------------------------------------------------------------------------
 Spdlog 01 (first round)
 [2024-12-31 17:57:42.421] [A] [info] [example.cpp:log_messages:432] [Threadid 140501474862656] test log: 999999
