@@ -26,7 +26,9 @@ At its core, SimpleLog-Topic follows the **Unix Philosophy** of **KISS (Keep It 
 6. **Superior Performance**  
    SimpleLog-Topic is engineered to be extremely fast and efficient. Its performance has been carefully benchmarked to ensure minimal overhead and **high throughput** under demanding conditions.
 
-
+7. **No dependence**  
+   Just use POSIX APIs and Win32 APIs.
+   
 ### **Performance Highlights: Speed and Efficiency**
 
 One of the core objectives of SimpleLog-Topic is to provide exceptional **performance** while maintaining **simplicity**. Here’s a detailed look at its performance in different scenarios:
