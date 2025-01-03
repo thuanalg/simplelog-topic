@@ -26,8 +26,6 @@ At its core, SimpleLog-Topic follows the **Unix Philosophy** of **KISS (Keep It 
 6. **Superior Performance**  
    SimpleLog-Topic is engineered to be extremely fast and efficient. Its performance has been carefully benchmarked to ensure minimal overhead and **high throughput** under demanding conditions.
 
-7. **Portable**  
-   Support Linux/Windows/MaxOS/Android/iOS ...
 
 ### **Performance Highlights: Speed and Efficiency**
 
