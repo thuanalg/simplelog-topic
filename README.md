@@ -32,7 +32,7 @@ One of the core objectives of SimpleLog-Topic is to provide exceptional **perfor
 
 #### **Benchmarking Performance**
 
-1. **MSVC 2022 with 10 Threads and 10 Million Records:**
+1. **Windows10/MSVC 2022 with 10 Threads and 10 Million Records:**
 
    - **SimpleLog-Topic:** **16 seconds** (https://github.com/thuanalg/simplelog-topic/blob/main/MSVC-2022-performance.txt)
    - **spdlog:** **66 seconds**
