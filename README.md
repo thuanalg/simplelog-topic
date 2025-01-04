@@ -1,6 +1,7 @@
 ### **SimpleLog-Topic: A Fast, Lightweight, and Flexible Logger for C and C++ Applications (Introduction written by ChatGPT, and I accepted.)**
-### **Demo**
-	- [InstallWindowsMSVC2022](https://drive.google.com/file/d/1Ls4aD8fd65qcc7qgRKns2SlWw6RAhH5l/view?usp=sharing)
+## **Video Demo:**
+	-[InstallWindowsMSVC2022](https://drive.google.com/file/d/1Ls4aD8fd65qcc7qgRKns2SlWw6RAhH5l/view?usp=sharing)
+
 
 Logging is an essential part of any software system, helping developers gain insights into application behavior, debug issues, and monitor production systems. However, many logging libraries often introduce unnecessary complexity and performance overhead. **SimpleLog-Topic** was designed to address these issues, offering a **fast, efficient, and easy-to-use logging solution** for both **C** and **C++** applications. 
 
