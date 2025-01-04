@@ -56,13 +56,14 @@
 #endif
 
 /*===========================================================================================================================*/
-
+/*
 //#define spl_malloc(__nn__, __obj__, __type__) { (__obj__) = (__type__*) malloc(__nn__); if(__obj__) \
 //	{spl_console_log("Malloc: 0x%p\n", (__obj__)); memset((void*)(__obj__), 0, (__nn__));} \
 //	else {spl_console_log("Malloc: error.\n");}} 
 //
 //#define spl_free(__obj__) \
 //	{ spl_console_log("Free: 0x:%p.\n", (__obj__)); free(__obj__); ; (__obj__) = 0;} 
+*/
 
 #define SPL_FCLOSE(__fp__, __n) { if(__fp__){ (__n) = fclose((FILE*)(__fp__)) ; if(__n) { spl_fclose_err(__n, __fp__); } \
 	else { /*spl_console_log("Close FILE 0x%p DONE.", (__fp__));;(__fp__) = 0;*/;}}}
@@ -331,8 +332,14 @@ int spl_set_off(int isoff) {
 		spl_rel_sem(__simple_log_static__.sem_rwfile);
 #ifndef UNIX_LINUX
 		errCode = (int) WaitForSingleObject(__simple_log_static__.sem_off, INFINITE);
+		if (errCode == WAIT_FAILED) {
+			spl_console_log("------- errCode: %d\n", (int)GetLastError());
+		}
 #else
 		errCode = SPL_sem_wait(__simple_log_static__.sem_off);
+		if (errCode) {
+			spl_console_log("------- errCode: %d\n", (int)errCode);
+		}
 #endif
 #ifdef SPL_SHOW_CONSOLE
 		spl_console_log("------- errCode: %d\n", (int)errCode);
@@ -410,15 +417,23 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 			int sz = 0;
 			int n = 0;
 			sz = sscanf(buff, "%d", &n);
-			__simple_log_static__.ncpu = n;
-			if (__simple_log_static__.ncpu < 1) {
+			if (sz < 1) {
 				__simple_log_static__.ncpu = 1;
+				break;
 			}
+			__simple_log_static__.ncpu = n;
+			//if (__simple_log_static__.ncpu < 1) {
+			//	__simple_log_static__.ncpu = 1;
+			//}
 			break;
 		}
 		if (strcmp(key, SPLOG_TRIGGER) == 0) {
 			int n = 0, sz = 0;
 			sz = sscanf(buff, "%d", &n);
+			if (sz < 1) {
+				__simple_log_static__.trigger_thread = 0;
+				break;
+			}
 			__simple_log_static__.trigger_thread = n;
 			break;
 		}
@@ -807,7 +822,7 @@ void* spl_written_thread_routine(void* lpParam)
 		main_src_thrd_buf[i] = p + t->buff_size * i;
 	}
 
-	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+	/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 	
 	if (t->arr_topic)
 	{
@@ -821,7 +836,7 @@ void* spl_written_thread_routine(void* lpParam)
 		}
 	}
 
-	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+	/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 	if (t->trigger_thread > 0) {
 		spl_create_thread(spl_trigger_routine, t);
 	}
@@ -860,13 +875,13 @@ void* spl_written_thread_routine(void* lpParam)
 					continue;
 				}
 
-				//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				if (!is_off) {
 					spl_mutex_lock(t->mtx_rw);
 						is_off = t->off;
 					spl_mutex_unlock(t->mtx_rw);
 				}
-				//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				for (i = 0; i < t->ncpu; ++i) {
 					spl_mutex_lock(t->arr_mtx[i]);
 					//do {
@@ -878,7 +893,7 @@ void* spl_written_thread_routine(void* lpParam)
 					//} while (0);
 					spl_mutex_unlock(t->arr_mtx[i]);
 				}
-				//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				if (only_cast->pl > 0) {
 					k = (int)fwrite(only_cast->data, 1, only_cast->pl, t->fp);
 					only_cast->pl = 0;
@@ -890,21 +905,20 @@ void* spl_written_thread_routine(void* lpParam)
 					spl_console_log("--fflush, ret: %d --\n", err);
 					break;
 				}
-				//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				if (t->n_topic > 0) {
 					char* src = 0;
-					char* dst = 0;
 					for (i = 0; i < t->n_topic; ++i) {
 						for (j = 0; j < t->ncpu; ++j) {
 							src = src_topic_thrd_buf[i][j];
 							spl_mutex_lock(t->arr_mtx[j]);
-							//do 
+							/*//do */
 								if (MYCASTGEN(src)->pl > 0) {
 									memcpy(only_cast->data + only_cast->pl, MYCASTGEN(src)->data, MYCASTGEN(src)->pl);
 									only_cast->pl += MYCASTGEN(src)->pl;
 									MYCASTGEN(src)->pl = 0;
 								}
-							//} while (0);
+							/*//} while (0);*/
 							spl_mutex_unlock(t->arr_mtx[j]);
 							if (only_cast->pl) {
 								k = (int)fwrite(only_cast->data, 1, only_cast->pl, (FILE*)(t->arr_topic[i].fp));
@@ -921,7 +935,7 @@ void* spl_written_thread_routine(void* lpParam)
 						}
 					}
 				}
-				//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				if (is_off) {
 					break;
 				}
@@ -938,7 +952,7 @@ void* spl_written_thread_routine(void* lpParam)
 			spl_mutex_lock(t->mtx_rw);
 				if (t->buf) {
 					spl_free(t->buf);
-					//spl_del_memory((void*)t->buf);
+					/*spl_del_memory((void*)t->buf);*/
 				}
 				for (i = 0; i < t->n_topic; ++i) {
 					if (t->arr_topic[i].buf) {
@@ -950,7 +964,7 @@ void* spl_written_thread_routine(void* lpParam)
 
 		
 	} while (0);
-	//spl_free(thrd_buffer);
+	/*//spl_free(thrd_buffer);*/
 	spl_free(main_src_thrd_buf);
 	if (t->arr_topic) {
 		for (i = 0; i < t->n_topic; ++i) {
@@ -959,7 +973,7 @@ void* spl_written_thread_routine(void* lpParam)
 		spl_free(src_topic_thrd_buf);
 	}
 	spl_free(only_buf);
-	//spl_del_memory((void *) only_buf);
+	/*//spl_del_memory((void *) only_buf);*/
 	/*Send a signal to the waiting thread.*/
 	spl_rel_sem(__simple_log_static__.sem_rwfile);
 	spl_rel_sem(__simple_log_static__.sem_off);
@@ -1053,14 +1067,13 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 	spl_local_time_st stt;
 	int n = 0;
 	*outlen = 0;
-	//do {
+
 		ret = spl_local_time_now(&stt);
 		if (ret) {
 			return p;
 		}
-		//if (r) {
-			*r = (stt.nn  % __simple_log_static__.ncpu);
-		//}
+
+		*r = (stt.nn  % __simple_log_static__.ncpu);
 
 		n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X"[%c] [tid\t%llu]\t",
 			stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day,
@@ -1088,10 +1101,7 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 				filename, funcname, line);
 		}
 		
-		//memcpy(fmtt, "-------------------------------------------------------------------------------------------------------------------------------------\
-		//	-----------------------------------------------------------------------------------", 86);
-		//	*outlen = 86;
-	//} while (0);
+
 	return p;
 }
 
