@@ -104,12 +104,12 @@ extern "C" {
 		SPL_LOG_ALOCK_NUM,
 		SPL_LOG_ALOCK_NULL,
 		SPL_LOG_SHM_CREATE_NULL,
-		SPL_LOG_SHM_CREATE_UNMAP,
+		SPL_LOG_SHM_WIN_UNMAP,
 		SPL_LOG_SHM_UNIX_OPEN,
 		SPL_LOG_SHM_UNIX_TRUNC, 
 		SPL_LOG_SHM_UNIX_MAP_FAILED, 
-
-
+		SPL_LOG_WIN_SHM_CLOSE,
+		SPL_LOG_SHM_UNIX_UNMAP,
 		
 		
 		
@@ -145,6 +145,7 @@ extern "C" {
 
 #define				SPL_TOPIC_SIZE					32
 #define				SPL_MEMO_PADDING				2048
+#define				SPL_SHARED_KEY_LEN				64
 
 	typedef
 		struct __SIMPLE_LOG_TOPIC_ST__ {
@@ -202,6 +203,15 @@ extern "C" {
 			trigger_thread;				/*Use trigger thread or not.*/
 		void	
 			**arr_mtx;					/*Use trigger thread or not.*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+#ifndef UNIX_LINUX
+		void*
+#else
+		int
+#endif
+			hd;							/* Handle of shared memory.*/
+		char
+			shared_key[SPL_SHARED_KEY_LEN]; /* Name of shared key.*/
 	} SIMPLE_LOG_ST;
 /*
 typedef struct __FMT_FOR_OUTPUT__ {

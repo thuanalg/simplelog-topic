@@ -234,8 +234,12 @@ static int
 	spl_create_thread(THREAD_ROUTINE f, void* arg);
 static void*
 	spl_trigger_routine(void* arg);
-static int \
-	spl_del_memory(void* shmm);
+static int
+#ifndef UNIX_LINUX
+	spl_del_memory(void* obj, void* hd, void* shmm);
+#else
+	spl_del_memory(void* obj, int hd, void* shmm, int length);
+#endif
 static int 
 	spl_create_memory(void** output, char* shared_key, int size_shared, char isCreating);
 /*===========================================================================================================================*/
@@ -1829,18 +1833,38 @@ int spl_create_thread(THREAD_ROUTINE f, void* arg) {
 	return ret;
 }
 /*===========================================================================================================================*/
-
-int spl_del_memory(void* shmm) {
+#define spl_shm_unlink(__name__, __err__) { __err__ = shm_unlink(__name__); \
+		if(__err__) {spl_console_log("shm_unlink: err: %d, errno: %d, text: %s, name: %s.", __err__, errno, strerror(errno), __name__);}}
+#ifndef UNIX_LINUX
+int spl_del_memory(void *obj, void* hd, void* shmm)
+#else
+int spl_del_memory(void* obj, int hd, void* shmm, int length)
+#endif
+{
 	int ret = 0;
 	int isWell = 0;
+	SIMPLE_LOG_ST* t = (SIMPLE_LOG_ST*)obj;
+	do {
 #ifndef UNIX_LINUX
-	isWell = UnmapViewOfFile(shmm);
-	if (!isWell) {
-		spl_console_log("UnmapViewOfFile error: %d", (int)GetLastError());
-		ret = SPL_LOG_SHM_CREATE_UNMAP;
-	}
+		isWell = (int)UnmapViewOfFile(shmm);
+		if (!isWell) {
+			spl_console_log("UnmapViewOfFile error: %d", (int)GetLastError());
+			ret = SPL_LOG_SHM_WIN_UNMAP;
+		}
+		isWell = (int)CloseHandle((HANDLE)hd);
+		if (!isWell) {
+			spl_console_log("SPL_LOG_WIN_SHM_CLOSE, err: %d", (int)GetLastError());
+			ret = SPL_LOG_WIN_SHM_CLOSE;
+		}
 #else
+		ret = munmap(shmm, (size_t) length);
+		if (ret) {
+			ret = SPL_LOG_SHM_UNIX_UNMAP;
+			spl_console_log("shm_unlink: err: %d, errno: %d, text: %s, name: %s.", ret, errno, strerror(errno), "__name__");
+		}
+		spl_shm_unlink("__name__", ret);
 #endif
+	} while (0);
 	return ret;
 }
 /*===========================================================================================================================*/
