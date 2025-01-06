@@ -231,10 +231,10 @@ __p__ = __FILE__;} while(0);
 
 #ifndef __UNIX_LINUX_CPP11_AND_NEWERS__
 	#define spl_console_log(___fmttt___, ...)		{char buf[1024]; const char *pfn = 0; __FILLE__(pfn);spl_fmmt_now(buf, 1024);\
-		fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , buf, pfn, __FUNCTION__, __LINE__, spl_get_threadid(), ##__VA_ARGS__);}
+		fprintf(stdout, "[%s] [%s:%s:%d] [thid: %llu] "___fmttt___"\n" , (char *)buf, (char *)pfn, (char*)__FUNCTION__, (int)__LINE__, spl_get_threadid(), ##__VA_ARGS__);}
 #else
 	#define spl_console_log(___fmttt___, ...)		{std::string __c11fmt__="[%s] [%s:%s:%d] [thid: %llu] ";__c11fmt__+=___fmttt___;__c11fmt__+="\n";;char buf[1024]; const char *pfn = 0; __FILLE__(pfn);spl_fmmt_now(buf, 1024);\
-		fprintf(stdout, __c11fmt__.c_str(), buf, pfn, __FUNCTION__, __LINE__, spl_get_threadid(), ##__VA_ARGS__);}
+		fprintf(stdout, __c11fmt__.c_str(), (char *)buf, (char *)pfn, (char *)__FUNCTION__, (int)__LINE__, spl_get_threadid(), ##__VA_ARGS__);}
 #endif
 
 #define spl_malloc(__nn__, __obj__, __type__) { (__obj__) = (__type__*) malloc(__nn__); if(__obj__) \
