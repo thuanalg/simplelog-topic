@@ -15,11 +15,8 @@
 *		<2024-Dec-22>
 *		<2024-Dec-23>
 *		<2024-Dec-30>
-<<<<<<< HEAD
 *		<2025-Jan-03>
-=======
 *		<2025-Jan-06>
->>>>>>> c56f242382637c8b798391195a592dd1c21fdfda
 * Decription:													
 *		The (only) main file to implement simple log.
 */
