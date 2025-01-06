@@ -15,7 +15,11 @@
 *		<2024-Dec-22>
 *		<2024-Dec-23>
 *		<2024-Dec-30>
+<<<<<<< HEAD
 *		<2025-Jan-03>
+=======
+*		<2025-Jan-06>
+>>>>>>> c56f242382637c8b798391195a592dd1c21fdfda
 * Decription:													
 *		The (only) main file to implement simple log.
 */
@@ -138,6 +142,7 @@
 #define				SPL_TEXT_FATAL					"F"
 
 #define				SPL_MILLION						1000000
+#define				SPL_FNAME_LEN					128
 
 
 #define MYCASTGEN(__t__)	((generic_dta_st*)__t__)
@@ -454,9 +459,26 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 	} while (0);
 	return ret;
 }
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-int 
-spl_init_log( char *pathcfg) 
+
+int spl_init_log_ext(SPL_INPUT_ARG* input) 
+{
+	int ret = 0;
+	do {
+		memcpy(__simple_log_static__.id_name, input->id_name, SPL_IDD_NAME);
+		ret = spl_init_log(input->folder);;
+		if (ret) {
+			spl_console_log("Cannot initiate log.");
+			break;
+		}
+	} while (0);
+	return ret;
+}
+
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+
+int spl_init_log( char *pathcfg) 
 {
 	int ret = 0;
 	FILE* fp = 0;
@@ -787,11 +809,18 @@ int spl_get_fname_now(char* name) {
 	spl_local_time_st lt;
 	spl_local_time_now(&lt);
 	if (name) {
-		snprintf(name, 64, "%.4d-%.2d-%.2d-simplelog", lt.year + YEAR_PADDING, lt.month + MONTH_PADDING, lt.day);
+		if (__simple_log_static__.id_name[0]) {
+			snprintf(name, SPL_FNAME_LEN, "%.4d-%.2d-%.2d-%s", 
+				lt.year + YEAR_PADDING, (int)lt.month + MONTH_PADDING, (int)lt.day, (char *)__simple_log_static__.id_name);
+		}
+		else {
+			snprintf(name, SPL_FNAME_LEN, "%.4d-%.2d-%.2d-simplelog", 
+				lt.year + YEAR_PADDING, (int)lt.month + MONTH_PADDING, (int)lt.day);
+		}
 	}
 	return ret;
 }
-#include <time.h>
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 #ifndef UNIX_LINUX
 DWORD WINAPI spl_written_thread_routine(LPVOID lpParam)
@@ -1149,7 +1178,7 @@ int spl_gen_file(SIMPLE_LOG_ST* t, int *sz, int limit, int *index) {
 	spl_local_time_st lt,* plt = 0;;
 	//int renew = SPL_NO_CHANGE_NAME;
 	char path[1024];
-	char fmt_file_name[64];
+	char fmt_file_name[SPL_FNAME_LEN];
 	int ferr = 0;
 	char yearmonth[16];
 	

@@ -1,4 +1,4 @@
-/*===============================================================================================================*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 /* Email:
 *		<nguyenthaithuanalg@gmail.com> - Nguyễn Thái Thuận
 * Mobile:
@@ -17,7 +17,7 @@
 * Decription:
 *		The (only) main header file to export 3 APIs: [spl_init_log, spllog, spllogtopic, spl_finish_log].
 */
-/*===============================================================================================================*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 #ifndef ___SIMPLE_LOG__
 #define ___SIMPLE_LOG__
 #include <stdio.h>
@@ -40,16 +40,18 @@ extern "C" {
 
 #define LLU				unsigned long long
 
-#define					SPL_LOG_BASE					0
-#define					SPL_LOG_DEBUG					1
-#define					SPL_LOG_INFO					2
-#define					SPL_LOG_WARNING					3
-#define					SPL_LOG_ERROR					4
-#define					SPL_LOG_FATAL					5
-#define					SPL_LOG_PEAK					6
+#define					SPL_LOG_BASE						0
+#define					SPL_LOG_DEBUG						1
+#define					SPL_LOG_INFO						2
+#define					SPL_LOG_WARNING						3
+#define					SPL_LOG_ERROR						4
+#define					SPL_LOG_FATAL						5
+#define					SPL_LOG_PEAK						6
 
 //#define					SPL_RL_BUF						50
-#define					SPL_RL_BUF						256
+#define					SPL_RL_BUF							256
+#define					SPL_PATH_FOLDER						1024
+#define					SPL_IDD_NAME						64
 
 #ifndef  UNIX_LINUX
 	#ifndef __SIMPLE_STATIC_LOG__
@@ -203,7 +205,7 @@ extern "C" {
 			trigger_thread;				/*Use trigger thread or not.*/
 		void	
 			**arr_mtx;					/*Use trigger thread or not.*/
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+		/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #ifndef UNIX_LINUX
 		void*
 #else
@@ -212,6 +214,8 @@ extern "C" {
 			hd;							/* Handle of shared memory.*/
 		char
 			shared_key[SPL_SHARED_KEY_LEN]; /* Name of shared key.*/
+		char 
+			id_name[SPL_IDD_NAME];		/*To avoid duplicating of file name.*/
 	} SIMPLE_LOG_ST;
 /*
 typedef struct __FMT_FOR_OUTPUT__ {
@@ -225,6 +229,10 @@ typedef struct __FMT_FOR_OUTPUT__ {
 	unsigned short r ;
 } FMT_FOR_OUTPUT;
 */
+	typedef struct __SPL_INPUT_ARG__ {
+		char folder[SPL_PATH_FOLDER];
+		char id_name[SPL_IDD_NAME];
+	} SPL_INPUT_ARG;
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
 #define __FILLE__(__p__)	do { __p__ = strrchr(__FILE__, '/'); if(__p__) {++__p__;break;} \
@@ -333,6 +341,10 @@ __p__ = __FILE__;} while(0);
 /* Please demo with spl_init_log */
 DLL_API_SIMPLE_LOG int
 	spl_init_log(char* path);
+
+/* Please demo with spl_init_log */
+DLL_API_SIMPLE_LOG int
+	spl_init_log_ext(SPL_INPUT_ARG* input);
 
 /* 
 * Export name:	spllog
