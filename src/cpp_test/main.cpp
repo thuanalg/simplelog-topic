@@ -21,7 +21,7 @@ int loop_count = 1000 * 1000;
 #define		TCONFIG_FILE						"--cfg="	
 #define		TLOOP_COUNT							"--loopcount="	
 
-int main(int argc, char* argv[]) {
+int main__(int argc, char* argv[]) {
 	int ret = 0, i = 0;
 	char cfgpath[1024];
 	for (i = 1; i < argc; ++i) {
@@ -134,16 +134,23 @@ void* posix_thread_routine(void* lpParam) {
 	return 0;
 }
 
-int main__(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
 	int ret = 0;
+	SPL_INPUT_ARG input;
+	int count = 2;
+	memset(&input, 0, sizeof(input));
+	snprintf(input.id_name, SPL_IDD_NAME, "testlog");
 	//int ret = spl_init_log((char *)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
 #ifndef UNIX_LINUX
-	ret = spl_init_log((char*)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
+	//ret = spl_init_log((char*)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
+	snprintf(input.folder, SPL_PATH_FOLDER, "C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
 #else
-	ret = spl_init_log((char*)"simplelog.cfg");
+	//ret = spl_init_log((char*)"simplelog.cfg");
+	snprintf(input.folder, SPL_PATH_FOLDER, "simplelog.cfg");
 #endif
-	int count = 2;
-	spl_milli_sleep(1000 * 5);
+	ret = spl_init_log_ext(&input);
+	
+	//spl_milli_sleep(1000 * 5);
 	for (int i = 0; i < count; ++i) {
 		//spl_console_log("spl_milli_sleep ------------------------------ ");
 		//spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), 0);
