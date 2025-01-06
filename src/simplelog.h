@@ -248,7 +248,7 @@ __p__ = __FILE__;} while(0);
 
 #define SPLKEYBUF(__t__, __i__)				((generic_dta_st*)( (char*)__t__->buf + (t->buff_size * __i__)))
 #define __spl_log_buf_level__(__lv__, ___fmttt___, ...)	\
-{;SIMPLE_LOG_ST *t = spl_control_obj();;\
+{SIMPLE_LOG_ST *t = spl_control_obj();\
 	if(t->llevel <= (__lv__) && ___fmttt___[0])\
 	{\
 		;\
@@ -289,7 +289,7 @@ __p__ = __FILE__;} while(0);
 #define STSPLOGBUFTOPIC_RANGE(__t__,__i__, __r__)				((generic_dta_st*)((char *)STSPLOGBUFTOPIC(__t__,__i__) + t->buff_size * __r__))
 
 #define __spl_log_buf_topic_level__(__lv__, __tpic__, ___fmttt___, ...)	\
-{;SIMPLE_LOG_ST *t = spl_control_obj();; \
+{SIMPLE_LOG_ST *t = spl_control_obj();\
 	if(t->llevel <= (__lv__) && ___fmttt___[0] && t->arr_topic) \
 	{\
 		;short tpp = 0;int len = 0;unsigned short r = 0;;const char *pfn = 0;;\
