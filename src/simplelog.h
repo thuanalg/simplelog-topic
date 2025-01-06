@@ -248,13 +248,13 @@ __p__ = __FILE__;} while(0);
 
 #define SPLKEYBUF(__t__, __i__)				((generic_dta_st*)( (char*)__t__->buf + (t->buff_size * __i__)))
 #define __spl_log_buf_level__(__lv__, ___fmttt___, ...)	\
-{;;\
-	if(spl_get_log_levwel() <= (__lv__) )\
+{SIMPLE_LOG_ST *t = spl_control_obj();\
+	if(t->llevel <= (__lv__) && ___fmttt___[0])\
 	{\
 		;\
 		;int outlen = 0;;const char *pfn = 0;/*char __isOof = 0;*/ ;\
 		;unsigned short r = 0;;char tnow[SPL_RL_BUF]; char *pprefmt = 0; \
-		;SIMPLE_LOG_ST *t = spl_control_obj();;\
+		;;\
 		;__FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r, &outlen);;\
 		{\
 			do{\
@@ -289,16 +289,16 @@ __p__ = __FILE__;} while(0);
 #define STSPLOGBUFTOPIC_RANGE(__t__,__i__, __r__)				((generic_dta_st*)((char *)STSPLOGBUFTOPIC(__t__,__i__) + t->buff_size * __r__))
 
 #define __spl_log_buf_topic_level__(__lv__, __tpic__, ___fmttt___, ...)	\
-{ \
-	if(spl_get_log_levwel() <= (__lv__) ) \
+{SIMPLE_LOG_ST *t = spl_control_obj();\
+	if(t->llevel <= (__lv__) && ___fmttt___[0] && t->arr_topic) \
 	{\
-		;short tpp = 0;int len = 0;unsigned short r = 0;;const char *pfn = 0;SIMPLE_LOG_ST *t = 0;\
+		;short tpp = 0;int len = 0;unsigned short r = 0;;const char *pfn = 0;;\
 		;int outlen = 0;;char *pprefmt = 0;; char tnow[SPL_RL_BUF];;;\
-		; __FILLE__(pfn);t = spl_control_obj();\
+		; __FILLE__(pfn);;\
 		;pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r, &outlen);;\
 		do\
 		{\
-			;if(!t->arr_topic) break;tpp = __tpic__%t->n_topic;;\
+			;;tpp = __tpic__%t->n_topic;;\
 			spl_mutex_lock(t->arr_mtx[r]);\
 				/*do \
 				{*/\
