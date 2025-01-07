@@ -51,7 +51,8 @@ One of the core objectives of SimpleLog-Topic is to provide exceptional **perfor
 	
 	**With 5CPUs:**	
 	- **SimpleLog-Topic:** ** ~13 seconds** (https://github.com/thuanalg/simplelog-topic/blob/main/LinuxCentOs09-performance.txt)
-	- **SimpleLog-Topic:** ** ~17 seconds**
+	- **SimpleLog-Topic:** ** ~17 seconds**  
+   
    On **Linux**, both SimpleLog-Topic and spdlog performed similarly, completing the test in **16 seconds**. This consistency across platforms demonstrates that SimpleLog-Topic provides **reliable performance** in both Windows and Linux environments. If number od CPUs are more, then SimpleLog-Topic becomes more effective.
 
 3. **Large-Scale Logging Test (1 Billion Records, 10 Threads):**
