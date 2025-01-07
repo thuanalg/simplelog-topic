@@ -43,10 +43,10 @@ One of the core objectives of SimpleLog-Topic is to provide exceptional **perfor
 
    In this test, **SimpleLog-Topic** logged **10 million records** in just **16 seconds**, compared to **66 seconds** taken by **spdlog**. This demonstrates **4x faster performance** in multithreaded environments, showing that SimpleLog-Topic efficiently manages logging tasks without unnecessary performance bottlenecks.
 
-2. **Linux Performance Benchmark (10 Threads and 10 Million Records), VM CentOs9:**
+2. **Linux Performance Benchmark (10 Threads and 10 Million Records), VM CentOs9:**  
 	**With 3CPUs:**
    - **SimpleLog-Topic:** **15-16 seconds**
-   - **spdlog:** **15 seconds** (https://github.com/thuanalg/simplelog-topic/blob/main/LinuxCentOs09-performance.txt)
+   - **spdlog:** **15 seconds** (https://github.com/thuanalg/simplelog-topic/blob/main/LinuxCentOs09-performance.txt)  
 	**With 5CPUs:**
 	- **SimpleLog-Topic:** ** ~13 seconds** (https://github.com/thuanalg/simplelog-topic/blob/main/LinuxCentOs09-performance.txt)
 	- **SimpleLog-Topic:** ** ~17 seconds**
