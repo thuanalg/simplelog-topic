@@ -257,6 +257,8 @@ static int
 	spl_init_segments();
 static int
 	spl_allocate_topics();
+static int
+	spl_gen_sync_tool();
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 SIMPLE_LOG_ST* spl_control_obj() {
 	//spl_con
@@ -2394,6 +2396,25 @@ int spl_allocate_topics() {
 			}
 			p1++;
 			p0 = p1;
+		}
+	} while (0);
+	return ret;
+}
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+int spl_gen_sync_tool() {
+	int ret = 0;
+	do {
+		ret = spl_allocate_topics();
+		if (ret) {
+			break;
+		}
+		ret = spl_calculate_size();
+		if (ret) {
+			break;
+		}
+		ret = spl_init_segments();
+		if (ret) {
+			break;
 		}
 	} while (0);
 	return ret;
