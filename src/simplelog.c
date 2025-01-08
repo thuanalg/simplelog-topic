@@ -2064,7 +2064,7 @@ int spl_calculate_size() {
 	#ifdef SPL_USING_SPIN_LOCK
 		
 		t->mtx_rw = (void*)(buff + k);
-		
+
 		step_size = sizeof(volatile long);
 		p = (buff + k) + step_size;
 		for (i = 0; i < t->ncpu; ++i) {
@@ -2076,7 +2076,7 @@ int spl_calculate_size() {
 	#endif
 		ret = spl_win32_sync_create();
 #else
-		/*t->mtx_rw = (void*)(buff + k);*/
+		t->mtx_rw = (void*)(buff + k);
 	#ifdef SPL_USING_SPIN_LOCK
 		if (t->mtx_rw) {
 			pthread_spinlock_t* mtx = (pthread_spinlock_t*)t->mtx_rw;
