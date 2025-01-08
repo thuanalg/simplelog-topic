@@ -245,10 +245,10 @@ static void*
 		spl_mtx_init(void* mtx, char shared);
 #endif
 
-static int
-	spl_del_memory();
 static int 
 	spl_create_memory(void** output, char* shared_key, int size_shared, char isCreating);
+static int
+	spl_del_memory();
 static int 
 	spl_calculate_size();
 static int
@@ -342,22 +342,29 @@ int spl_get_log_levwel() {
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 int spl_set_off(int isoff) {
 	int ret = 0;
-	spl_mutex_lock(__simple_log_static__.mtx_rw);
+	SIMPLE_LOG_ST* t = &__simple_log_static__;
+	spl_mutex_lock(t->mtx_rw);
 	do {
-		__simple_log_static__.off = isoff;
+		t->off = isoff;
 	} while (0);
-	spl_mutex_unlock(__simple_log_static__.mtx_rw);
+	spl_mutex_unlock(t->mtx_rw);
 	
 	if (isoff) {
 		int errCode = 0;
-		spl_rel_sem(__simple_log_static__.sem_rwfile);
+		spl_rel_sem(t->sem_rwfile);
+		if (t->isProcessMode)
+		{
+			if (!t->is_master) {
+				spl_rel_sem(t->sem_off);
+			}
+		}
 #ifndef UNIX_LINUX
-		errCode = (int) WaitForSingleObject(__simple_log_static__.sem_off, INFINITE);
+		errCode = (int) WaitForSingleObject(t->sem_off, INFINITE);
 		if (errCode == WAIT_FAILED) {
 			spl_console_log("------- errCode: %d\n", (int)GetLastError());
 		}
 #else
-		errCode = SPL_sem_wait(__simple_log_static__.sem_off);
+		errCode = SPL_sem_wait(t->sem_off);
 		if (errCode) {
 			spl_console_log("------- errCode: %d\n", (int)errCode);
 		}
@@ -1361,6 +1368,7 @@ int spl_rel_sem(void *sem) {
 int spl_finish_log() {
 	int ret = 0; 
 	spl_set_off(1);
+/*
 #ifndef UNIX_LINUX
 #ifndef SPL_USING_SPIN_LOCK
 	SPL_CloseHandle(__simple_log_static__.mtx_rw);
@@ -1372,8 +1380,8 @@ int spl_finish_log() {
 	SPL_CloseHandle(__simple_log_static__.sem_off);
 #else
 	int err = 0;
-/*https://linux.die.net/man/3/SPL_sem_destroy
-//https://linux.die.net/man/3/pthread_mutex_init*/
+//https://linux.die.net/man/3/SPL_sem_destroy
+//https://linux.die.net/man/3/pthread_mutex_init
 #ifndef SPL_USING_SPIN_LOCK
 	SPL_pthread_mutex_destroy(__simple_log_static__.mtx_rw, err);
 	spl_free(__simple_log_static__.mtx_rw);
@@ -1391,6 +1399,8 @@ int spl_finish_log() {
 	spl_mutex_del_arr(__simple_log_static__.ncpu);
 	spl_free(__simple_log_static__.topics);
 	spl_free(__simple_log_static__.arr_topic);
+*/
+	spl_clean_sync_tool();
 
 	memset(&__simple_log_static__, 0, sizeof(__simple_log_static__));
 	return ret;
@@ -2428,10 +2438,17 @@ int spl_gen_sync_tool() {
 	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*
+	spl_mutex_del_arr(__simple_log_static__.ncpu);
+	spl_free(__simple_log_static__.topics);
+	spl_free(__simple_log_static__.arr_topic);
+*/
 int spl_clean_sync_tool() {
 	int ret = 0;
 	SIMPLE_LOG_ST* t = &__simple_log_static__;
 	do {
+		spl_free(t->topics);
+		spl_free(t->arr_topic);
 #ifndef UNIX_LINUX
 	#ifdef SPL_USING_SPIN_LOCK
 	#else

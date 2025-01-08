@@ -236,6 +236,8 @@ extern "C" {
 			isProcessMode;				/*For cross processes mode.*/
 		int 
 			map_mem_size;				/*Total mapped memory.*/
+		char
+			is_master;
 	} SIMPLE_LOG_ST;
 /*
 typedef struct __FMT_FOR_OUTPUT__ {
