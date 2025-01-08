@@ -220,6 +220,8 @@ extern "C" {
 			shared_key[SPL_SHARED_KEY_LEN]; /* Name of shared key.*/
 		char 
 			id_name[SPL_IDD_NAME];		/*To avoid duplicating of file name.*/
+		char
+			isProcessMode;				/*For cross processes mdoe.*/
 	} SIMPLE_LOG_ST;
 /*
 typedef struct __FMT_FOR_OUTPUT__ {

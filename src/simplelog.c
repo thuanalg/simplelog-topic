@@ -2058,20 +2058,43 @@ int spl_calculate_size(int* outn) {
 		/*t->mtx_rw: is NamedSem*/
 	#endif
 #else
+		t->mtx_rw = (void*)(buff + k);
 	#ifdef SPL_USING_SPIN_LOCK
 		step_size = sizeof(pthread_spinlock_t);
+		for (i = 0; i < t->ncpu; ++i) {
+			pthread_spinlock_t* mtx = 0;
+			t->arr_mtx[i] = (void*)(p + i * step_size);
+			mtx = (pthread_spinlock_t*)t->arr_mtx[i];
+			if (!isProcessMode) {
+				pthread_spin_init(mtx, PTHREAD_PROCESS_PRIVATE);
+			}
+		}
 	#else
 		step_size = sizeof(pthread_mutex_t);
-	#endif
-		t->mtx_rw = (void*)(buff + k);
-		p = (buff + k) + step_size;
 		for (i = 0; i < t->ncpu; ++i) {
+			pthread_mutex_t* mtx = 0;
 			t->arr_mtx[i] = (void*)(p + i * step_size);
+			mtx = (pthread_mutex_t*)t->arr_mtx[i];
+			if (!isProcessMode) {
+				pthread_mutex_init(mtx, 0);
+			}
 		}
+	#endif
+		/*Semaphore*/
 #endif
 	} while (0);
 	return ret;
 }
+/*
+memset(tmp, 0, sizeof(pthread_mutex_t));
+pthread_mutex_init((pthread_mutex_t*)tmp, 0);
+ret[i] = (void*)tmp;
+#else
+pthread_spinlock_t* tmp = 0;
+spl_malloc(sizeof(pthread_spinlock_t), tmp, pthread_spinlock_t);
+pthread_spin_init((pthread_spinlock_t*)tmp, PTHREAD_PROCESS_PRIVATE);
+ret[i] = (void*)tmp;
+*/
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 #ifndef UNIX_LINUX
 #else
