@@ -230,12 +230,17 @@ static int
 	spl_create_thread(THREAD_ROUTINE f, void* arg);
 static void*
 	spl_trigger_routine(void* arg);
-static int
+
 #ifndef UNIX_LINUX
-	spl_del_memory(void* obj, void* hd, void* shmm);
+	static int 
+		spl_del_memory(void* obj, void* hd, void* shmm);
 #else
-	spl_del_memory(void* obj, int hd, void* shmm, int length);
+	static int 
+			spl_del_memory(void* obj, int hd, void* shmm, int length);
+	static int
+		spl_mtx_init(pthread_mutex_t* mtx, char shared);
 #endif
+
 static int 
 	spl_create_memory(void** output, char* shared_key, int size_shared, char isCreating);
 static int 
@@ -2047,8 +2052,10 @@ int spl_calculate_size(int* outn) {
 		
 #ifndef UNIX_LINUX
 	#ifdef SPL_USING_SPIN_LOCK
-		step_size = sizeof(volatile long);
+		
 		t->mtx_rw = (void*)(buff + k);
+		
+		step_size = sizeof(volatile long);
 		p = (buff + k) + step_size;
 		for (i = 0; i < t->ncpu; ++i) {
 			t->arr_mtx[i] = (void*) (p + i * step_size);
@@ -2060,8 +2067,18 @@ int spl_calculate_size(int* outn) {
 #else
 		t->mtx_rw = (void*)(buff + k);
 	#ifdef SPL_USING_SPIN_LOCK
+		if (t->mtx_rw) {
+			pthread_spinlock_t* mtx = (pthread_spinlock_t*)t->mtx_rw;
+			if (t->isProcessMode) {
+				pthread_spin_init(mtx, PTHREAD_PROCESS_SHARED);
+			}
+			else {
+				pthread_spin_init(mtx, PTHREAD_PROCESS_PRIVATE);
+			}
+		}
 		step_size = sizeof(pthread_spinlock_t);
-		for (i = 0; i < t->ncpu; ++i) {
+		for (i = 0; i < t->ncpu; ++i) 
+		{
 			pthread_spinlock_t* mtx = 0;
 			t->arr_mtx[i] = (void*)(p + i * step_size);
 			mtx = (pthread_spinlock_t*)t->arr_mtx[i];
@@ -2073,29 +2090,19 @@ int spl_calculate_size(int* outn) {
 			}
 		}
 	#else
+		if (t->mtx_rw) {
+			pthread_mutex_t* mtx = (pthread_mutex_t*)t->mtx_rw;
+			ret = spl_mtx_init(mtx, t->isProcessMode);
+		}
 		step_size = sizeof(pthread_mutex_t);
-		for (i = 0; i < t->ncpu; ++i) {
-			int err = 0;
+		for (i = 0; i < t->ncpu; ++i) 
+		{
 			pthread_mutex_t* mtx = 0;
 			t->arr_mtx[i] = (void*)(p + i * step_size);
 			mtx = (pthread_mutex_t*)t->arr_mtx[i];
-			if (t->isProcessMode) {
-				
-				pthread_mutexattr_t psharedm;
-				err = pthread_mutexattr_init(&psharedm);
-				if (err) {
-					ret = SPL_LOG_MTX_ATT_SHARED_MODE;
-					spl_console_log("pthread_mutexattr_init, errno: %d, errno_text: %s.", errno, strerror(errno));
-					break;
-				}
-			}
-			else {
-				err = pthread_mutex_init(mtx, 0);
-				if (err) {
-					ret = SPL_LOG_MTX_INIT_ERR;
-					spl_console_log("pthread_mutex_init, errno: %d, errno_text: %s.", errno, strerror(errno));
-					break;
-				}
+			ret = spl_mtx_init(mtx, t->isProcessMode);
+			if (ret) {
+				break;
 			}
 		}
 	#endif
@@ -2105,6 +2112,51 @@ int spl_calculate_size(int* outn) {
 
 	return ret;
 }
+#ifndef UNIX_LINUX
+#else
+
+
+int spl_mtx_init(pthread_mutex_t* mtx, char shared) 
+{
+	int ret = 0;
+	int err = 0;
+	do {	
+		pthread_mutex_t* mtx = 0;
+		t->arr_mtx[i] = (void*)(p + i * step_size);
+		mtx = (pthread_mutex_t*)t->arr_mtx[i];
+		if (shared) {
+			pthread_mutexattr_t psharedm;
+			err = pthread_mutexattr_init(&psharedm);
+			if (err) {
+				ret = SPL_LOG_MTX_ATT_SHARED_MODE;
+				spl_console_log("pthread_mutexattr_init, errno: %d, errno_text: %s.", errno, strerror(errno));
+				break;
+			}
+			err = pthread_mutexattr_setpshared(&psharedm, PTHREAD_PROCESS_SHARED);
+			if (err) {
+				ret = SPL_LOG_MTX_ATT_SHARED_MODE_SET;
+				spl_console_log("pthread_mutexattr_setpshared, errno: %d, errno_text: %s.", errno, strerror(errno));
+				break;
+			}
+			err = pthread_mutex_init(mtx, &psharedm);
+			if (err) {
+				ret = SPL_LOG_SHM_UNIX_INIT_MUTEX;
+				spl_console_log("pthread_mutex_init, errno: %d, errno_text: %s.", errno, strerror(errno));
+				break;
+			}
+		}
+		else {
+			err = pthread_mutex_init(mtx, 0);
+			if (err) {
+				ret = SPL_LOG_MTX_INIT_ERR;
+				spl_console_log("pthread_mutex_init, errno: %d, errno_text: %s.", errno, strerror(errno));
+				break;
+			}
+		}
+	} while (0);
+	return ret;
+}
+#endif
 /*
 memset(tmp, 0, sizeof(pthread_mutex_t));
 pthread_mutex_init((pthread_mutex_t*)tmp, 0);
