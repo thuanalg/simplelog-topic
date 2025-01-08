@@ -238,6 +238,9 @@ static int
 #endif
 static int 
 	spl_create_memory(void** output, char* shared_key, int size_shared, char isCreating);
+static int 
+	spl_calculate_size(int*);
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 SIMPLE_LOG_ST* spl_control_obj() {
 	//spl_con
@@ -1968,14 +1971,14 @@ int spl_create_memory(void** output, char* shared_key, int size_shared, char isC
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 /* (SIMPLE_LOG_ST*)&__simple_log_static__, volatile long, pthread_spinlock_t, pthread_mutex_t */
-static int spl_calculate_size(int *);
+
 int spl_calculate_size(int* n) {
 	int ret = 0;
 	SIMPLE_LOG_ST* t = &__simple_log_static__;
 	int k = 0;
 	int mtxsize = 0;
 	int semsize = 0;
-	int i = 0;
+	
 	/*k: For buffer.*/
 	k = t->buff_size * t->ncpu * (t->n_topic + 1);
 	/*k = t->buff_size * t->ncpu + t->buff_size * t->ncpu * t->n_topic;*/
@@ -1991,7 +1994,7 @@ int spl_calculate_size(int* n) {
 		/*1: Mutex of On/Off.*/
 		/*t->ncpu: Mutex of Concurrence.*/
 		/*t->mtx_rw = (void*) ((char *)t->buf + k);*/
-		/*char* p = ((char*)t->buf + k) + sizeof(volatile long);*/
+		/*int i = 0;char* p = ((char*)t->buf + k) + sizeof(volatile long);*/
 		mtxsize = (1 + t->ncpu) * sizeof(volatile long);
 		/*
 		for (i = 0; i < t->ncpu; ++i) {
@@ -2007,7 +2010,7 @@ int spl_calculate_size(int* n) {
 		/*1: Mutex of On/Off.*/
 		/*t->ncpu: Mutex of Concurrence.*/
 		/*t->mtx_rw = (void*) ((char *)t->buf + k);*/
-		/*char* p = ((char*)t->buf + k) + sizeof(pthread_spinlock_t);*/
+		/*int i = 0;char* p = ((char*)t->buf + k) + sizeof(pthread_spinlock_t);*/
 		mtxsize = (1 + t->ncpu) * sizeof(pthread_spinlock_t);
 		/*
 		for (i = 0; i < t->ncpu; ++i) {
@@ -2019,7 +2022,7 @@ int spl_calculate_size(int* n) {
 		/*t->ncpu: Mutex of Concurrence.*/
 		/*t->mtx_rw = (void*) ((char *)t->buf + k);*/
 
-		/*char* p = ((char*)t->buf + k) + sizeof(pthread_mutex_t);*/		
+		/*int i = 0;char* p = ((char*)t->buf + k) + sizeof(pthread_mutex_t);*/		
 		mtxsize = (1 + t->ncpu) * sizeof(pthread_mutex_t);
 		/*
 		for (i = 0; i < t->ncpu; ++i) {
