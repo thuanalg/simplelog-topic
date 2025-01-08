@@ -2065,24 +2065,44 @@ int spl_calculate_size(int* outn) {
 			pthread_spinlock_t* mtx = 0;
 			t->arr_mtx[i] = (void*)(p + i * step_size);
 			mtx = (pthread_spinlock_t*)t->arr_mtx[i];
-			if (!t->isProcessMode) {
+			if (t->isProcessMode) {
+				pthread_spin_init(mtx, PTHREAD_PROCESS_SHARED);
+			}
+			else {
 				pthread_spin_init(mtx, PTHREAD_PROCESS_PRIVATE);
 			}
 		}
 	#else
 		step_size = sizeof(pthread_mutex_t);
 		for (i = 0; i < t->ncpu; ++i) {
+			int err = 0;
 			pthread_mutex_t* mtx = 0;
 			t->arr_mtx[i] = (void*)(p + i * step_size);
 			mtx = (pthread_mutex_t*)t->arr_mtx[i];
-			if (!t->isProcessMode) {
-				pthread_mutex_init(mtx, 0);
+			if (t->isProcessMode) {
+				
+				pthread_mutexattr_t psharedm;
+				err = pthread_mutexattr_init(&psharedm);
+				if (err) {
+					ret = SPL_LOG_MTX_ATT_SHARED_MODE;
+					spl_console_log("pthread_mutexattr_init, errno: %d, errno_text: %s.", errno, strerror(errno));
+					break;
+				}
+			}
+			else {
+				err = pthread_mutex_init(mtx, 0);
+				if (err) {
+					ret = SPL_LOG_MTX_INIT_ERR;
+					spl_console_log("pthread_mutex_init, errno: %d, errno_text: %s.", errno, strerror(errno));
+					break;
+				}
 			}
 		}
 	#endif
 		/*Semaphore*/
 #endif
 	} while (0);
+
 	return ret;
 }
 /*
