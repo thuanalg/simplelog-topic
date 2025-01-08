@@ -2070,10 +2070,19 @@ int spl_calculate_size(int* outn) {
 		if (t->mtx_rw) {
 			pthread_spinlock_t* mtx = (pthread_spinlock_t*)t->mtx_rw;
 			if (t->isProcessMode) {
-				pthread_spin_init(mtx, PTHREAD_PROCESS_SHARED);
+				int err = 0;
+				err = pthread_spin_init(mtx, PTHREAD_PROCESS_SHARED);
+				if (err) {
+					ret = SPL_LOG_SPINLOCK_INIT_SHARED;
+					spl_console_log("pthread_spin_init, errno: %d, errno_text: %s.", errno, strerror(errno));
+				}
 			}
 			else {
-				pthread_spin_init(mtx, PTHREAD_PROCESS_PRIVATE);
+				err = pthread_spin_init(mtx, PTHREAD_PROCESS_PRIVATE);
+				if (err) {
+					ret = SPL_LOG_SPINLOCK_INIT_PRIVATE;
+					spl_console_log("pthread_spin_init, errno: %d, errno_text: %s.", errno, strerror(errno));
+				}
 			}
 		}
 		step_size = sizeof(pthread_spinlock_t);
