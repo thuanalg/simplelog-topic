@@ -257,6 +257,8 @@ static int
 	spl_allocate_topics();
 static int
 	spl_gen_sync_tool();
+static int 
+	spl_clean_sync_tool();
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 SIMPLE_LOG_ST* spl_control_obj() {
 	//spl_con
