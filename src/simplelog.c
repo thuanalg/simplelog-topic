@@ -2448,7 +2448,7 @@ int spl_clean_sync_tool() {
 			spl_del_memory();
 		}
 		else {
-			spl_free((char*)t->buf);
+			spl_free(t->buf);
 		}
 	} while (0);
 	return ret;
