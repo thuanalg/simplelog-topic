@@ -2019,10 +2019,13 @@ int spl_calculate_size() {
 	k = t->buff_size * t->ncpu * (t->n_topic + 1);
 	/*k = t->buff_size * t->ncpu + t->buff_size * t->ncpu * t->n_topic;*/
 	do {
-		spl_malloc(size_arr_mtx, t->arr_mtx, void*);
 		if (!t->arr_mtx) {
-			ret = SPL_LOG_ARR_MTX_NULL;
-			break;
+			spl_malloc(size_arr_mtx, t->arr_mtx, void*);
+			if (!t->arr_mtx) {
+				ret = SPL_LOG_ARR_MTX_NULL;
+				spl_console_log("spl_malloc: SPL_LOG_ARR_MTX_NULL.");
+				break;
+			}
 		}
 #ifndef UNIX_LINUX
 	#ifdef SPL_USING_SPIN_LOCK
@@ -2055,7 +2058,8 @@ int spl_calculate_size() {
 		
 		spl_malloc( n, buff, char);
 		if (!buff) {
-			ret = SPL_LOG_ARR_BUFF_NULL;
+			ret = SPL_LOG_BUFF_MALLOC_ERROR;
+			spl_console_log("spl_malloc: SPL_LOG_BUFF_MALLOC_ERROR.");
 			break;
 		}
 		t->buf = (generic_dta_st*)buff;
@@ -2188,6 +2192,7 @@ int spl_win32_sync_create() {
 			spl_malloc(n, t->arr_mtx, void*);
 			if (!t->arr_mtx) {
 				ret = SPL_LOG_ARR_MTX_NULL;
+				spl_console_log("spl_malloc: SPL_LOG_ARR_MTX_NULL");
 				break;
 			}
 		}

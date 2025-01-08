@@ -77,6 +77,7 @@ extern "C" {
 		SPL_ERROR_CREATE_MUTEX,
 		SPL_ERROR_CREATE_SEM,
 		SPL_LOG_BUFF_SIZE_ERROR,
+		SPL_LOG_BUFF_MALLOC_ERROR,
 		SPL_LOG_FOLDER_ERROR,
 		SPL_LOG_CREATE_THREAD_ERROR,
 		SPL_LOG_FMT_NULL_ERROR,
@@ -199,17 +200,17 @@ extern "C" {
 		void*
 			sem_off;					/*sem_off: Need to close handle*/
 		spl_local_time_st
-			lc_time_now;				/*lc_time: Need to sync, free*/
+			lc_time_now;				/*Current time.*/
 		FILE*
 			fp;							/*fp: Need to close*/
 		generic_dta_st*
-			buf;						/*buf: Must be sync, free*/
+			buf;						/*buf: Must be synchoronized. Must be freed.*/
 		char*
 			topics;						/*topics: topics string. Must be freed */
 		int
 			n_topic;					/*Number of topics, SIMPLE_LOG_TOPIC_ST.*/
 		SIMPLE_LOG_TOPIC_ST*
-			arr_topic;					/*List od topics: SIMPLE_LOG_TOPIC_ST*.*/
+			arr_topic;					/*List od topics: SIMPLE_LOG_TOPIC_ST. Must be freed*/
 		int
 			renew;						/*In a thread of logger, NO NEED SYNC.*/
 		char
@@ -219,7 +220,7 @@ extern "C" {
 		int
 			trigger_thread;				/*Use trigger thread or not.*/
 		void	
-			**arr_mtx;					/*Use trigger thread or not.*/
+			**arr_mtx;					/*List of lock: Spinlock or Mutex. Must be freed.*/
 		/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #ifndef UNIX_LINUX
 		void*
