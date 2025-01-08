@@ -15,6 +15,7 @@
 *		<2024-Dec-23>
 *		<2024-Dec-30>
 *		<2024-Jan-06>
+*		<2024-Jan-08>
 * Decription:
 *		The (only) main header file to export 3 APIs: [spl_init_log, spllog, spllogtopic, spl_finish_log].
 */
@@ -159,6 +160,7 @@ extern "C" {
 #define				SPL_TOPIC_SIZE					32
 #define				SPL_MEMO_PADDING				2048
 #define				SPL_SHARED_KEY_LEN				64
+#define				SPL_SHARED_NAME_LEN				128
 
 	typedef
 		struct __SIMPLE_LOG_TOPIC_ST__ {

@@ -89,6 +89,12 @@
 		{ (__err) = pthread_mutex_unlock((pthread_mutex_t*)(__obj)); if((__err)) spl_console_log("pthread_mutex_unlock errcode: %d. %s\n", (__err), (__err) ? "FALIED": "DONE");}
 #endif
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+#define SPL_SEM_NAME_RW				"_SEM_RW"
+#define SPL_SEM_NAME_OFF			"_SEM_OFF"
+
+#define SPL_MTX_NAME_RW				"_MTX_RW"
+#define SPL_MTX_NAME_OFF			"_MTX_OFF"
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
 #define	SPLOG_PATHFOLDR \
 	"pathfoder="
@@ -232,6 +238,8 @@ static void*
 	spl_trigger_routine(void* arg);
 
 #ifndef UNIX_LINUX
+static int
+	spl_win32_sync_create();
 	static int 
 		spl_del_memory(void* obj, void* hd, void* shmm);
 #else
@@ -2065,6 +2073,7 @@ int spl_calculate_size() {
 	#else
 		/*t->mtx_rw: is NamedMutex*/
 		/*t->mtx_rw: is NamedSem*/
+		ret = spl_win32_sync_create();
 	#endif
 #else
 		t->mtx_rw = (void*)(buff + k);
@@ -2148,7 +2157,66 @@ int spl_calculate_size() {
 	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*
+	
+
+		t->mtx_rw = (void*)(buff + k);
+
+		step_size = sizeof(volatile long);
+		p = (buff + k) + step_size;
+		for (i = 0; i < t->ncpu; ++i) {
+			t->arr_mtx[i] = (void*) (p + i * step_size);
+		}
+	#else
+#endif
+#define SPL_SEM_NAME_RW				"_SEM_RW"
+#define SPL_SEM_NAME_OFF			"_SEM_OFF"
+
+#define SPL_MTX_NAME_RW				"_MTX_RW"
+#define SPL_MTX_NAME_OFF			"_MTX_OFF"
+*/
 #ifndef UNIX_LINUX
+int spl_win32_sync_create() {
+	int ret = 0;
+	SIMPLE_LOG_ST* t = &__simple_log_static__;
+	char nameobj[SPL_SHARED_NAME_LEN];
+	do {
+	#ifdef SPL_USING_SPIN_LOCK
+	#else
+		if (t->isProcessMode) {
+
+		}
+		else {
+
+		}
+	#endif
+		if (t->isProcessMode) {
+			HANDLE hd = 0;
+			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s:%s", SPL_MTX_NAME_RW, t->shared_key);
+			hd = CreateSemaphoreA(0, 0, 1, nameobj);
+			if (!hd) {
+				spl_console_log("CreateSemaphoreA, errno: %d.", (int) GetLastError());
+			}
+			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s:%s", SPL_MTX_NAME_OFF, t->shared_key);
+			hd = CreateSemaphoreA(0, 0, 1, nameobj);
+			if (!hd) {
+				spl_console_log("CreateSemaphoreA, errno: %d.", (int)GetLastError());
+			}
+		}
+		else {
+			HANDLE hd = 0;
+			hd = CreateSemaphoreA(0, 0, 1, 0);
+			if (!hd) {
+				spl_console_log("CreateSemaphoreA, errno: %d.", (int)GetLastError());
+			}
+			hd = CreateSemaphoreA(0, 0, 1, 0);
+			if (!hd) {
+				spl_console_log("CreateSemaphoreA, errno: %d.", (int)GetLastError());
+			}
+		}
+	} while (0);
+	return ret;
+}
 #else
 int spl_mtx_init(void* obj, char shared) 
 {
