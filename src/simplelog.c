@@ -497,15 +497,18 @@ int spl_init_log( char *pathcfg)
 			spl_console_log("Cannot open file error.");
 			break;
 		}
-		while (1) {
+		while (1) 
+		{
 			c = fgetc(fp);
-			if (c == '\r' || c == '\n' || c == EOF) {
+			if (c == '\r' || c == '\n' || c == EOF) 
+			{
 				int  j = 0;
 				char* node = 0;
 				if (count < 1) {
 					continue;
 				}
-				while (1) {
+				while (1) 
+				{
 					char* pp = 0;
 					node = (char *)__splog_pathfolder[j];
 					if (!node) {
@@ -595,6 +598,7 @@ int spl_init_log( char *pathcfg)
 		SPL_FCLOSE(fp,ret);
 	}
 	if (ret == 0) {
+		/*Allocate buffer here*/
 		ret = spl_gen_topic_buff(&__simple_log_static__);
 	}
 	if (ret == 0) {
