@@ -17,6 +17,7 @@
 *		<2024-Dec-30>
 *		<2025-Jan-03>
 *		<2025-Jan-06>
+*		<2025-Jan-08>
 * Decription:													
 *		The (only) main file to implement simple log.
 */
@@ -58,14 +59,6 @@
 #endif
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-/*
-//#define spl_malloc(__nn__, __obj__, __type__) { (__obj__) = (__type__*) malloc(__nn__); if(__obj__) \
-//	{spl_console_log("Malloc: 0x%p\n", (__obj__)); memset((void*)(__obj__), 0, (__nn__));} \
-//	else {spl_console_log("Malloc: error.\n");}} 
-//
-//#define spl_free(__obj__) \
-//	{ spl_console_log("Free: 0x:%p.\n", (__obj__)); free(__obj__); ; (__obj__) = 0;} 
-*/
 
 #define SPL_FCLOSE(__fp__, __n) { if(__fp__){ (__n) = fclose((FILE*)(__fp__)) ; if(__n) { spl_fclose_err(__n, __fp__); } \
 	else { /*spl_console_log("Close FILE 0x%p DONE.", (__fp__));;(__fp__) = 0;*/;}}}
@@ -1972,6 +1965,79 @@ int spl_create_memory(void** output, char* shared_key, int size_shared, char isC
 
 	} while (0);
 	return ret = 0;
+}
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/* (SIMPLE_LOG_ST*)&__simple_log_static__, volatile long, pthread_spinlock_t, pthread_mutex_t */
+static int spl_calculate_size(int *);
+int spl_calculate_size(int* n) {
+	int ret = 0;
+	SIMPLE_LOG_ST* t = &__simple_log_static__;
+	int k = 0;
+	int mtxsize = 0;
+	int semsize = 0;
+	int i = 0;
+	/*k: For buffer.*/
+	k = t->buff_size * t->ncpu * (t->n_topic + 1);
+	/*k = t->buff_size * t->ncpu + t->buff_size * t->ncpu * t->n_topic;*/
+	do {
+		if (!n) {
+			ret = SPL_LOG_VAR_NULL;
+			break;
+		}
+		(*n) = 0;
+		
+#ifndef UNIX_LINUX
+	#ifdef SPL_USING_SPIN_LOCK
+		/*1: Mutex of On/Off.*/
+		/*t->ncpu: Mutex of Concurrence.*/
+		/*t->mtx_rw = (void*) ((char *)t->buf + k);*/
+		/*char* p = ((char*)t->buf + k) + sizeof(volatile long);*/
+		mtxsize = (1 + t->ncpu) * sizeof(volatile long);
+		/*
+		for (i = 0; i < t->ncpu; ++i) {
+			t->arr_mtx[i] = p + i * sizeof(volatile long);
+		}
+		*/
+	#else
+		/*t->mtx_rw: is NamedMutex*/
+	#endif
+		/*semsize*/
+#else
+	#ifdef SPL_USING_SPIN_LOCK
+		/*1: Mutex of On/Off.*/
+		/*t->ncpu: Mutex of Concurrence.*/
+		/*t->mtx_rw = (void*) ((char *)t->buf + k);*/
+		/*char* p = ((char*)t->buf + k) + sizeof(pthread_spinlock_t);*/
+		mtxsize = (1 + t->ncpu) * sizeof(pthread_spinlock_t);
+		/*
+		for (i = 0; i < t->ncpu; ++i) {
+			t->arr_mtx[i] = p + i * sizeof(pthread_spinlock_t);
+		}
+		*/
+	#else
+		/*1: Mutex of On/Off.*/
+		/*t->ncpu: Mutex of Concurrence.*/
+		/*t->mtx_rw = (void*) ((char *)t->buf + k);*/
+
+		/*char* p = ((char*)t->buf + k) + sizeof(pthread_mutex_t);*/		
+		mtxsize = (1 + t->ncpu) * sizeof(pthread_mutex_t);
+		/*
+		for (i = 0; i < t->ncpu; ++i) {
+			t->arr_mtx[i] = p + i * sizeof(pthread_mutex_t);
+		}
+		*/
+
+	#endif
+		/*1: For semrw.*/
+		/*1: For semOnOff.*/
+		semsize = 2 * sizeof(sem_t);
+#endif
+		/*k: For buffer.*/
+		/*mtxsize: mutex size.*/
+		/*semsize: sem size.*/
+		(*n) = k + mtxsize + semsize;
+	} while (0);
+	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 #ifndef UNIX_LINUX
