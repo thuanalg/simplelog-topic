@@ -239,15 +239,14 @@ static void*
 			spl_del_memory(void* obj, int hd, void* shmm, int length);
 	static int
 		spl_mtx_init(void* mtx, char shared);
-	static int
-		spl_sem_init(void* mtx, char shared);
 #endif
 
 static int 
 	spl_create_memory(void** output, char* shared_key, int size_shared, char isCreating);
 static int 
 	spl_calculate_size(int*);
-
+static int
+	spl_init_segment();
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 SIMPLE_LOG_ST* spl_control_obj() {
 	//spl_con
@@ -598,7 +597,7 @@ int spl_init_log( char *pathcfg)
 		SPL_FCLOSE(fp,ret);
 	}
 	if (ret == 0) {
-		/*Allocate buffer here*/
+		/*Allocate buffer here.*/
 		ret = spl_gen_topic_buff(&__simple_log_static__);
 	}
 	if (ret == 0) {
@@ -1747,7 +1746,7 @@ int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
 				break;
 			}
 			for (i = 0; i < t->n_topic; ++i) {
-				int j = 0;
+					int j = 0;
 				int steep = 0;
 				char* p1 = 0;
 
@@ -2155,8 +2154,6 @@ int spl_calculate_size(int* outn) {
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 #ifndef UNIX_LINUX
 #else
-
-
 int spl_mtx_init(void* obj, char shared) 
 {
 	int ret = 0;
@@ -2195,16 +2192,13 @@ int spl_mtx_init(void* obj, char shared)
 	} while (0);
 	return ret;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-int spl_sem_init(void* sem, char shared) {
-	int ret = 0;
-	do {
-
-	} while (0);
-	return ret;
-}
 #endif
 
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+int spl_init_segment() {
+	int ret = 0;
+	return ret;
+}
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 #ifndef UNIX_LINUX
 #else
