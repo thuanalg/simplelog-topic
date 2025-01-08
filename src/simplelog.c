@@ -238,7 +238,7 @@ static void*
 	static int 
 			spl_del_memory(void* obj, int hd, void* shmm, int length);
 	static int
-		spl_mtx_init(pthread_mutex_t* mtx, char shared);
+		spl_mtx_init(void* mtx, char shared);
 #endif
 
 static int 
@@ -2112,14 +2112,16 @@ int spl_calculate_size(int* outn) {
 
 	return ret;
 }
+
 #ifndef UNIX_LINUX
 #else
 
 
-int spl_mtx_init(pthread_mutex_t* mtx, char shared) 
+int spl_mtx_init(void* obj, char shared) 
 {
 	int ret = 0;
 	int err = 0;
+	pthread_mutex_t* mtx = (pthread_mutex_t*)obj;
 	do {	
 		if (shared) {
 			pthread_mutexattr_t psharedm;
