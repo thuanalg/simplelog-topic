@@ -2183,36 +2183,97 @@ int spl_win32_sync_create() {
 	do {
 	#ifdef SPL_USING_SPIN_LOCK
 	#else
-		if (t->isProcessMode) {
-
+		if (!t->arr_mtx) {
+			int n = t->ncpu * sizeof(void*);
+			spl_malloc(n, t->arr_mtx, void*);
+			if (!t->arr_mtx) {
+				ret = SPL_LOG_ARR_MTX_NULL;
+				break;
+			}
 		}
-		else {
-
-		}
-	#endif
 		if (t->isProcessMode) {
 			HANDLE hd = 0;
-			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s:%s", SPL_MTX_NAME_RW, t->shared_key);
+			int i = 0;
+			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_MTX_NAME_OFF, t->shared_key);
+			hd  = CreateMutexA(0, 0, nameobj);
+			if (!hd) {
+				ret = SPL_LOG_MTX_WIN32_CREATE_ERROR;
+				spl_console_log("CreateMutexA, errno: %d.", (int)GetLastError());
+				break;
+			}
+			t->mtx_rw = hd;
+
+			for (i = 0; i < t->ncpu; ++i) {
+				snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s_%0.2d", SPL_MTX_NAME_OFF, t->shared_key, i);
+				hd = CreateMutexA(0, 0, nameobj);
+				if (!hd) {
+					ret = SPL_LOG_MTX_WIN32_CREATE_ERROR;
+					spl_console_log("CreateMutexA, errno: %d.", (int)GetLastError());
+					break;
+				}
+				t->arr_mtx[i] = hd;
+			}
+		}
+		else {
+			HANDLE hd = 0;
+			int i = 0;
+			hd = CreateMutexA(0, 0, 0);
+			if (!hd) {
+				ret = SPL_LOG_MTX_WIN32_CREATE_ERROR;
+				spl_console_log("CreateMutexA, errno: %d.", (int)GetLastError());
+				break;
+			}
+			t->mtx_rw = hd;
+
+			for (i = 0; i < t->ncpu; ++i) {
+				hd = CreateMutexA(0, 0, 0);
+				if (!hd) {
+					ret = SPL_LOG_MTX_WIN32_CREATE_ERROR;
+					spl_console_log("CreateMutexA, errno: %d.", (int)GetLastError());
+					break;
+				}
+				t->arr_mtx[i] = hd;
+			}
+		}
+	#endif
+		if (ret) {
+			break;
+		}
+		if (t->isProcessMode) {
+			HANDLE hd = 0;
+			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_RW, t->shared_key);
 			hd = CreateSemaphoreA(0, 0, 1, nameobj);
 			if (!hd) {
 				spl_console_log("CreateSemaphoreA, errno: %d.", (int) GetLastError());
+				ret = SPL_LOG_SEM_WIN32_CREATE_ERROR;
+				break;
 			}
-			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s:%s", SPL_MTX_NAME_OFF, t->shared_key);
+			t->sem_rwfile = hd;
+			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_OFF, t->shared_key);
 			hd = CreateSemaphoreA(0, 0, 1, nameobj);
 			if (!hd) {
 				spl_console_log("CreateSemaphoreA, errno: %d.", (int)GetLastError());
+				ret = SPL_LOG_SEM_WIN32_CREATE_ERROR;
+				break;
 			}
+			t->sem_off = hd;
 		}
 		else {
 			HANDLE hd = 0;
 			hd = CreateSemaphoreA(0, 0, 1, 0);
 			if (!hd) {
 				spl_console_log("CreateSemaphoreA, errno: %d.", (int)GetLastError());
+				ret = SPL_LOG_SEM_WIN32_CREATE_ERROR;
+				break;
 			}
+			t->sem_rwfile = hd;
 			hd = CreateSemaphoreA(0, 0, 1, 0);
 			if (!hd) {
 				spl_console_log("CreateSemaphoreA, errno: %d.", (int)GetLastError());
+				ret = SPL_LOG_SEM_WIN32_CREATE_ERROR;
+				break;
 			}
+			t->sem_off = hd;
 		}
 	} while (0);
 	return ret;
