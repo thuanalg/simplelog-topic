@@ -1972,22 +1972,41 @@ int spl_create_memory(void** output, char* shared_key, int size_shared, char isC
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 /* (SIMPLE_LOG_ST*)&__simple_log_static__, volatile long, pthread_spinlock_t, pthread_mutex_t */
 
-int spl_calculate_size(int* n) {
+int spl_calculate_size(int* outn) {
 	int ret = 0;
 	int k = 0;
+	int n = 0;
 	int mtxsize = 0;
 	int semsize = 0;
+	int size_arr_mtx = 0;
+	char* buff = 0;
+
+#ifndef UNIX_LINUX
+	#ifdef SPL_USING_SPIN_LOCK
+		int i = 0;
+		char* p = 0;
+	#else
+	#endif
+#else
+	int i = 0;
+	char* p = 0;
+#endif
 	SIMPLE_LOG_ST* t = &__simple_log_static__;
+	size_arr_mtx = t->ncpu * sizeof(void *);
 	/*k: For buffer.*/
 	k = t->buff_size * t->ncpu * (t->n_topic + 1);
 	/*k = t->buff_size * t->ncpu + t->buff_size * t->ncpu * t->n_topic;*/
 	do {
-		if (!n) {
+		if (!outn) {
 			ret = SPL_LOG_VAR_NULL;
 			break;
 		}
-		(*n) = 0;
-		
+		(*outn) = 0;
+		spl_malloc(size_arr_mtx, t->arr_mtx, void*);
+		if (!t->arr_mtx) {
+			ret = SPL_LOG_ARR_MTX_NULL;
+			break;
+		}
 #ifndef UNIX_LINUX
 	#ifdef SPL_USING_SPIN_LOCK
 		/*1: Mutex of On/Off.*/
@@ -2037,13 +2056,59 @@ int spl_calculate_size(int* n) {
 		/*k: For buffer.*/
 		/*mtxsize: mutex size.*/
 		/*semsize: sem size.*/
-		(*n) = k + mtxsize + semsize;
+		n = k + mtxsize + semsize;
+		(*outn) = n;
+		
+		/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+		
+		spl_malloc( n, buff, char);
+		if (!buff) {
+			ret = SPL_LOG_ARR_BUFF_NULL;
+			break;
+		}
+		t->buf = (generic_dta_st*)buff;
+		
+#ifndef UNIX_LINUX
+	#ifdef SPL_USING_SPIN_LOCK
+		p = (buff + k) + sizeof(volatile long);
+		t->mtx_rw = (void *)p;
+		for (i = 0; i < t->ncpu; ++i) {
+			t->arr_mtx[i] = (void*) (p + i * sizeof(volatile long));
+		}
+	#else
+		/*t->mtx_rw: is NamedMutex*/
+	#endif
+#else
+	#ifdef SPL_USING_SPIN_LOCK
+		p = (buff + k) + sizeof(pthread_spinlock_t);
+		t->mtx_rw = (void *)p;
+		for (i = 0; i < t->ncpu; ++i) {
+			t->arr_mtx[i] = (void*)(p + i * sizeof(pthread_spinlock_t));
+		}
+	#else
+		p = (buff + k) + sizeof(pthread_mutex_t);
+		t->mtx_rw = (void*)p;
+		for (i = 0; i < t->ncpu; ++i) {
+			t->arr_mtx[i] = (void*)(p + i * sizeof(pthread_mutex_t));
+		}
+	#endif
+#endif
 	} while (0);
 	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 #ifndef UNIX_LINUX
 #else
+#endif
+
+#ifndef UNIX_LINUX
+	#ifdef SPL_USING_SPIN_LOCK
+	#else
+	#endif
+#else
+	#ifdef SPL_USING_SPIN_LOCK
+	#else
+	#endif
 #endif
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
