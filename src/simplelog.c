@@ -2073,8 +2073,8 @@ int spl_calculate_size() {
 	#else
 		/*t->mtx_rw: is NamedMutex*/
 		/*t->mtx_rw: is NamedSem*/
-		ret = spl_win32_sync_create();
 	#endif
+		ret = spl_win32_sync_create();
 #else
 		t->mtx_rw = (void*)(buff + k);
 	#ifdef SPL_USING_SPIN_LOCK
