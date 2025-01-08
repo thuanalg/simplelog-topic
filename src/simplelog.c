@@ -2076,8 +2076,13 @@ int spl_calculate_size() {
 		n = k + mtxsize + semsize;		
 		t->map_mem_size = n;
 		/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-		
-		spl_malloc( n, buff, char);
+		//int spl_create_memory(void** output, char* shared_key, int size_shared, char isCreating) {
+		if (t->isProcessMode) {
+			spl_create_memory(&buff, t->shared_key, n, t->is_master);
+		}
+		else {
+			spl_malloc(n, buff, char);
+		}
 		if (!buff) {
 			ret = SPL_LOG_BUFF_MALLOC_ERROR;
 			spl_console_log("spl_malloc: SPL_LOG_BUFF_MALLOC_ERROR.");
