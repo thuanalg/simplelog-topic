@@ -2202,7 +2202,7 @@ int spl_win32_sync_create() {
 			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_MTX_NAME_OFF, t->shared_key);
 			hd  = CreateMutexA(0, 0, nameobj);
 			if (!hd) {
-				ret = SPL_LOG_MTX_WIN32_CREATE_ERROR;
+				ret = SPL_LOG_MTX_WIN32_CREATED_ERROR;
 				spl_console_log("CreateMutexA, errno: %d.", (int)GetLastError());
 				break;
 			}
@@ -2212,7 +2212,7 @@ int spl_win32_sync_create() {
 				snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s_%0.2d", SPL_MTX_NAME_OFF, t->shared_key, i);
 				hd = CreateMutexA(0, 0, nameobj);
 				if (!hd) {
-					ret = SPL_LOG_MTX_WIN32_CREATE_ERROR;
+					ret = SPL_LOG_MTX_WIN32_CREATED_ERROR;
 					spl_console_log("CreateMutexA, errno: %d.", (int)GetLastError());
 					break;
 				}
@@ -2224,7 +2224,7 @@ int spl_win32_sync_create() {
 			int i = 0;
 			hd = CreateMutexA(0, 0, 0);
 			if (!hd) {
-				ret = SPL_LOG_MTX_WIN32_CREATE_ERROR;
+				ret = SPL_LOG_MTX_WIN32_CREATED_ERROR;
 				spl_console_log("CreateMutexA, errno: %d.", (int)GetLastError());
 				break;
 			}
@@ -2233,7 +2233,7 @@ int spl_win32_sync_create() {
 			for (i = 0; i < t->ncpu; ++i) {
 				hd = CreateMutexA(0, 0, 0);
 				if (!hd) {
-					ret = SPL_LOG_MTX_WIN32_CREATE_ERROR;
+					ret = SPL_LOG_MTX_WIN32_CREATED_ERROR;
 					spl_console_log("CreateMutexA, errno: %d.", (int)GetLastError());
 					break;
 				}
@@ -2250,7 +2250,7 @@ int spl_win32_sync_create() {
 			hd = CreateSemaphoreA(0, 0, 1, nameobj);
 			if (!hd) {
 				spl_console_log("CreateSemaphoreA, errno: %d.", (int) GetLastError());
-				ret = SPL_LOG_SEM_WIN32_CREATE_ERROR;
+				ret = SPL_LOG_SEM_WIN32_CREATED_ERROR;
 				break;
 			}
 			t->sem_rwfile = hd;
@@ -2258,7 +2258,7 @@ int spl_win32_sync_create() {
 			hd = CreateSemaphoreA(0, 0, 1, nameobj);
 			if (!hd) {
 				spl_console_log("CreateSemaphoreA, errno: %d.", (int)GetLastError());
-				ret = SPL_LOG_SEM_WIN32_CREATE_ERROR;
+				ret = SPL_LOG_SEM_WIN32_CREATED_ERROR;
 				break;
 			}
 			t->sem_off = hd;
@@ -2268,14 +2268,14 @@ int spl_win32_sync_create() {
 			hd = CreateSemaphoreA(0, 0, 1, 0);
 			if (!hd) {
 				spl_console_log("CreateSemaphoreA, errno: %d.", (int)GetLastError());
-				ret = SPL_LOG_SEM_WIN32_CREATE_ERROR;
+				ret = SPL_LOG_SEM_WIN32_CREATED_ERROR;
 				break;
 			}
 			t->sem_rwfile = hd;
 			hd = CreateSemaphoreA(0, 0, 1, 0);
 			if (!hd) {
 				spl_console_log("CreateSemaphoreA, errno: %d.", (int)GetLastError());
-				ret = SPL_LOG_SEM_WIN32_CREATE_ERROR;
+				ret = SPL_LOG_SEM_WIN32_CREATED_ERROR;
 				break;
 			}
 			t->sem_off = hd;
