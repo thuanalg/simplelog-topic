@@ -246,7 +246,7 @@ static int
 static int 
 	spl_calculate_size(int*);
 static int
-	spl_init_segment();
+	spl_init_segments();
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 SIMPLE_LOG_ST* spl_control_obj() {
 	//spl_con
@@ -2195,8 +2195,36 @@ int spl_mtx_init(void* obj, char shared)
 #endif
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-int spl_init_segment() {
+int spl_init_segments() {
 	int ret = 0;
+	char* p = 0; 
+	char *seg = 0;
+	int i = 0;
+	int k = 0;
+	int step = 0;
+	generic_dta_st* sgment = 0;
+	SIMPLE_LOG_ST* t = &__simple_log_static__;
+	p = t->buf;
+	do {
+		for (i = 0; i < t->ncpu; ++i) {
+			seg = p + i * t->buff_size;
+			sgment = (generic_dta_st*)seg;
+			sgment->total = t->buff_size;
+			sgment->range = sgment->total - sizeof(generic_dta_st) - SPL_MEMO_PADDING;
+			sgment->pl = 0;
+		}
+		for (k = 0; k < t->n_topic; ++k) {
+			step = (k + 1) * t->buff_size * t->ncpu;
+			seg = p + step;
+			for (i = 0; i < t->ncpu; ++i) {
+				seg = p + i * t->buff_size;
+				sgment = (generic_dta_st*)seg;
+				sgment->total = t->buff_size;
+				sgment->range = sgment->total - sizeof(generic_dta_st) - SPL_MEMO_PADDING;
+				sgment->pl = 0;
+			}
+		}
+	} while (0);
 	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
