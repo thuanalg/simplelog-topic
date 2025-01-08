@@ -1016,10 +1016,11 @@ void* spl_written_thread_routine(void* lpParam)
 				}
 			}
 			spl_mutex_lock(t->mtx_rw);
+				/*
 				if (t->buf) {
 					spl_free(t->buf);
-					/*spl_del_memory((void*)t->buf);*/
 				}
+				*/
 				for (i = 0; i < t->n_topic; ++i) {
 					if (t->arr_topic[i].buf) {
 						t->arr_topic[i].buf = 0;
