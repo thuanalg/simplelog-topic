@@ -239,6 +239,8 @@ static void*
 			spl_del_memory(void* obj, int hd, void* shmm, int length);
 	static int
 		spl_mtx_init(void* mtx, char shared);
+	static int
+		spl_sem_init(void* mtx, char shared);
 #endif
 
 static int 
@@ -2018,6 +2020,7 @@ int spl_calculate_size(int* outn) {
 	#ifdef SPL_USING_SPIN_LOCK
 		step_size = sizeof(volatile long);
 		mtxsize = (1 + t->ncpu) * step_size;
+		semsize = 0;
 	#else
 		/*t->mtx_rw: is NamedMutex*/
 		mtxsize = 0;
@@ -2116,13 +2119,36 @@ int spl_calculate_size(int* outn) {
 			}
 		}
 	#endif
-		/*Semaphore*/
+		/*Semaphore UNIX_LINUX*/
+		p = buff + k + mtxsize;
+		t->sem_rwfile = p;
+		t->sem_off = P + sizeof(sem_t);
+		/*
+		* https://linux.die.net/man/3/sem_init
+		* #include <semaphore.h>
+		* int sem_init(sem_t *sem, int pshared, unsigned int value);
+		*/
+		if (t->sem_rwfile && t->sem_off) {
+			int err = 0;
+			err = sem_init((sem_t *)t->sem_rwfile, (int)t->isProcessMode, 0);
+			if (err) {
+				ret = SPL_LOG_SEM_INIT_UNIX;
+				spl_console_log("sem_init, errno: %d, errno_text: %s.", errno, strerror(errno));
+				break;
+			}
+			err = sem_init((sem_t*)t->sem_off, (int)t->isProcessMode, 0);
+			if (err) {
+				ret = SPL_LOG_SEM_INIT_UNIX;
+				spl_console_log("sem_init, errno: %d, errno_text: %s.", errno, strerror(errno));
+				break;
+			}
+		}
 #endif
 	} while (0);
 
 	return ret;
 }
-
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 #ifndef UNIX_LINUX
 #else
 
@@ -2162,6 +2188,14 @@ int spl_mtx_init(void* obj, char shared)
 				break;
 			}
 		}
+	} while (0);
+	return ret;
+}
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+int spl_sem_init(void* sem, char shared) {
+	int ret = 0;
+	do {
+
 	} while (0);
 	return ret;
 }
