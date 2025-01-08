@@ -575,7 +575,7 @@ int spl_init_log( char *pathcfg)
 		if (ret) {
 			break;
 		}
-
+		/*
 		__simple_log_static__.arr_mtx = spl_mutex_create_arr(__simple_log_static__.ncpu);
 
 		obj = spl_mutex_create();
@@ -599,8 +599,17 @@ int spl_init_log( char *pathcfg)
 		}
 		__simple_log_static__.sem_off = obj;
 
-		char* folder = __simple_log_static__.folder;
-		ret = spl_verify_folder(folder);
+		*/
+
+		ret = spl_verify_folder(__simple_log_static__.folder);
+		if (ret) {
+			break;
+		}
+		ret = spl_gen_sync_tool();
+		if (ret) {
+			break;
+		}
+		ret = spl_simple_log_thread(&__simple_log_static__);
 		if (ret) {
 			break;
 		}
@@ -608,14 +617,15 @@ int spl_init_log( char *pathcfg)
 	if (fp) {
 		SPL_FCLOSE(fp,ret);
 	}
+	/*
 	if (ret == 0) {
-		/*Allocate buffer here.*/
 		ret = spl_gen_topic_buff(&__simple_log_static__);
 	}
+	
 	if (ret == 0) {
 		ret = spl_simple_log_thread(&__simple_log_static__);
 	}
-
+	*/
 	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
@@ -2421,9 +2431,10 @@ int spl_gen_sync_tool() {
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 /*
-spl_allocate_topics();
-spl_calculate_size();
-spl_init_segments();
+* spl_gen_sync_tool -->>
+	spl_allocate_topics();
+	spl_calculate_size();
+	spl_init_segments();
 */
 #ifndef UNIX_LINUX
 #else
