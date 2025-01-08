@@ -233,7 +233,9 @@ extern "C" {
 		char 
 			id_name[SPL_IDD_NAME];		/*To avoid duplicating of file name.*/
 		char
-			isProcessMode;				/*For cross processes mdoe.*/
+			isProcessMode;				/*For cross processes mode.*/
+		int 
+			map_mem_size;				/*Total mapped memory.*/
 	} SIMPLE_LOG_ST;
 /*
 typedef struct __FMT_FOR_OUTPUT__ {

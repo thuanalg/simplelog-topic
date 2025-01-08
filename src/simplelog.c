@@ -73,7 +73,7 @@
 
 #ifndef UNIX_LINUX
 	#define SPL_CloseHandle(__obj) \
-		{ int bl = CloseHandle((__obj)); if(!bl) spl_console_log("CloseHandle %s", bl ? "DONE": "ERROR");}
+		{ int bl = CloseHandle((__obj)); if(!bl) spl_console_log("CloseHandle %s", bl ? "DONE": "ERROR"); (__obj) = 0;}
 #else
 	#define SPL_sem_wait(__obj) \
 		sem_wait((sem_t*)(__obj))
@@ -238,17 +238,15 @@ static void*
 	spl_trigger_routine(void* arg);
 
 #ifndef UNIX_LINUX
-static int
-	spl_win32_sync_create();
-	static int 
-		spl_del_memory(void* obj, void* hd, void* shmm);
+	static int
+		spl_win32_sync_create();
 #else
-	static int 
-			spl_del_memory(void* obj, int hd, void* shmm, int length);
 	static int
 		spl_mtx_init(void* mtx, char shared);
 #endif
 
+static int
+	spl_del_memory();
 static int 
 	spl_create_memory(void** output, char* shared_key, int size_shared, char isCreating);
 static int 
@@ -1890,34 +1888,31 @@ int spl_create_thread(THREAD_ROUTINE f, void* arg) {
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 #define spl_shm_unlink(__name__, __err__) { __err__ = shm_unlink(__name__); \
 		if(__err__) {spl_console_log("shm_unlink: err: %d, errno: %d, text: %s, name: %s.", __err__, errno, strerror(errno), __name__);}}
-#ifndef UNIX_LINUX
-int spl_del_memory(void *obj, void* hd, void* shmm)
-#else
-int spl_del_memory(void* obj, int hd, void* shmm, int length)
-#endif
+
+int spl_del_memory()
 {
 	int ret = 0;
 	int isWell = 0;
-	SIMPLE_LOG_ST* t = (SIMPLE_LOG_ST*)obj;
+	SIMPLE_LOG_ST *t = &__simple_log_static__;
 	do {
 #ifndef UNIX_LINUX
-		isWell = (int)UnmapViewOfFile(shmm);
+		isWell = (int)UnmapViewOfFile((void*)t->buf);
 		if (!isWell) {
 			spl_console_log("UnmapViewOfFile error: %d", (int)GetLastError());
 			ret = SPL_LOG_SHM_WIN_UNMAP;
 		}
-		isWell = (int)CloseHandle((HANDLE)hd);
+		isWell = (int)CloseHandle((HANDLE)t->hd);
 		if (!isWell) {
 			spl_console_log("SPL_LOG_WIN_SHM_CLOSE, err: %d", (int)GetLastError());
 			ret = SPL_LOG_WIN_SHM_CLOSE;
 		}
 #else
-		ret = munmap(shmm, (size_t) length);
+		ret = munmap((void*)t->buf, (size_t) t->map_mem_size);
 		if (ret) {
 			ret = SPL_LOG_SHM_UNIX_UNMAP;
 			spl_console_log("shm_unlink: err: %d, errno: %d, text: %s, name: %s.", ret, errno, strerror(errno), "__name__");
 		}
-		spl_shm_unlink("__name__", ret);
+		spl_shm_unlink(t->shared_key, ret);
 #endif
 	} while (0);
 	return ret;
@@ -2066,6 +2061,7 @@ int spl_calculate_size() {
 		/*semsize: sem size.*/
 		/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		n = k + mtxsize + semsize;		
+		t->map_mem_size = n;
 		/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		
 		spl_malloc( n, buff, char);
@@ -2425,6 +2421,34 @@ int spl_gen_sync_tool() {
 		ret = spl_init_segments();
 		if (ret) {
 			break;
+		}
+	} while (0);
+	return ret;
+}
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+int spl_clean_sync_tool() {
+	int ret = 0;
+	SIMPLE_LOG_ST* t = &__simple_log_static__;
+	do {
+#ifndef UNIX_LINUX
+	#ifdef SPL_USING_SPIN_LOCK
+	#else
+		int i = 0;
+		SPL_CloseHandle(t->mtx_rw);
+		for (i = 0; i < t->ncpu; ++i) {
+			SPL_CloseHandle(t->arr_mtx[i]);
+		}
+		spl_free(t->arr_mtx);
+	#endif
+		SPL_CloseHandle(t->sem_rwfile);
+		SPL_CloseHandle(t->sem_off);
+#else	
+#endif
+		if (t->isProcessMode) {
+			spl_del_memory(t);
+		}
+		else {
+			spl_free((char*)t->buf);
 		}
 	} while (0);
 	return ret;
