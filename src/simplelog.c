@@ -2049,8 +2049,8 @@ int spl_calculate_size() {
 		/*k: For buffer.*/
 		/*mtxsize: mutex size.*/
 		/*semsize: sem size.*/
-		n = k + mtxsize + semsize;
-		
+		/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+		n = k + mtxsize + semsize;		
 		/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		
 		spl_malloc( n, buff, char);
