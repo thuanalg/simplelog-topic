@@ -1985,11 +1985,13 @@ int spl_calculate_size(int* outn) {
 	#ifdef SPL_USING_SPIN_LOCK
 		int i = 0;
 		char* p = 0;
+		int step_size = 0;
 	#else
 	#endif
 #else
 	int i = 0;
 	char* p = 0;
+	int step_size = 0;
 #endif
 	SIMPLE_LOG_ST* t = &__simple_log_static__;
 	size_arr_mtx = t->ncpu * sizeof(void *);
@@ -2009,46 +2011,21 @@ int spl_calculate_size(int* outn) {
 		}
 #ifndef UNIX_LINUX
 	#ifdef SPL_USING_SPIN_LOCK
-		/*1: Mutex of On/Off.*/
-		/*t->ncpu: Mutex of Concurrence.*/
-		/*t->mtx_rw = (void*) ((char *)t->buf + k);*/
-		/*int i = 0;char* p = ((char*)t->buf + k) + sizeof(volatile long);*/
-		mtxsize = (1 + t->ncpu) * sizeof(volatile long);
-		/*
-		for (i = 0; i < t->ncpu; ++i) {
-			t->arr_mtx[i] = p + i * sizeof(volatile long);
-		}
-		*/
+		step_size = sizeof(volatile long);
+		mtxsize = (1 + t->ncpu) * step_size;
 	#else
 		/*t->mtx_rw: is NamedMutex*/
-	#endif
+		mtxsize = 0;
 		/*semsize*/
+		semsize = 0;
+	#endif
 #else
 	#ifdef SPL_USING_SPIN_LOCK
-		/*1: Mutex of On/Off.*/
-		/*t->ncpu: Mutex of Concurrence.*/
-		/*t->mtx_rw = (void*) ((char *)t->buf + k);*/
-		/*int i = 0;char* p = ((char*)t->buf + k) + sizeof(pthread_spinlock_t);*/
-		mtxsize = (1 + t->ncpu) * sizeof(pthread_spinlock_t);
-		/*
-		for (i = 0; i < t->ncpu; ++i) {
-			t->arr_mtx[i] = p + i * sizeof(pthread_spinlock_t);
-		}
-		*/
+		step_size = sizeof(pthread_spinlock_t);
 	#else
-		/*1: Mutex of On/Off.*/
-		/*t->ncpu: Mutex of Concurrence.*/
-		/*t->mtx_rw = (void*) ((char *)t->buf + k);*/
-
-		/*int i = 0;char* p = ((char*)t->buf + k) + sizeof(pthread_mutex_t);*/		
-		mtxsize = (1 + t->ncpu) * sizeof(pthread_mutex_t);
-		/*
-		for (i = 0; i < t->ncpu; ++i) {
-			t->arr_mtx[i] = p + i * sizeof(pthread_mutex_t);
-		}
-		*/
-
+		step_size = sizeof(pthread_mutex_t);
 	#endif
+		mtxsize = (1 + t->ncpu) * step_size;
 		/*1: For semrw.*/
 		/*1: For semOnOff.*/
 		semsize = 2 * sizeof(sem_t);
@@ -2070,28 +2047,27 @@ int spl_calculate_size(int* outn) {
 		
 #ifndef UNIX_LINUX
 	#ifdef SPL_USING_SPIN_LOCK
-		p = (buff + k) + sizeof(volatile long);
-		t->mtx_rw = (void *)p;
+		step_size = sizeof(volatile long);
+		t->mtx_rw = (void*)(buff + k);
+		p = (buff + k) + step_size;
 		for (i = 0; i < t->ncpu; ++i) {
-			t->arr_mtx[i] = (void*) (p + i * sizeof(volatile long));
+			t->arr_mtx[i] = (void*) (p + i * step_size);
 		}
 	#else
 		/*t->mtx_rw: is NamedMutex*/
+		/*t->mtx_rw: is NamedSem*/
 	#endif
 #else
 	#ifdef SPL_USING_SPIN_LOCK
-		p = (buff + k) + sizeof(pthread_spinlock_t);
-		t->mtx_rw = (void *)p;
-		for (i = 0; i < t->ncpu; ++i) {
-			t->arr_mtx[i] = (void*)(p + i * sizeof(pthread_spinlock_t));
-		}
+		step_size = sizeof(pthread_spinlock_t);
 	#else
-		p = (buff + k) + sizeof(pthread_mutex_t);
-		t->mtx_rw = (void*)p;
-		for (i = 0; i < t->ncpu; ++i) {
-			t->arr_mtx[i] = (void*)(p + i * sizeof(pthread_mutex_t));
-		}
+		step_size = sizeof(pthread_mutex_t);
 	#endif
+		t->mtx_rw = (void*)(buff + k);
+		p = (buff + k) + step_size;
+		for (i = 0; i < t->ncpu; ++i) {
+			t->arr_mtx[i] = (void*)(p + i * step_size);
+		}
 #endif
 	} while (0);
 	return ret;
