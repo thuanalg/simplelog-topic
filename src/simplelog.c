@@ -2445,7 +2445,7 @@ int spl_clean_sync_tool() {
 #else	
 #endif
 		if (t->isProcessMode) {
-			spl_del_memory(t);
+			spl_del_memory();
 		}
 		else {
 			spl_free((char*)t->buf);
