@@ -2121,8 +2121,8 @@ int spl_calculate_size(int* outn) {
 	#endif
 		/*Semaphore UNIX_LINUX*/
 		p = buff + k + mtxsize;
-		t->sem_rwfile = p;
-		t->sem_off = P + sizeof(sem_t);
+		t->sem_rwfile = (void *)p;
+		t->sem_off = (void *)(p + sizeof(sem_t));
 		/*
 		* https://linux.die.net/man/3/sem_init
 		* #include <semaphore.h>
