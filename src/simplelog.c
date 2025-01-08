@@ -2078,6 +2078,7 @@ int spl_calculate_size(int* outn) {
 				}
 			}
 			else {
+				int err = 0;
 				err = pthread_spin_init(mtx, PTHREAD_PROCESS_PRIVATE);
 				if (err) {
 					ret = SPL_LOG_SPINLOCK_INIT_PRIVATE;
