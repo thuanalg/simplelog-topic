@@ -2204,7 +2204,7 @@ int spl_init_segments() {
 	int step = 0;
 	generic_dta_st* sgment = 0;
 	SIMPLE_LOG_ST* t = &__simple_log_static__;
-	p = t->buf;
+	p = (char *)t->buf;
 	do {
 		for (i = 0; i < t->ncpu; ++i) {
 			seg = p + i * t->buff_size;
