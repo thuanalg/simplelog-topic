@@ -2156,16 +2156,7 @@ int spl_mtx_init(void* obj, char shared)
 	return ret;
 }
 #endif
-/*
-memset(tmp, 0, sizeof(pthread_mutex_t));
-pthread_mutex_init((pthread_mutex_t*)tmp, 0);
-ret[i] = (void*)tmp;
-#else
-pthread_spinlock_t* tmp = 0;
-spl_malloc(sizeof(pthread_spinlock_t), tmp, pthread_spinlock_t);
-pthread_spin_init((pthread_spinlock_t*)tmp, PTHREAD_PROCESS_PRIVATE);
-ret[i] = (void*)tmp;
-*/
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 #ifndef UNIX_LINUX
 #else
