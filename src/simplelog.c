@@ -2065,7 +2065,7 @@ int spl_calculate_size(int* outn) {
 			pthread_spinlock_t* mtx = 0;
 			t->arr_mtx[i] = (void*)(p + i * step_size);
 			mtx = (pthread_spinlock_t*)t->arr_mtx[i];
-			if (!isProcessMode) {
+			if (!t->isProcessMode) {
 				pthread_spin_init(mtx, PTHREAD_PROCESS_PRIVATE);
 			}
 		}
@@ -2075,7 +2075,7 @@ int spl_calculate_size(int* outn) {
 			pthread_mutex_t* mtx = 0;
 			t->arr_mtx[i] = (void*)(p + i * step_size);
 			mtx = (pthread_mutex_t*)t->arr_mtx[i];
-			if (!isProcessMode) {
+			if (!t->isProcessMode) {
 				pthread_mutex_init(mtx, 0);
 			}
 		}
