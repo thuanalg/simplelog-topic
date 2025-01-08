@@ -244,9 +244,11 @@ static void*
 static int 
 	spl_create_memory(void** output, char* shared_key, int size_shared, char isCreating);
 static int 
-	spl_calculate_size(int*);
+	spl_calculate_size();
 static int
 	spl_init_segments();
+static int
+	spl_allocate_topics();
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 SIMPLE_LOG_ST* spl_control_obj() {
 	//spl_con
@@ -1982,7 +1984,7 @@ int spl_create_memory(void** output, char* shared_key, int size_shared, char isC
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 /* (SIMPLE_LOG_ST*)&__simple_log_static__, volatile long, pthread_spinlock_t, pthread_mutex_t */
 
-int spl_calculate_size(int* outn) {
+int spl_calculate_size() {
 	int ret = 0;
 	int k = 0;
 	int n = 0;
@@ -2009,11 +2011,6 @@ int spl_calculate_size(int* outn) {
 	k = t->buff_size * t->ncpu * (t->n_topic + 1);
 	/*k = t->buff_size * t->ncpu + t->buff_size * t->ncpu * t->n_topic;*/
 	do {
-		if (!outn) {
-			ret = SPL_LOG_VAR_NULL;
-			break;
-		}
-		(*outn) = 0;
 		spl_malloc(size_arr_mtx, t->arr_mtx, void*);
 		if (!t->arr_mtx) {
 			ret = SPL_LOG_ARR_MTX_NULL;
@@ -2045,7 +2042,6 @@ int spl_calculate_size(int* outn) {
 		/*mtxsize: mutex size.*/
 		/*semsize: sem size.*/
 		n = k + mtxsize + semsize;
-		(*outn) = n;
 		
 		/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		
@@ -2223,6 +2219,45 @@ int spl_init_segments() {
 				sgment->range = sgment->total - sizeof(generic_dta_st) - SPL_MEMO_PADDING;
 				sgment->pl = 0;
 			}
+		}
+	} while (0);
+	return ret;
+}
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+#define SPL_MIN_AB(a,b)			((a) < (b)) ? (a) : (b) 
+#define SPL_MAX_AB(a,b)			((a) > (b)) ? (a) : (b) 
+int spl_allocate_topics() {
+	int ret = 0;
+	int i = 0;
+	char* p0 = 0;
+	char* p1 = 0;
+	int n = 0;
+	int szitopics = 0;
+	SIMPLE_LOG_ST* t = &__simple_log_static__;
+	do {
+		if(!t->n_topic) {
+			break;
+		}
+		szitopics = sizeof(SIMPLE_LOG_TOPIC_ST)* t->n_topic;
+		spl_malloc(szitopics, t->arr_topic, SIMPLE_LOG_TOPIC_ST);
+		if (!t->arr_topic) {
+			ret = SPL_LOG_TOPIC_MEMORY;
+			break;
+		}
+		p0 = t->topics;
+		for (i = 0; i < t->n_topic; ++i) {
+			p1 = strstr(p0, ",");
+			if (!p1) {
+				snprintf(t->arr_topic[i].topic, SPL_TOPIC_SIZE, "%s", p0);
+				continue;
+			} 
+			n = (int)(p1 - p0);
+			if (n > 0) {
+				snprintf(t->arr_topic[i].topic, 
+					SPL_MIN_AB(SPL_TOPIC_SIZE, n + 1), "%s", p0);
+			}
+			p1++;
+			p0 = p1;
 		}
 	} while (0);
 	return ret;
