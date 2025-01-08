@@ -2097,10 +2097,10 @@ int spl_calculate_size(int* outn) {
 		step_size = sizeof(pthread_mutex_t);
 		for (i = 0; i < t->ncpu; ++i) 
 		{
-			pthread_mutex_t* mtx = 0;
+			/*pthread_mutex_t* mtx = 0;*/
 			t->arr_mtx[i] = (void*)(p + i * step_size);
-			mtx = (pthread_mutex_t*)t->arr_mtx[i];
-			ret = spl_mtx_init(mtx, t->isProcessMode);
+			/*mtx = (pthread_mutex_t*)t->arr_mtx[i];*/
+			ret = spl_mtx_init(t->arr_mtx[i], t->isProcessMode);
 			if (ret) {
 				break;
 			}
