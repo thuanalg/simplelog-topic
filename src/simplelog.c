@@ -1974,11 +1974,10 @@ int spl_create_memory(void** output, char* shared_key, int size_shared, char isC
 
 int spl_calculate_size(int* n) {
 	int ret = 0;
-	SIMPLE_LOG_ST* t = &__simple_log_static__;
 	int k = 0;
 	int mtxsize = 0;
 	int semsize = 0;
-	
+	SIMPLE_LOG_ST* t = &__simple_log_static__;
 	/*k: For buffer.*/
 	k = t->buff_size * t->ncpu * (t->n_topic + 1);
 	/*k = t->buff_size * t->ncpu + t->buff_size * t->ncpu * t->n_topic;*/
