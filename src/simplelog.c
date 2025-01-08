@@ -2121,9 +2121,6 @@ int spl_mtx_init(pthread_mutex_t* mtx, char shared)
 	int ret = 0;
 	int err = 0;
 	do {	
-		pthread_mutex_t* mtx = 0;
-		t->arr_mtx[i] = (void*)(p + i * step_size);
-		mtx = (pthread_mutex_t*)t->arr_mtx[i];
 		if (shared) {
 			pthread_mutexattr_t psharedm;
 			err = pthread_mutexattr_init(&psharedm);
