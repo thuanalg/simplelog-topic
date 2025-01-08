@@ -2078,7 +2078,7 @@ int spl_calculate_size() {
 		/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 		//int spl_create_memory(void** output, char* shared_key, int size_shared, char isCreating) {
 		if (t->isProcessMode) {
-			spl_create_memory(&buff, t->shared_key, n, t->is_master);
+			spl_create_memory((void**) & buff, t->shared_key, n, t->is_master);
 		}
 		else {
 			spl_malloc(n, buff, char);
