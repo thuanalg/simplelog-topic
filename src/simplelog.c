@@ -212,8 +212,7 @@ static int
 	spl_local_time_now(spl_local_time_st*st_time);
 static int	
 	spl_stdz_topics(char *buff, int *inoutlen, int *, char** );
-static int 
-	spl_gen_topic_buff(SIMPLE_LOG_ST* t);
+
 #ifndef UNIX_LINUX
 	static DWORD WINAPI
 		spl_written_thread_routine(LPVOID lpParam);
@@ -1686,82 +1685,6 @@ spl_milli_now() {
 		}
 		ret = t0 * 1000 + (nanosec.tv_nsec / SPL_MILLION);
 #endif	
-	} while (0);
-	return ret;
-}
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-int spl_gen_topic_buff(SIMPLE_LOG_ST* t) {
-	int ret = 0;
-	char path[1024];
-	int i = 0;
-	char* buffer = 0;
-	int total_buf_sz = 0;
-	generic_dta_st* tmpBuff = 0;
-	total_buf_sz = (t->buff_size * t->ncpu) * (1 + t->n_topic) ;
-	spl_malloc(total_buf_sz, buffer, char);
-	//spl_create_memory((void**)&buffer, "mani_buf", total_buf_sz, 1);
-	if (!buffer) {
-		exit(1);
-	}
-	do {
-		if (!buffer) {
-			ret = SPL_LOG_TOPIC_BUFF_MEM;
-			break;
-		}
-		t->buf = (generic_dta_st*)buffer;
-		for (i = 0; i < t->ncpu; ++i) {
-			int count = t->buff_size * i;
-			char* p = buffer + count;
-			tmpBuff = (generic_dta_st*)p;
-			tmpBuff->total = t->buff_size - SPL_MEMO_PADDING;
-			tmpBuff->range = tmpBuff->total - sizeof(generic_dta_st);
-		}
-
-		if (!t->arr_topic && t->n_topic > 0) {
-			char* p0 = t->topics;
-			int sz = sizeof(SIMPLE_LOG_TOPIC_ST) * t->n_topic;
-			spl_malloc(sz, t->arr_topic, SIMPLE_LOG_TOPIC_ST);
-			memset(path, 0, sizeof(path));
-			if (!t->arr_topic) {
-				ret = SPL_LOG_TOPIC_MEMORY;
-				break;
-			}
-			for (i = 0; i < t->n_topic; ++i) {
-					int j = 0;
-				int steep = 0;
-				char* p1 = 0;
-
-				p1 = strstr(p0, ",");
-				if (!p1) {
-					snprintf(t->arr_topic[i].topic, SPL_TOPIC_SIZE, "%s", p0);
-				}
-				else {
-					int n = (int)(p1 - p0);
-					snprintf(t->arr_topic[i].topic, n + 1, "%s", p0);
-					p1++;
-					p0 = p1;
-				}
-				steep = ((i + 1) * t->buff_size * t->ncpu);
-				tmpBuff = (generic_dta_st*)(buffer + steep);
-				t->arr_topic[i].buf = tmpBuff;
-
-				for (j = 0; j < t->ncpu; ++j) {
-					char* p = 0;
-					generic_dta_st* seg = 0;
-					int k = j * t->buff_size;
-					p = (char*)tmpBuff + k;
-					seg = (generic_dta_st*)p;
-					seg->total = t->buff_size - SPL_MEMO_PADDING;
-					seg->range = seg->total - sizeof(generic_dta_st);
-				}
-			}
-			if (ret) {
-				break;
-			}
-		}
-		if (ret) {
-			break;
-		}
 	} while (0);
 	return ret;
 }
