@@ -253,15 +253,20 @@ extern "C" {
 			map_mem_size;				/*Total mapped memory.*/
 		char
 			is_master;
-		SPL_CALLBACL_DATA
+		SPL_CALLBACL_FUNCTION
 			fn;
+		SPL_CALLBACL_DATA*
+			obj;
 	} SIMPLE_LOG_ST;
 
 	typedef struct __SPL_INPUT_ARG__ {
 		char folder[SPL_PATH_FOLDER];
 		char id_name[SPL_IDD_NAME];
 		char is_master;
-		SPL_CALLBACL_DATA fn;
+		SPL_CALLBACL_FUNCTION
+			fn;
+		SPL_CALLBACL_DATA*
+			obj;
 	} SPL_INPUT_ARG;
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
