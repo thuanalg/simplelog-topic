@@ -2466,18 +2466,17 @@ int spl_clean_sync_tool() {
 		}
 #ifndef UNIX_LINUX
 	#ifdef SPL_USING_SPIN_LOCK
-		spl_free(t->arr_mtx);
 	#else
 		int i = 0;
 		SPL_CloseHandle(t->mtx_rw);
 		for (i = 0; i < t->ncpu; ++i) {
 			SPL_CloseHandle(t->arr_mtx[i]);
 		}
-		spl_free(t->arr_mtx);
 	#endif
 		SPL_CloseHandle(t->sem_rwfile);
 		SPL_CloseHandle(t->sem_off);
 #else	
+		
 #endif
 		spl_free(t->arr_mtx);
 		if (t->isProcessMode) {
