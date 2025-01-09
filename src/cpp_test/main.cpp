@@ -119,13 +119,11 @@ void* posix_thread_routine(void* lpParam) {
 		while (count < loop_count) {
 			//spllog(SPL_LOG_INFO, "test log: %d", count);
 			spllog(SPL_LOG_INFO, "test log test log test log: %d", count);
-			//tpic = (spl_milli_now() % 3);
-			//spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
+			//spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sys");
 			//splloglib(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "lib");
 			//spllogexe(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "exe");
 			//spllognaxyax(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "nayax");
 			//spllogsksgn(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sksg");
-			//spl_sleep(1);
 			++count;
 		}
 		//spl_console_log("Main close: End.\n");
@@ -155,6 +153,11 @@ int main___(int argc, char* argv[]) {
 		//spl_console_log("spl_milli_sleep ------------------------------ ");
 		//spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), 0);
 		spllog(SPL_LOG_INFO, "test log test log test log test log %d", i);
+		spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sys");
+		splloglib(SPL_LOG_INFO, "test log: %llu, topic: %s", time(0), "lib");
+		spllogexe(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "exe");
+		spllognaxyax(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "nayax");
+		spllogsksgn(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sksg");
 	}
 	//spl_milli_sleep( 1000 * 100);
 	spl_finish_log();

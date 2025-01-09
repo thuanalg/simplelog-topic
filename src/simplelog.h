@@ -14,6 +14,8 @@
 *		<2024-Dec-22>
 *		<2024-Dec-23>
 *		<2024-Dec-30>
+*		<2024-Jan-06>
+*		<2024-Jan-08>
 * Decription:
 *		The (only) main header file to export 3 APIs: [spl_init_log, spllog, spllogtopic, spl_finish_log].
 */
@@ -75,6 +77,7 @@ extern "C" {
 		SPL_ERROR_CREATE_MUTEX,
 		SPL_ERROR_CREATE_SEM,
 		SPL_LOG_BUFF_SIZE_ERROR,
+		SPL_LOG_BUFF_MALLOC_ERROR,
 		SPL_LOG_FOLDER_ERROR,
 		SPL_LOG_CREATE_THREAD_ERROR,
 		SPL_LOG_FMT_NULL_ERROR,
@@ -84,6 +87,8 @@ extern "C" {
 		SPL_LOG_OPEN1_FILE_ERROR,
 		SPL_LOG_CLOSE_FILE_ERROR,
 		SPL_LOG_SEM_NULL_ERROR,
+		SPL_LOG_SEM_WIN32_CREATED_ERROR,
+		SPL_LOG_MTX_WIN32_CREATED_ERROR,
 		SPL_LOG_ROT_SIZE_ERROR,
 		SPL_LOG_TOPIC_EMPTY,
 		SPL_LOG_TOPIC_NULL,
@@ -106,12 +111,22 @@ extern "C" {
 		SPL_LOG_ALOCK_NUM,
 		SPL_LOG_ALOCK_NULL,
 		SPL_LOG_SHM_CREATE_NULL,
-		SPL_LOG_SHM_CREATE_UNMAP,
+		SPL_LOG_SHM_WIN_UNMAP,
 		SPL_LOG_SHM_UNIX_OPEN,
 		SPL_LOG_SHM_UNIX_TRUNC, 
 		SPL_LOG_SHM_UNIX_MAP_FAILED, 
-
-
+		SPL_LOG_WIN_SHM_CLOSE,
+		SPL_LOG_SHM_UNIX_UNMAP,
+		SPL_LOG_VAR_NULL,
+		SPL_LOG_ARR_MTX_NULL,
+		SPL_LOG_ARR_BUFF_NULL,
+		SPL_LOG_MTX_ATT_SHARED_MODE,
+		SPL_LOG_MTX_ATT_SHARED_MODE_SET,
+		SPL_LOG_MTX_INIT_ERR,
+		SPL_LOG_SHM_UNIX_INIT_MUTEX,
+		SPL_LOG_SPINLOCK_INIT_SHARED,
+		SPL_LOG_SPINLOCK_INIT_PRIVATE,
+		SPL_LOG_SEM_INIT_UNIX,
 		
 		
 		
@@ -147,6 +162,8 @@ extern "C" {
 
 #define				SPL_TOPIC_SIZE					32
 #define				SPL_MEMO_PADDING				2048
+#define				SPL_SHARED_KEY_LEN				64
+#define				SPL_SHARED_NAME_LEN				128
 
 	typedef
 		struct __SIMPLE_LOG_TOPIC_ST__ {
@@ -183,17 +200,17 @@ extern "C" {
 		void*
 			sem_off;					/*sem_off: Need to close handle*/
 		spl_local_time_st
-			lc_time_now;				/*lc_time: Need to sync, free*/
+			lc_time_now;				/*Current time.*/
 		FILE*
 			fp;							/*fp: Need to close*/
 		generic_dta_st*
-			buf;						/*buf: Must be sync, free*/
+			buf;						/*buf: Must be synchoronized. Must be freed.*/
 		char*
 			topics;						/*topics: topics string. Must be freed */
 		int
 			n_topic;					/*Number of topics, SIMPLE_LOG_TOPIC_ST.*/
 		SIMPLE_LOG_TOPIC_ST*
-			arr_topic;					/*List od topics: SIMPLE_LOG_TOPIC_ST*.*/
+			arr_topic;					/*List od topics: SIMPLE_LOG_TOPIC_ST. Must be freed*/
 		int
 			renew;						/*In a thread of logger, NO NEED SYNC.*/
 		char
@@ -203,9 +220,24 @@ extern "C" {
 		int
 			trigger_thread;				/*Use trigger thread or not.*/
 		void	
-			**arr_mtx;					/*Use trigger thread or not.*/
+			**arr_mtx;					/*List of lock: Spinlock or Mutex. Must be freed.*/
+		/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+#ifndef UNIX_LINUX
+		void*
+#else
+		int
+#endif
+			hd;							/* Handle of shared memory.*/
+		char
+			shared_key[SPL_SHARED_KEY_LEN]; /* Name of shared key.*/
 		char 
 			id_name[SPL_IDD_NAME];		/*To avoid duplicating of file name.*/
+		char
+			isProcessMode;				/*For cross processes mode.*/
+		int 
+			map_mem_size;				/*Total mapped memory.*/
+		char
+			is_master;
 	} SIMPLE_LOG_ST;
 /*
 typedef struct __FMT_FOR_OUTPUT__ {
@@ -242,7 +274,7 @@ __p__ = __FILE__;} while(0);
 	else {spl_console_log("Malloc: error.\n");}} 
 
 #define spl_free(__obj__) \
-	{ /*spl_console_log("Free: 0x:%p.\n", (__obj__));*/; free(__obj__); ; (__obj__) = 0;} 
+	{ /*spl_console_log("Free: 0x%p.\n", (__obj__));*/; free(__obj__); ; (__obj__) = 0;} 
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
@@ -293,16 +325,17 @@ __p__ = __FILE__;} while(0);
 	if(t->llevel <= (__lv__) && ___fmttt___[0] && t->arr_topic) \
 	{\
 		;short tpp = 0;int len = 0;unsigned short r = 0;;const char *pfn = 0;;\
-		;int outlen = 0;;char *pprefmt = 0;; char tnow[SPL_RL_BUF];;;\
+		;int outlen = 0;;char *pprefmt = 0;; char tnow[SPL_RL_BUF];;tpp = __tpic__%t->n_topic;;;\
 		; __FILLE__(pfn);;\
 		;pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r, &outlen);;\
 		do\
 		{\
-			;;tpp = __tpic__%t->n_topic;;\
+			;;\
 			spl_mutex_lock(t->arr_mtx[r]);\
 				/*do \
 				{*/\
-					/*if(t->arr_topic){*/\
+					/*if(t->arr_topic){*/;;\
+						;;\
 						if(STSPLOGBUFTOPIC_RANGE(t,tpp, r)->range > STSPLOGBUFTOPIC_RANGE(t,tpp, r)->pl) {\
 							;memcpy(STSPLOGBUFTOPIC_RANGE(t,tpp, r)->data + STSPLOGBUFTOPIC_RANGE(t,tpp, r)->pl, pprefmt, outlen);\
 							;STSPLOGBUFTOPIC_RANGE(t, tpp, r)->pl += outlen;;\
