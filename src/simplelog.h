@@ -133,6 +133,21 @@ extern "C" {
 		SPL_END_ERROR,
 	} SPL_LOG_ERR_CODE;
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+	typedef struct __SPL_CALLBACL_DATA__ {
+		int 
+			total;
+		int 
+			eventid;
+		int 
+			range;
+		int 
+			pc;
+		int 
+			pl;
+		char 
+			data[0];
+	} SPL_CALLBACL_DATA;
+	typedef int (*SPL_CALLBACL_FUNCTION)(void*);
 	typedef
 		struct __GENERIC_DATA__ {
 		int
