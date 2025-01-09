@@ -1043,7 +1043,14 @@ void* spl_written_thread_routine(void* lpParam)
 	/*//spl_del_memory((void *) only_buf);*/
 	/*Send a signal to the waiting thread.*/
 	spl_rel_sem(__simple_log_static__.sem_rwfile);
-	spl_rel_sem(__simple_log_static__.sem_off);
+	if (!t->isProcessMode) {
+		spl_rel_sem(__simple_log_static__.sem_off);
+	}
+	else {
+		if (t->is_master) {
+			spl_rel_sem(__simple_log_static__.sem_off);
+		}
+	}
 	return 0;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
@@ -2453,10 +2460,13 @@ int spl_clean_sync_tool() {
 	int ret = 0;
 	SIMPLE_LOG_ST* t = &__simple_log_static__;
 	do {
-		spl_free(t->topics);
-		spl_free(t->arr_topic);
+		if (t->topics > 0) {
+			spl_free(t->topics);
+			spl_free(t->arr_topic);
+		}
 #ifndef UNIX_LINUX
 	#ifdef SPL_USING_SPIN_LOCK
+		spl_free(t->arr_mtx);
 	#else
 		int i = 0;
 		SPL_CloseHandle(t->mtx_rw);
@@ -2469,6 +2479,7 @@ int spl_clean_sync_tool() {
 		SPL_CloseHandle(t->sem_off);
 #else	
 #endif
+		spl_free(t->arr_mtx);
 		if (t->isProcessMode) {
 			spl_del_memory();
 		}

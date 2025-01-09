@@ -21,7 +21,7 @@ int loop_count = 1000 * 1000;
 #define		TCONFIG_FILE						"--cfg="	
 #define		TLOOP_COUNT							"--loopcount="	
 
-int main(int argc, char* argv[]) {
+int main__(int argc, char* argv[]) {
 	int ret = 0, i = 0;
 	char cfgpath[1024];
 	for (i = 1; i < argc; ++i) {
@@ -136,7 +136,7 @@ void* posix_thread_routine(void* lpParam) {
 	return 0;
 }
 
-int main___(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
 	int ret = 0;
 	SPL_INPUT_ARG input;
 	int count = 2;
