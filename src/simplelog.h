@@ -254,6 +254,7 @@ typedef struct __FMT_FOR_OUTPUT__ {
 	typedef struct __SPL_INPUT_ARG__ {
 		char folder[SPL_PATH_FOLDER];
 		char id_name[SPL_IDD_NAME];
+		char is_master;
 	} SPL_INPUT_ARG;
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
