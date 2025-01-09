@@ -226,9 +226,6 @@ static int
 static int
 	spl_fflush_err(int t, void *fpp);
 
-static int
-	spl_mutex_del_arr(int n);
-
 static int 
 	spl_create_thread(THREAD_ROUTINE f, void* arg);
 static void*
@@ -599,35 +596,6 @@ int spl_init_log( char *pathcfg)
 	}
 
 	return ret;
-}
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-int spl_mutex_del_arr(int n) {
-	int ret = 0;
-	int i = 0;
-	SIMPLE_LOG_ST* t = &__simple_log_static__;
-	do {
-		if (n < 1) {
-			ret = SPL_LOG_ALOCK_NUM;
-			return ret;
-		}
-		if (!t->arr_mtx) {
-			ret = SPL_LOG_ALOCK_NULL;
-			return ret;
-		}
-		for (i = 0; i < n; ++i) {
-#ifndef UNIX_LINUX
-	#ifndef SPL_USING_SPIN_LOCK
-			SPL_CloseHandle(t->arr_mtx[i]);
-	#else
-			spl_free(t->arr_mtx[i]);
-	#endif
-#else
-			spl_free(t->arr_mtx[i]);
-#endif 
-		}
-		spl_free(t->arr_mtx);
-	} while (0);
-	return ret = 0;
 }
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
