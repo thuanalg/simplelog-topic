@@ -270,11 +270,11 @@ __p__ = __FILE__;} while(0);
 #endif
 
 #define spl_malloc(__nn__, __obj__, __type__) { (__obj__) = (__type__*) malloc(__nn__); if(__obj__) \
-	{ spl_console_log("Malloc: 0x%p\n", (__obj__));; memset((void*)(__obj__), 0, (__nn__));} \
+	{ /*spl_console_log("Malloc: 0x%p\n", (__obj__));*/; memset((void*)(__obj__), 0, (__nn__));} \
 	else {spl_console_log("Malloc: error.\n");}} 
 
 #define spl_free(__obj__) \
-	{ spl_console_log("Free: 0x%p.\n", (__obj__));; free(__obj__); ; (__obj__) = 0;} 
+	{ /*spl_console_log("Free: 0x%p.\n", (__obj__));*/; free(__obj__); ; (__obj__) = 0;} 
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
