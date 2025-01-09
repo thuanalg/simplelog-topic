@@ -325,16 +325,17 @@ __p__ = __FILE__;} while(0);
 	if(t->llevel <= (__lv__) && ___fmttt___[0] && t->arr_topic) \
 	{\
 		;short tpp = 0;int len = 0;unsigned short r = 0;;const char *pfn = 0;;\
-		;int outlen = 0;;char *pprefmt = 0;; char tnow[SPL_RL_BUF];;;\
+		;int outlen = 0;;char *pprefmt = 0;; char tnow[SPL_RL_BUF];;tpp = __tpic__%t->n_topic;;;\
 		; __FILLE__(pfn);;\
 		;pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r, &outlen);;\
 		do\
 		{\
-			;;tpp = __tpic__%t->n_topic;;\
+			;;\
 			spl_mutex_lock(t->arr_mtx[r]);\
 				/*do \
 				{*/\
-					/*if(t->arr_topic){*/\
+					/*if(t->arr_topic){*/;;\
+						;;\
 						if(STSPLOGBUFTOPIC_RANGE(t,tpp, r)->range > STSPLOGBUFTOPIC_RANGE(t,tpp, r)->pl) {\
 							;memcpy(STSPLOGBUFTOPIC_RANGE(t,tpp, r)->data + STSPLOGBUFTOPIC_RANGE(t,tpp, r)->pl, pprefmt, outlen);\
 							;STSPLOGBUFTOPIC_RANGE(t, tpp, r)->pl += outlen;;\

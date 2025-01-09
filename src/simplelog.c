@@ -2349,10 +2349,10 @@ int spl_init_segments() {
 			sgment->range = sgment->total - sizeof(generic_dta_st) - SPL_MEMO_PADDING;
 			sgment->pl = 0;
 		}
+		step = t->buff_size * t->ncpu;
 		for (k = 0; k < t->n_topic; ++k) {
-			step = (k + 1) * t->buff_size * t->ncpu;
-			seg = p + step;
-			t->arr_topic[k].buf = (generic_dta_st*)seg;
+			p += step;
+			t->arr_topic[k].buf = (generic_dta_st*)p;
 			for (i = 0; i < t->ncpu; ++i) {
 				seg = p + i * t->buff_size;
 				sgment = (generic_dta_st*)seg;
