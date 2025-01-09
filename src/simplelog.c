@@ -1908,6 +1908,7 @@ int spl_calculate_size() {
 			}
 		}
 		step_size = sizeof(pthread_spinlock_t);
+		p = buff + k + step_size;
 		for (i = 0; i < t->ncpu; ++i) 
 		{
 			pthread_spinlock_t* mtx = 0;
@@ -1926,6 +1927,7 @@ int spl_calculate_size() {
 			ret = spl_mtx_init(mtx, t->isProcessMode);
 		}
 		step_size = sizeof(pthread_mutex_t);
+		p = buff + k + step_size;
 		for (i = 0; i < t->ncpu; ++i) 
 		{
 			/*pthread_mutex_t* mtx = 0;*/
