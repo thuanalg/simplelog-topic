@@ -239,18 +239,7 @@ extern "C" {
 		char
 			is_master;
 	} SIMPLE_LOG_ST;
-/*
-typedef struct __FMT_FOR_OUTPUT__ {
-	int outlen ;
-	const char* finame ;
-	const char* fcname;
-	int line;
-	char tnow[SPL_RL_BUF];
-	char *prefmt;
-	int lv;
-	unsigned short r ;
-} FMT_FOR_OUTPUT;
-*/
+
 	typedef struct __SPL_INPUT_ARG__ {
 		char folder[SPL_PATH_FOLDER];
 		char id_name[SPL_IDD_NAME];
