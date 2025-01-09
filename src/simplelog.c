@@ -192,8 +192,7 @@ static	SIMPLE_LOG_ST
 
 static int	
 	spl_init_log_parse(char* buff, char* key, char *);
-static void*
-	spl_sem_create(int ini);
+
 static int	
 	spl_verify_folder(char* folder);
 static int	
@@ -621,23 +620,6 @@ void* spl_mutex_create() {
 		ret = (void *) &spl_rw_spin;
 		pthread_spin_init((pthread_spinlock_t*)ret, PTHREAD_PROCESS_PRIVATE);
 #endif
-#endif 
-	} while (0);
-	return ret;
-}
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-void* spl_sem_create(int ini) {
-	void* ret = 0;
-	do {
-#ifndef UNIX_LINUX
-		ret = CreateSemaphoreA(0, 0, ini, 0);
-#else
-		spl_malloc(sizeof(sem_t), ret, void);
-		if (!ret) {
-			break;
-		}
-		memset(ret, 0, sizeof(sem_t));
-		sem_init((sem_t*)ret, 0, 0);
 #endif 
 	} while (0);
 	return ret;
