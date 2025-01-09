@@ -2392,11 +2392,7 @@ int spl_gen_sync_tool() {
 	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-/*
-	spl_mutex_del_arr(__simple_log_static__.ncpu);
-	spl_free(__simple_log_static__.topics);
-	spl_free(__simple_log_static__.arr_topic);
-*/
+
 int spl_clean_sync_tool() {
 	int ret = 0;
 	SIMPLE_LOG_ST* t = &__simple_log_static__;
