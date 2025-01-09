@@ -1375,41 +1375,14 @@ int spl_rel_sem(void *sem) {
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 int spl_finish_log() {
 	int ret = 0; 
-	spl_set_off(1);
-/*
-#ifndef UNIX_LINUX
-#ifndef SPL_USING_SPIN_LOCK
-	SPL_CloseHandle(__simple_log_static__.mtx_rw);
-#else
-	//Don't need free
-#endif
-	//SPL_CloseHandle(__simple_log_static__.mtx_off);
-	SPL_CloseHandle(__simple_log_static__.sem_rwfile);
-	SPL_CloseHandle(__simple_log_static__.sem_off);
-#else
-	int err = 0;
-//https://linux.die.net/man/3/SPL_sem_destroy
-//https://linux.die.net/man/3/pthread_mutex_init
-#ifndef SPL_USING_SPIN_LOCK
-	SPL_pthread_mutex_destroy(__simple_log_static__.mtx_rw, err);
-	spl_free(__simple_log_static__.mtx_rw);
-#else
-	//Don't need free
-#endif
-	//SPL_pthread_mutex_destroy(__simple_log_static__.mtx_off, err);
-	//spl_free(__simple_log_static__.mtx_off);
-	SPL_sem_destroy(__simple_log_static__.sem_rwfile, err);
-	spl_free(__simple_log_static__.sem_rwfile);
-	SPL_sem_destroy(__simple_log_static__.sem_off, err);
-	spl_free(__simple_log_static__.sem_off);
-#endif
-
-	spl_mutex_del_arr(__simple_log_static__.ncpu);
-	spl_free(__simple_log_static__.topics);
-	spl_free(__simple_log_static__.arr_topic);
-*/
-	spl_clean_sync_tool();
-
+	ret = spl_set_off(1);
+	if (ret) {
+		spl_console_log("spl_set_off ret: %d", ret);
+	}
+	ret = spl_clean_sync_tool();
+	if (ret) {
+		spl_console_log("spl_clean_sync_tool ret: %d", ret);
+	}
 	memset(&__simple_log_static__, 0, sizeof(__simple_log_static__));
 	return ret;
 }
