@@ -955,60 +955,6 @@ int spl_simple_log_thread(SIMPLE_LOG_ST* t) {
 	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-/*
-char *spl_prefmt_now(FMT_FOR_OUTPUT* pp) {
-	int ret = 0;
-	spl_local_time_st stt;
-	int n = 0;
-	char* p = pp->tnow;
-	pp->outlen = 0;
-	//do {
-	ret = spl_local_time_now(&stt);
-	if (ret) {
-		return p;
-	}
-	//if (r) {
-	pp->r = (stt.nn % __simple_log_static__.ncpu);
-	//}
-
-	n = sprintf(p, SPL_FMT_DATE_ADDING_X,
-		stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day,
-		stt.hour, stt.minute, stt.sec, (unsigned int)stt.nn);
-	if (n < 1) {
-		ret = SPL_LOG_PRINTF_ERROR;
-		return p;
-	}
-	p[n++] = spl_text_gb_c[pp->lv % SPL_LOG_PEAK];
-	memcpy(p + n, "] [tid:\t", 8);
-	n += 8;
-
-	n += sprintf(p + n, HHHHHHHHHHH, spl_get_threadid());
-	pp->outlen = n;
-	pp->outlen += snprintf(p + n, SPL_RL_BUF - n, "[%s:%s:%d]\t",
-		pp->finame, pp->fcname, pp->line);
-	//*outlen += snprintf(fmtt + n, len - n, "[%s:%s:%d] [r: %d]\t",
-	//	filename, funcname, line, (int)*r);
-	if (pp->outlen > SPL_RL_BUF) {
-		spl_malloc((pp->outlen + 1), p, char);
-		if (!p) {
-			spl_console_log("Malloc error");
-		}
-		memcpy(p, pp->tnow, n);
-		pp->outlen = n;
-		//*outlen += sprintf(p + n, "[%s:%s:%d] [r: %d]\t",
-		//	filename, funcname, line, (int)*r);
-		pp->outlen += sprintf(p + n, "[%s:%s:%d]\t",
-			pp->finame, pp->fcname, pp->line);
-	}
-
-	//		memcpy(fmtt, "-------------------------------------------------------------------------------------------------------------------------------------\
-	//			-----------------------------------------------------------------------------------", 86);
-	//					*outlen = 86;
-		//} while (0);
-	return p;
-}
-*/
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 char* spl_fmt_now_ext(char* fmtt, int len, int lv, 
 	const char* filename, const char* funcname, int  line, unsigned short *r, int *outlen)
 {
@@ -1969,24 +1915,7 @@ int spl_calculate_size() {
 	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-/*
-	
 
-		t->mtx_rw = (void*)(buff + k);
-
-		step_size = sizeof(volatile long);
-		p = (buff + k) + step_size;
-		for (i = 0; i < t->ncpu; ++i) {
-			t->arr_mtx[i] = (void*) (p + i * step_size);
-		}
-	#else
-#endif
-#define SPL_SEM_NAME_RW				"_SEM_RW"
-#define SPL_SEM_NAME_OFF			"_SEM_OFF"
-
-#define SPL_MTX_NAME_RW				"_MTX_RW"
-#define SPL_MTX_NAME_OFF			"_MTX_OFF"
-*/
 #ifndef UNIX_LINUX
 int spl_win32_sync_create() {
 	int ret = 0;
@@ -2260,12 +2189,7 @@ int spl_clean_sync_tool() {
 	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-/*
-* spl_gen_sync_tool -->>
-	spl_allocate_topics();
-	spl_calculate_size();
-	spl_init_segments();
-*/
+
 #ifndef UNIX_LINUX
 #else
 #endif
