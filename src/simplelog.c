@@ -582,31 +582,6 @@ int spl_init_log( char *pathcfg)
 		if (ret) {
 			break;
 		}
-		/*
-		__simple_log_static__.arr_mtx = spl_mutex_create_arr(__simple_log_static__.ncpu);
-
-		obj = spl_mutex_create();
-		if (!obj) {
-			ret = SPL_ERROR_CREATE_MUTEX;
-			break;
-		}
-		__simple_log_static__.mtx_rw = obj;
-
-		obj = spl_sem_create(1);
-		if (!obj) {
-			ret = SPL_ERROR_CREATE_SEM;
-			break;
-		}
-		__simple_log_static__.sem_rwfile = obj;
-
-		obj = spl_sem_create(1);
-		if (!obj) {
-			ret = SPL_ERROR_CREATE_SEM;
-			break;
-		}
-		__simple_log_static__.sem_off = obj;
-
-		*/
 
 		ret = spl_verify_folder(__simple_log_static__.folder);
 		if (ret) {
@@ -621,18 +596,11 @@ int spl_init_log( char *pathcfg)
 			break;
 		}
 	} while (0);
+
 	if (fp) {
 		SPL_FCLOSE(fp,ret);
 	}
-	/*
-	if (ret == 0) {
-		ret = spl_gen_topic_buff(&__simple_log_static__);
-	}
-	
-	if (ret == 0) {
-		ret = spl_simple_log_thread(&__simple_log_static__);
-	}
-	*/
+
 	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
