@@ -2320,7 +2320,7 @@ int spl_clean_sync_tool() {
 	int ret = 0;
 	SIMPLE_LOG_ST* t = &__simple_log_static__;
 	do {
-		if (t->topics > 0) {
+		if (t->n_topic > 0) {
 			spl_free(t->topics);
 			spl_free(t->arr_topic);
 		}
