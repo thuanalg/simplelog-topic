@@ -1317,7 +1317,7 @@ void spl_sleep(unsigned int sec) {
 		sleep(sec);
 #endif 
 		t1 = time(0);
-		if ((t1 - t0) >= sec) {
+		if (t1 >= (t0 + sec)) {
 			break;
 		}
 	} while (1);
@@ -1333,7 +1333,7 @@ void spl_milli_sleep(unsigned int mill_sec) {
 		usleep(mill_sec * 1000);
 #endif 
 		t1 = spl_milli_now();
-		if ((t1 - t0) >= mill_sec) {
+		if (t1 >= (t0 + mill_sec)) {
 			break;
 		}
 	} while (1);
