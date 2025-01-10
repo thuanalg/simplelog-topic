@@ -28,7 +28,7 @@
 /*strrchr*/
 
 #ifndef SPL_USING_SPIN_LOCK
-	#define SPL_USING_SPIN_LOCK
+	//#define SPL_USING_SPIN_LOCK
 #endif // !SPL_USING_SPIN_LOCK
 
 //#define __UNIX_LINUX_CPP11_AND_NEWERS__
