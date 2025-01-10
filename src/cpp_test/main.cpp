@@ -21,7 +21,7 @@ int loop_count = 1000 * 1000;
 #define		TCONFIG_FILE						"--cfg="	
 #define		TLOOP_COUNT							"--loopcount="	
 
-int main__(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
 	int ret = 0, i = 0;
 	char cfgpath[1024];
 	for (i = 1; i < argc; ++i) {
@@ -72,7 +72,7 @@ void dotest() {
 	//https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitformultipleobjects
 	//https://learn.microsoft.com/en-us/windows/win32/sync/waiting-for-multiple-objects
 	dwEvent = WaitForMultipleObjects(
-			num_threads,           // number of objects in array
+			num_threads,			// number of objects in array
 			hpThread,				// array of objects
 			TRUE,					// wait for any object
 			INFINITE);				// five-second wait
@@ -113,10 +113,8 @@ void* posix_thread_routine(void* lpParam) {
 #endif // !UNIX_LINUX
 	int k = 0;
 	int tpic = 0;
-	//while (1) {
-		int count = 0;
-		
-		while (count < loop_count) {
+	int count = 0;
+	while (count < loop_count) {
 			//spllog(SPL_LOG_INFO, "test log: %d", count);
 			spllog(SPL_LOG_INFO, "test log test log test log: %d", count);
 			//spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sys");
@@ -125,14 +123,11 @@ void* posix_thread_routine(void* lpParam) {
 			//spllognaxyax(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "nayax");
 			//spllogsksgn(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sksg");
 			++count;
-		}
-		//spl_console_log("Main close: End.\n");
-		//break;
-	//}
+	}
 	return 0;
 }
 
-int main(int argc, char* argv[]) {
+int main__(int argc, char* argv[]) {
 	int ret = 0;
 	SPL_INPUT_ARG input;
 	int count = 2;
