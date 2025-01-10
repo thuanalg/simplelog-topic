@@ -21,7 +21,7 @@ int loop_count = 1000 * 1000;
 #define		TCONFIG_FILE						"--cfg="	
 #define		TLOOP_COUNT							"--loopcount="	
 
-int main__(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
 	int ret = 0, i = 0;
 	char cfgpath[1024];
 	for (i = 1; i < argc; ++i) {
@@ -72,7 +72,7 @@ void dotest() {
 	//https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitformultipleobjects
 	//https://learn.microsoft.com/en-us/windows/win32/sync/waiting-for-multiple-objects
 	dwEvent = WaitForMultipleObjects(
-			num_threads,           // number of objects in array
+			num_threads,			// number of objects in array
 			hpThread,				// array of objects
 			TRUE,					// wait for any object
 			INFINITE);				// five-second wait
@@ -113,10 +113,8 @@ void* posix_thread_routine(void* lpParam) {
 #endif // !UNIX_LINUX
 	int k = 0;
 	int tpic = 0;
-	//while (1) {
-		int count = 0;
-		
-		while (count < loop_count) {
+	int count = 0;
+	while (count < loop_count) {
 			//spllog(SPL_LOG_INFO, "test log: %d", count);
 			spllog(SPL_LOG_INFO, "test log test log test log: %d", count);
 			//spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sys");
@@ -125,14 +123,11 @@ void* posix_thread_routine(void* lpParam) {
 			//spllognaxyax(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "nayax");
 			//spllogsksgn(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sksg");
 			++count;
-		}
-		//spl_console_log("Main close: End.\n");
-		//break;
-	//}
+	}
 	return 0;
 }
 
-int main(int argc, char* argv[]) {
+int main__(int argc, char* argv[]) {
 	int ret = 0;
 	SPL_INPUT_ARG input;
 	int count = 2;
@@ -163,76 +158,4 @@ int main(int argc, char* argv[]) {
 	spl_finish_log();
 	//spl_milli_sleep(100 * 1000);
 	return 0;
-}
-//#include <stdio.h>
-//
-//int main____() {
-//	//LARGE_INTEGER frequency;
-//	LARGE_INTEGER counter;
-//
-//	// Query the performance frequency (ticks per second)
-//	//if (QueryPerformanceFrequency(&frequency)) {
-//		// Get the current value of the performance counter
-//	for (int i = 0; i < 10; ++i) {
-//		QueryPerformanceCounter(&counter);
-//
-//		// Convert ticks to nanoseconds
-//		// frequency.QuadPart gives the number of ticks per second
-//		// counter.QuadPart gives the number of ticks that have passed since the system was booted
-//		// To get nanoseconds, we calculate (counter * 10^9) / frequency
-//		short nanoseconds = (counter.QuadPart & 0xFF );
-//#ifdef DEBUG_MODE_0
-//		printf("debug Current time in nanoseconds: %d\n", nanoseconds % 8);
-//		//open trigger socket, subprogram
-//		//socket(UDP, 20000);
-//#else
-//		printf("Current time in nanoseconds: %d\n", nanoseconds % 7);
-//#endif
-//		
-//	}
-//
-//
-//	return 0;
-//}
-//int quick_sort(int* arr, int n);
-//int validate_quick_sort(int* arr, int n);
-//int main__1__() {
-//	LARGE_INTEGER counter;
-//	int arr[10];
-//	////......
-//	//arr = (int*)malloc(sizeof(int) * n);
-//	//if (!arr) {
-//	//	exit(1);
-//	//}
-//	for (int i = 0; i < 10; i++)
-//	{
-//		int tmp = 0;
-//		QueryPerformanceCounter(&counter);
-//		tmp = (counter.QuadPart & 0xFF)%7;
-//		arr[i] = tmp;
-//	}
-//	quick_sort(arr, 10);
-//#ifdef VALIDATE
-//	int ret = validate_quick_sort(arr, 10);
-//	if (ret) {
-//		fprintf(stderr, "sort err at: %d\n", ret - 1);
-//	}
-//#endif
-//	return 0;
-//}
-
-int quick_sort(int* arr, int n) {
-	return 0;
-}
-
-int validate_quick_sort(int* arr, int n) {
-	int ret = 0;
-	for (int i = 0; i < n - 1; ++i) {
-		if (arr[i] > arr[i + 1]) {
-			ret = i + 1;
-			break;
-		}
-	}
-	spl_console_log("jhgfjgf");
-	return ret;
 }

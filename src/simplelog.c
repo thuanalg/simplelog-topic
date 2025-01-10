@@ -1308,18 +1308,19 @@ int spl_folder_sup(char* folder, spl_local_time_st* lctime, char* year_month) {
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 void spl_sleep(unsigned int sec) {
+
 #ifndef UNIX_LINUX
-	Sleep( ((DWORD)(sec)) * 1000);
+		Sleep(((DWORD)(sec)) * 1000);
 #else
-	sleep(sec);
+		sleep(sec);
 #endif 
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 void spl_milli_sleep(unsigned int mill_sec) {
 #ifndef UNIX_LINUX
-	Sleep(((DWORD)(mill_sec)));
+		Sleep(((DWORD)(mill_sec)));
 #else
-	usleep(mill_sec * 1000);
+		usleep(mill_sec * 1000);
 #endif 
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
@@ -1613,13 +1614,15 @@ int spl_create_thread(THREAD_ROUTINE f, void* arg) {
 	HANDLE hThread = 0;
 	hThread = CreateThread(NULL, 0, f, arg, 0, &dwThreadId);
 	if (!hThread) {
-		ret = 1;
+		ret = SPL_LOG_THREAD_W32_CREATE;
+		spl_console_log("CreateThread error: %d", (int) GetLastError());
 	}
 #else
 	pthread_t tidd = 0;
 	ret = pthread_create(&tidd, 0, f, arg);
 	if (ret) {
-		//
+		ret = SPL_LOG_THREAD_PX_CREATE;
+		spl_console_log("pthread_create: ret: %d, errno: %d, text: %s.", ret, errno, strerror(errno));
 	}
 #endif
 	return ret;
@@ -1679,7 +1682,7 @@ int spl_create_memory(void** output, char* shared_key, int size_shared, char isC
 				shared_key);                 // name of mapping object
 
 			if (!hMapFile) {
-				fprintf(stdout, "Cannot create SHM. error: %d\n", (int)GetLastError());
+				spl_console_log("Cannot create SHM. error: %d\n", (int)GetLastError());
 				ret = 1;
 				break;
 			}
@@ -1689,7 +1692,7 @@ int spl_create_memory(void** output, char* shared_key, int size_shared, char isC
 				FILE_MAP_ALL_ACCESS, 0, shared_key);
 			if (!hMapFile) {
 				ret = 2;
-				fprintf(stdout, "Cannot open SHM. error: %d\n", (int)GetLastError());
+				spl_console_log("Cannot open SHM. error: %d\n", (int)GetLastError());
 				break;
 			}
 		}
@@ -1699,7 +1702,7 @@ int spl_create_memory(void** output, char* shared_key, int size_shared, char isC
 		p = (char*)MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, size_shared);
 		if (!p) {
 			ret = 3;
-			fprintf(stdout, "Cannot MapViewOfFile. error: %d\n", (int)GetLastError());
+			spl_console_log("Cannot MapViewOfFile. error: %d\n", (int)GetLastError());
 			break;
 		}
 #else
@@ -2203,6 +2206,4 @@ int spl_clean_sync_tool() {
 	#else
 	#endif
 #endif
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
