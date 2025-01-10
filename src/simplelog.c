@@ -1308,39 +1308,20 @@ int spl_folder_sup(char* folder, spl_local_time_st* lctime, char* year_month) {
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 void spl_sleep(unsigned int sec) {
-	time_t t0, t1;
-	t0 = time(0);
-	do {
+
 #ifndef UNIX_LINUX
 		Sleep(((DWORD)(sec)) * 1000);
 #else
 		sleep(sec);
 #endif 
-		t1 = time(0);
-		if (t1 >= (t0 + sec)) {
-			break;
-		}
-		sec = (t0 + sec) - t1;
-		t0 = t1;
-	} while (1);
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 void spl_milli_sleep(unsigned int mill_sec) {
-	LLU t0, t1;
-	t0 = spl_milli_now();
-	do {
 #ifndef UNIX_LINUX
 		Sleep(((DWORD)(mill_sec)));
 #else
 		usleep(mill_sec * 1000);
 #endif 
-		t1 = spl_milli_now();
-		if (t1 >= (t0 + mill_sec)) {
-			break;
-		}
-		mill_sec = (t0 + mill_sec) - t1;
-		t0 = t1;
-	} while (1);
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 int spl_standardize_path(char* fname) {
