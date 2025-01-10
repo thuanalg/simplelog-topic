@@ -28,7 +28,7 @@
 /*strrchr*/
 
 #ifndef SPL_USING_SPIN_LOCK
-	//#define SPL_USING_SPIN_LOCK
+	#define SPL_USING_SPIN_LOCK
 #endif // !SPL_USING_SPIN_LOCK
 
 //#define __UNIX_LINUX_CPP11_AND_NEWERS__
@@ -426,8 +426,9 @@ DLL_API_SIMPLE_LOG LLU
 	spl_get_threadid();
 DLL_API_SIMPLE_LOG int									
 	spl_rel_sem(void* sem);
+/*
 DLL_API_SIMPLE_LOG 
-	void* spl_mutex_create();
+	void* spl_mutex_create();*/
 DLL_API_SIMPLE_LOG
 	void spl_sleep(unsigned  int);
 DLL_API_SIMPLE_LOG
