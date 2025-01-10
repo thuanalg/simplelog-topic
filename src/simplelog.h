@@ -14,7 +14,7 @@
 *		<2024-Dec-22>
 *		<2024-Dec-23>
 *		<2024-Dec-30>
-*		<2025-Jan-06>
+*		<2024-Jan-06>
 *		<2025-Jan-08>
 *		<2025-Jan-10>
 * Decription:
@@ -28,7 +28,7 @@
 /*strrchr*/
 
 #ifndef SPL_USING_SPIN_LOCK
-	#define SPL_USING_SPIN_LOCK
+	//#define SPL_USING_SPIN_LOCK
 #endif // !SPL_USING_SPIN_LOCK
 
 //#define __UNIX_LINUX_CPP11_AND_NEWERS__
