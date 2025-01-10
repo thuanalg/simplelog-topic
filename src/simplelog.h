@@ -14,10 +14,11 @@
 *		<2024-Dec-22>
 *		<2024-Dec-23>
 *		<2024-Dec-30>
-*		<2024-Jan-06>
-*		<2024-Jan-08>
+*		<2025-Jan-06>
+*		<2025-Jan-08>
+*		<2025-Jan-10>
 * Decription:
-*		The (only) main header file to export 3 APIs: [spl_init_log, spllog, spllogtopic, spl_finish_log].
+*		The (only) main header file to export 5 APIs: [spl_init_log, spllog, spllogtopic, spl_finish_log].
 */
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 #ifndef ___SIMPLE_LOG__
