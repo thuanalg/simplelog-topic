@@ -15,9 +15,10 @@
 *		<2024-Dec-23>
 *		<2024-Dec-30>
 *		<2024-Jan-06>
-*		<2024-Jan-08>
+*		<2025-Jan-08>
+*		<2025-Jan-10>
 * Decription:
-*		The (only) main header file to export 3 APIs: [spl_init_log, spllog, spllogtopic, spl_finish_log].
+*		The (only) main header file to export 5 APIs: [spl_init_log, spl_init_log_ext, spllog, spllogtopic, spl_finish_log].
 */
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 #ifndef ___SIMPLE_LOG__
@@ -27,7 +28,7 @@
 /*strrchr*/
 
 #ifndef SPL_USING_SPIN_LOCK
-	//#define SPL_USING_SPIN_LOCK
+	#define SPL_USING_SPIN_LOCK
 #endif // !SPL_USING_SPIN_LOCK
 
 //#define __UNIX_LINUX_CPP11_AND_NEWERS__
@@ -425,8 +426,9 @@ DLL_API_SIMPLE_LOG LLU
 	spl_get_threadid();
 DLL_API_SIMPLE_LOG int									
 	spl_rel_sem(void* sem);
+/*
 DLL_API_SIMPLE_LOG 
-	void* spl_mutex_create();
+	void* spl_mutex_create();*/
 DLL_API_SIMPLE_LOG
 	void spl_sleep(unsigned  int);
 DLL_API_SIMPLE_LOG
