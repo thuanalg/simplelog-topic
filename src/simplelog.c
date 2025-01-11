@@ -863,18 +863,17 @@ void* spl_written_thread_routine(void* lpParam)
 								}
 							/*//} while (0);*/
 							spl_mutex_unlock(t->arr_mtx[j]);
-							if (only_cast->pl) {
-								k = (int)fwrite(only_cast->data, 1, only_cast->pl, (FILE*)(t->arr_topic[i].fp));
-								t->arr_topic[i].fizize += k;
-								only_cast->pl = 0;
-								SPL_FFLUSH((t->arr_topic[i].fp), err);
-								if (err) {
-									spl_console_log("--fflush, ret: %d --\n", err);
-									ret = SPL_LOG_TOPIC_FLUSH;
-									break;
-								}
+						}
+						if (only_cast->pl > 0) {
+							k = (int)fwrite(only_cast->data, 1, only_cast->pl, (FILE*)(t->arr_topic[i].fp));
+							t->arr_topic[i].fizize += k;
+							only_cast->pl = 0;
+							SPL_FFLUSH((t->arr_topic[i].fp), err);
+							if (err) {
+								spl_console_log("--fflush, ret: %d --\n", err);
+								ret = SPL_LOG_TOPIC_FLUSH;
+								break;
 							}
-
 						}
 					}
 				}
