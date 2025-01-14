@@ -120,8 +120,8 @@ void* posix_thread_routine(void* lpParam) {
 			//spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sys");
 			//splloglib(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "lib");
 			//spllogexe(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "exe");
-			spllognaxyax(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "nayax");
-			spllogsksgn(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sksg");
+			//spllognaxyax(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "nayax");
+			//spllogsksgn(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sksg");
 			++count;
 	}
 	return 0;
