@@ -128,7 +128,7 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
         - `spl_init_log_ext(SPL_INPUT_ARG *input)`  
       - **Logging** (in any thread):  
         - `spllog(level, fmt, ...)`
-        - **Levels**: `SPL_LOG_DEBUG`, `SPL_LOG_INFO`, `SPL_LOG_WARNING`, `SPL_LOG_ERROR`, `SPL_LOG_FATAL`
+        - **Levels**: `SPL_LOG_DEBUG`, `SPL_LOG_INFO`, `SPL_LOG_WARNING`, `SPL_LOG_ERROR`, `SPL_LOG_FATAL`  
       - **Topic-based Logging**:  
         - `spllogtopic(level, topic_index, fmt, ...)`  
       - **Finalization** (at the end of `main`):  
