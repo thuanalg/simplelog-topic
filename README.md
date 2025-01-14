@@ -123,15 +123,6 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 **APIs - Focus on Simplicity and Ease of Use**:
     - Designed with the **Unix Philosophy** in mind (KISS), the API is minimal and easy to understand. Example code and documentation are available on GitHub, and the library is focused on performance with simplicity.
     - **5 simple APIs** for usage:
-		// Define a structure for input arguments
-		typedef struct __SPL_INPUT_ARG__ {
-			char folder[SPL_PATH_FOLDER];  // Path to folder (length defined by SPL_PATH_FOLDER)
-			char id_name[SPL_IDD_NAME];    // Identifier name (length defined by SPL_IDD_NAME)
-			char is_master;                // A flag indicating if it is master (e.g., 'Y' for yes, 'N' for no)
-			SPL_CALLBACK_FUNCTION fn;      // Callback function (type SPL_CALLBACK_FUNCTION must be defined elsewhere)
-			SPL_CALLBACK_DATA* obj;        // Pointer to a callback data object (type SPL_CALLBACK_DATA must be defined elsewhere)
-		} SPL_INPUT_ARG;
-	
       - **Initialization** (at the start of `main`):
         - `spl_init_log(char *pathcfg)`
         - `spl_init_log_ext(SPL_INPUT_ARG *input)`
