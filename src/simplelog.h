@@ -145,8 +145,7 @@ extern "C" {
 			total;
 		int 
 			eventid;
-		int 
-			range;
+		/*int range;*/
 		int 
 			pc;
 		int 
@@ -368,14 +367,17 @@ __p__ = __FILE__;} while(0);
 				{*/\
 					/*if(t->arr_topic){*/;;\
 						;;\
-						if(STSPLOGBUFTOPIC_RANGE(t,tpp, r)->range > STSPLOGBUFTOPIC_RANGE(t,tpp, r)->pl) {\
+						if(t->range > STSPLOGBUFTOPIC_RANGE(t,tpp, r)->pl) {\
 							;memcpy(STSPLOGBUFTOPIC_RANGE(t,tpp, r)->data + STSPLOGBUFTOPIC_RANGE(t,tpp, r)->pl, pprefmt, outlen);\
 							;STSPLOGBUFTOPIC_RANGE(t, tpp, r)->pl += outlen;;\
 							;len = snprintf(STSPLOGBUFTOPIC_RANGE(t,tpp, r)->data + STSPLOGBUFTOPIC_RANGE(t,tpp, r)->pl, \
-								STSPLOGBUFTOPIC_RANGE(t, tpp, r)->range + SPL_MEMO_PADDING - STSPLOGBUFTOPIC_RANGE(t, tpp, r)->pl, \
+								t->krange - STSPLOGBUFTOPIC_RANGE(t, tpp, r)->pl, \
 								___fmttt___, ##__VA_ARGS__);\
 							;/*spl_console_log("--------------lllllllennnnnnnnnnnnnnnnn---r: %d, len: %d", (int)r, len);*/;\
-							if(len > 0) STSPLOGBUFTOPIC_RANGE(t, tpp, r)->pl += len;\
+							if(len > 0) {\
+								;outlen = SPL_MIN_AB(len, t->krange - STSPLOGBUFTOPIC_RANGE(t, tpp, r)->pl);;\
+								;STSPLOGBUFTOPIC_RANGE(t, tpp, r)->pl += outlen;\
+							}\
 						}\
 					/*}*/\
 				/*}\
