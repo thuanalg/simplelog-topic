@@ -102,6 +102,8 @@
 	"level="
 #define	SPLOG_BUFF_SIZE \
 	"buffsize="
+#define	SPL_MAX_SZ_MSG \
+	"max_sz_msg="
 #define	SPLOG_ROT_SIZE \
 	"rotation_size="
 #define	SPLOG_TOPIC \
@@ -177,6 +179,7 @@ static const char* __splog_pathfolder[] = {
 		SPLOG_PATHFOLDR, 
 		SPLOG_LEVEL, 
 		SPLOG_BUFF_SIZE, 
+		SPL_MAX_SZ_MSG,
 		SPLOG_ROT_SIZE, 
 		SPLOG_TOPIC, 
 		SPLOG_NCPU, 
@@ -402,6 +405,20 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 				break;
 			}
 			__simple_log_static__.buff_size = n;
+			break;
+		}
+		if (strcmp(key, SPL_MAX_SZ_MSG) == 0) {
+			int n = 0;
+			int sz = 0;
+			sz = sscanf(buff, "%d", &n);
+			if (n < 1 || sz < 1) {
+				ret = SPL_LOG_MAX_SZ_MSG_ERROR;
+				break;
+			}
+			if (n < SPL_MEMO_PADDING) {
+				n = SPL_MEMO_PADDING;
+			}
+			__simple_log_static__.max_sz_msg = n;
 			break;
 		}
 		if (strcmp(key, SPLOG_ROT_SIZE) == 0) {
@@ -2106,8 +2123,7 @@ int spl_init_segments() {
 	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-#define SPL_MIN_AB(a,b)			((a) < (b)) ? (a) : (b) 
-#define SPL_MAX_AB(a,b)			((a) > (b)) ? (a) : (b) 
+
 int spl_allocate_topics() {
 	int ret = 0;
 	int i = 0;
