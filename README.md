@@ -120,6 +120,31 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 
 ---
 
+**APIs - Focus on Simplicity and Ease of Use**:
+    - Designed with the **Unix Philosophy** in mind (KISS), the API is minimal and easy to understand. Example code and documentation are available on GitHub, and the library is focused on performance with simplicity.
+    - **5 simple APIs** for usage:
+		// Define a structure for input arguments
+		typedef struct __SPL_INPUT_ARG__ {
+			char folder[SPL_PATH_FOLDER];  // Path to folder (length defined by SPL_PATH_FOLDER)
+			char id_name[SPL_IDD_NAME];    // Identifier name (length defined by SPL_IDD_NAME)
+			char is_master;                // A flag indicating if it is master (e.g., 'Y' for yes, 'N' for no)
+			SPL_CALLBACK_FUNCTION fn;      // Callback function (type SPL_CALLBACK_FUNCTION must be defined elsewhere)
+			SPL_CALLBACK_DATA* obj;        // Pointer to a callback data object (type SPL_CALLBACK_DATA must be defined elsewhere)
+		} SPL_INPUT_ARG;
+	
+      - **Initialization** (at the start of `main`):
+        - `spl_init_log(char *pathcfg)`
+        - `spl_init_log_ext(SPL_INPUT_ARG *input)`
+      - **Logging** (in any thread):
+        - `spllog(level, fmt, ...)`
+        - **Levels**: `SPL_LOG_DEBUG`, `SPL_LOG_INFO`, `SPL_LOG_WARNING`, `SPL_LOG_ERROR`, `SPL_LOG_FATAL`
+      - **Topic-based Logging**:
+        - `spllogtopic(level, topic_index, fmt, ...)`
+      - **Finalization** (at the end of `main`):
+        - `spl_finish_log()`
+
+---
+
 **Video Install/Demo:**  
 	- For Windows 10 64bit: (https://drive.google.com/file/d/1Ls4aD8fd65qcc7qgRKns2SlWw6RAhH5l/view?usp=sharing)  
 	- For VM Linux CentOs9 64bit: (https://drive.google.com/file/d/1wxBjI6654wZqL7vTCZtvyiIRkJk-68HF/view?usp=sharing)  
