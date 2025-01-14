@@ -123,16 +123,16 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 **APIs - Focus on Simplicity and Ease of Use**:  
     - Designed with the **Unix Philosophy** in mind (KISS), the API is minimal and easy to understand. Example code and documentation are available on GitHub, and the library is focused on performance with simplicity.  
     - **5 simple APIs** for usage:  
-      - **Initialization** (at the start of `main`):  
-        - `spl_init_log(char *pathcfg)`  
-        - `spl_init_log_ext(SPL_INPUT_ARG *input)`  
-      - **Logging** (in any thread):  
-        - `spllog(level, fmt, ...)`
-        - **Levels**: `SPL_LOG_DEBUG`, `SPL_LOG_INFO`, `SPL_LOG_WARNING`, `SPL_LOG_ERROR`, `SPL_LOG_FATAL`  
-      - **Topic-based Logging**:  
-        - `spllogtopic(level, topic_index, fmt, ...)`  
-      - **Finalization** (at the end of `main`):  
-        - `spl_finish_log()`  
+		- **Initialization** (at the start of `main`):  
+				- `spl_init_log(char *pathcfg)`  
+				- `spl_init_log_ext(SPL_INPUT_ARG *input)`  
+		- **Logging** (in any thread):  
+				- `spllog(level, fmt, ...)`
+				- **Levels**: `SPL_LOG_DEBUG`, `SPL_LOG_INFO`, `SPL_LOG_WARNING`, `SPL_LOG_ERROR`, `SPL_LOG_FATAL`  
+		- **Topic-based Logging**:  
+				- `spllogtopic(level, topic_index, fmt, ...)`  
+		- **Finalization** (at the end of `main`):  
+			- `spl_finish_log()`  
 
 ---
 
