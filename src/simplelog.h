@@ -206,6 +206,12 @@ extern "C" {
 		int
 			buff_size;					/*Buffer size for each buffer. No nead SYNC.*/
 		int
+			range;						/*The limitation of usage buffer.*/
+		int
+			krange;						/*The limitation of usage buffer.*/
+		int
+			max_sz_msg;					/*If the size of the message is less than the number, it is safe to write. If not, it may be truncated.*/
+		int
 			index;						/*Index of default log, not in a topic. No nead SYNC.*/
 		char
 			folder[1024];				/*Path of genera folder. No nead SYNC.*/
