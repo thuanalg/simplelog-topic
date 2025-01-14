@@ -29,6 +29,9 @@ At its core, SimpleLog-Topic follows the **Unix Philosophy** of **KISS (Keep It 
 
 7. **No dependence**  
    Just use POSIX APIs and Win32 APIs.
+
+8. **Message safety feature**  
+   The **message safety feature** in your logger allows users to configure a size limit for each log message (e.g., 10,000 bytes). If a message exceeds this size, it, sometimes, **may be truncated**, but the first 10,000 bytes will still be logged. This ensures that large messages do not cause memory overflow or uncontrolled log writing, while still preserving the beginning of the message for logging. This feature is particularly useful in resource-constrained environments like embedded devices, providing both flexibility and safety in log management. **max_sz_msg**: (https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg)
    
 ### **Performance Highlights: Speed and Efficiency**
 
@@ -120,3 +123,10 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 **Video Install/Demo:**  
 	- For Windows 10 64bit: (https://drive.google.com/file/d/1Ls4aD8fd65qcc7qgRKns2SlWw6RAhH5l/view?usp=sharing)  
 	- For VM Linux CentOs9 64bit: (https://drive.google.com/file/d/1wxBjI6654wZqL7vTCZtvyiIRkJk-68HF/view?usp=sharing)  
+
+---
+
+**Thanks a lot to:**
+
+1. My family, friends.
+2. My colleagues: Lê Duy Cường, Bùi Khánh Duy, Nguyễn Công Đức , ... in my old company FPT (https://fpt.com/).
