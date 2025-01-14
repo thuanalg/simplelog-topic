@@ -27,6 +27,9 @@
 #include <string.h>
 /*strrchr*/
 
+#define SPL_MIN_AB(a,b)			((a) < (b)) ? (a) : (b) 
+#define SPL_MAX_AB(a,b)			((a) > (b)) ? (a) : (b) 
+
 #ifndef SPL_USING_SPIN_LOCK
 	//#define SPL_USING_SPIN_LOCK
 #endif // !SPL_USING_SPIN_LOCK
@@ -79,6 +82,7 @@ extern "C" {
 		SPL_ERROR_CREATE_SEM,
 		SPL_LOG_BUFF_SIZE_ERROR,
 		SPL_LOG_BUFF_MALLOC_ERROR,
+		SPL_LOG_MAX_SZ_MSG_ERROR,
 		SPL_LOG_FOLDER_ERROR,
 		SPL_LOG_CREATE_THREAD_ERROR,
 		SPL_LOG_FMT_NULL_ERROR,
@@ -141,8 +145,7 @@ extern "C" {
 			total;
 		int 
 			eventid;
-		int 
-			range;
+		/*int range;*/
 		int 
 			pc;
 		int 
@@ -205,6 +208,12 @@ extern "C" {
 			file_limit_size;			/*Limitation of each log file. No nead SYNC.*/
 		int
 			buff_size;					/*Buffer size for each buffer. No nead SYNC.*/
+		int
+			range;						/*The limitation of usage buffer.*/
+		int
+			krange;						/*The limitation of usage buffer.*/
+		int
+			max_sz_msg;					/*If the size of the message is less than the number, it is safe to write. If not, it may be truncated.*/
 		int
 			index;						/*Index of default log, not in a topic. No nead SYNC.*/
 		char
@@ -311,10 +320,16 @@ __p__ = __FILE__;} while(0);
 				;;;\
 				spl_mutex_lock(t->arr_mtx[r]);\
 					;\
-						if(SPLKEYBUF(t, r)->range > SPLKEYBUF(t, r)->pl) {\
-							;memcpy(SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl, pprefmt, outlen);SPLKEYBUF(t, r)->pl += outlen;\
-							;len = snprintf( SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl, (SPLKEYBUF(t, r)->range + SPL_MEMO_PADDING - SPLKEYBUF(t, r)->pl), \
-								___fmttt___, ##__VA_ARGS__); if(len > 0) SPLKEYBUF(t, r)->pl += (len); ;\
+						if(t->range > SPLKEYBUF(t, r)->pl) {\
+							;memcpy(SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl, pprefmt, outlen);\
+							;SPLKEYBUF(t, r)->pl += outlen;\
+							;len = snprintf( SPLKEYBUF(t, r)->data + SPLKEYBUF(t, r)->pl, t->krange - SPLKEYBUF(t, r)->pl, \
+								___fmttt___, ##__VA_ARGS__);\
+							;if(len > 0) {\
+								;outlen = SPL_MIN_AB(len, t->krange - SPLKEYBUF(t, r)->pl);\
+								;SPLKEYBUF(t, r)->pl += outlen;\
+								;\
+							};\
 							\
 						}\
 					\
@@ -352,14 +367,17 @@ __p__ = __FILE__;} while(0);
 				{*/\
 					/*if(t->arr_topic){*/;;\
 						;;\
-						if(STSPLOGBUFTOPIC_RANGE(t,tpp, r)->range > STSPLOGBUFTOPIC_RANGE(t,tpp, r)->pl) {\
+						if(t->range > STSPLOGBUFTOPIC_RANGE(t,tpp, r)->pl) {\
 							;memcpy(STSPLOGBUFTOPIC_RANGE(t,tpp, r)->data + STSPLOGBUFTOPIC_RANGE(t,tpp, r)->pl, pprefmt, outlen);\
 							;STSPLOGBUFTOPIC_RANGE(t, tpp, r)->pl += outlen;;\
 							;len = snprintf(STSPLOGBUFTOPIC_RANGE(t,tpp, r)->data + STSPLOGBUFTOPIC_RANGE(t,tpp, r)->pl, \
-								STSPLOGBUFTOPIC_RANGE(t, tpp, r)->range + SPL_MEMO_PADDING - STSPLOGBUFTOPIC_RANGE(t, tpp, r)->pl, \
+								t->krange - STSPLOGBUFTOPIC_RANGE(t, tpp, r)->pl, \
 								___fmttt___, ##__VA_ARGS__);\
 							;/*spl_console_log("--------------lllllllennnnnnnnnnnnnnnnn---r: %d, len: %d", (int)r, len);*/;\
-							if(len > 0) STSPLOGBUFTOPIC_RANGE(t, tpp, r)->pl += len;\
+							if(len > 0) {\
+								;outlen = SPL_MIN_AB(len, t->krange - STSPLOGBUFTOPIC_RANGE(t, tpp, r)->pl);;\
+								;STSPLOGBUFTOPIC_RANGE(t, tpp, r)->pl += outlen;\
+							}\
 						}\
 					/*}*/\
 				/*}\
