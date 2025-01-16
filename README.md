@@ -119,9 +119,8 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 ---
 
 **APIs - Focus on Simplicity and Ease of Use**:  
-  - **5 simple APIs** for usage:  
+  - **4 simple APIs** for usage:  
     - **Initialization** (at the start of `main`):  
-	    		    - `spl_init_log(char *pathcfg)`  
 	    		    - `spl_init_log_ext(SPL_INPUT_ARG *input)`  
     - **Logging** (in any thread):  
 	    	    - `spllog(level, fmt, ...)`  
