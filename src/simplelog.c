@@ -155,12 +155,13 @@
 	
 	/*static
 		volatile long spl_rw_spin = 0;*/
+	#define THREAD_ROUTINE LPTHREAD_START_ROUTINE
 #else
 	/*pthread_spinlock_t	spl_rw_spin; */
+	typedef void* (*THREAD_ROUTINE)(void*);
 #endif
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
-typedef void* (*THREAD_ROUTINE)(void*);
 
 typedef enum 
 __CHANGE_NAME_E__ {
@@ -230,15 +231,18 @@ static int
 
 static int 
 	spl_create_thread(THREAD_ROUTINE f, void* arg);
-static void*
-	spl_trigger_routine(void* arg);
+
 
 #ifndef UNIX_LINUX
 	static int
 		spl_win32_sync_create();
+	static DWORD WINAPI
+		spl_trigger_routine(void* arg);
 #else
 	static int
 		spl_mtx_init(void* mtx, char shared);
+	static void*
+		spl_trigger_routine(void* arg);
 #endif
 
 static int 
@@ -1611,8 +1615,11 @@ void splUnlockSpinlock(volatile long* p) {
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
 
-
+#ifndef UNIX_LINUX
+DWORD WINAPI spl_trigger_routine(void* arg)
+#else
 void* spl_trigger_routine(void* arg)
+#endif
 {
 	SIMPLE_LOG_ST* t = (SIMPLE_LOG_ST*)arg;
 	while (1) {
