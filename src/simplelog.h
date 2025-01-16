@@ -272,13 +272,14 @@ extern "C" {
 	} SIMPLE_LOG_ST;
 
 	typedef struct __SPL_INPUT_ARG__ {
-		char folder[SPL_PATH_FOLDER];
-		char id_name[SPL_IDD_NAME];
-		char is_master;
+		char 
+			folder[SPL_PATH_FOLDER];		/* Output folder of the logger. */
+		char 
+			id_name[SPL_IDD_NAME];			/* Identifier name for the logger*/
 		SPL_CALLBACL_FUNCTION
-			fn;
+			fn;								/* Callback function pointer (fn(obj)). */
 		SPL_CALLBACL_DATA*
-			obj;
+			obj;							/* Data pointer passed to the callback function (fn(obj)). */
 	} SPL_INPUT_ARG;
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
