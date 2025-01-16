@@ -236,7 +236,7 @@ static int
 #ifndef UNIX_LINUX
 	static int
 		spl_win32_sync_create();
-	DWORD WINAPI
+	static DWORD WINAPI
 		spl_trigger_routine(void* arg);
 #else
 	static int
