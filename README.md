@@ -146,5 +146,5 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 ---
 
 Reference & Dedication:
-   - https://www.amazon.com/UNIX-Network-Programming-Interprocess-Communications/dp/0130810819
-   - https://www.amazon.com/Unix-Network-Programming-Sockets-Networking/dp/0131411551
+   - "UNIX Network Programming, Volume 2: Interprocess Communications, Second Edition": https://www.amazon.com/UNIX-Network-Programming-Interprocess-Communications/dp/0130810819
+   - "Unix Network Programming: The Sockets Networking API": https://www.amazon.com/Unix-Network-Programming-Sockets-Networking/dp/0131411551
