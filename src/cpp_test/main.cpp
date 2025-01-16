@@ -16,10 +16,13 @@
 void dotest();
 int num_threads = 10;
 int loop_count = 1000 * 1000;
+int topicindex = 0;
 
 #define		TNUMBEER_OF_THREADS					"--nthread="	
 #define		TCONFIG_FILE						"--cfg="	
 #define		TLOOP_COUNT							"--loopcount="	
+#define		TMASTER_MODE						"--is_master="	
+#define		TTOPIC_INDEX						"--topic_index="
 
 int main(int argc, char* argv[]) {
 	int ret = 0, i = 0;
@@ -111,51 +114,21 @@ DWORD WINAPI win32_thread_routine(LPVOID lpParam) {
 #else
 void* posix_thread_routine(void* lpParam) {
 #endif // !UNIX_LINUX
-	int k = 0;
-	int tpic = 0;
 	int count = 0;
-	while (count < loop_count) {
-			//spllog(SPL_LOG_INFO, "test log: %d", count);
-			spllog(SPL_LOG_INFO, "test log test log test log: %d", count);
-			//spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sys");
-			//splloglib(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "lib");
-			//spllogexe(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "exe");
-			//spllognaxyax(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "nayax");
-			//spllogsksgn(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sksg");
+#define SPL_TEST_FMT			"test log test log test log: %d"
+/*#define SPL_TEST_FMT			"My test log : %d"*/
+	if (topicindex < 1) {
+		while (count < loop_count) {
+			spllog(SPL_LOG_INFO, SPL_TEST_FMT, count);
 			++count;
+		}
+	}
+	else {
+		while (count < loop_count) {
+			spllogtopic(SPL_LOG_INFO, topicindex - 1, SPL_TEST_FMT, count);
+			++count;
+		}
 	}
 	return 0;
 }
 
-int main__(int argc, char* argv[]) {
-	int ret = 0;
-	SPL_INPUT_ARG input;
-	int count = 2;
-	memset(&input, 0, sizeof(input));
-	snprintf(input.id_name, SPL_IDD_NAME, "testlog");
-	//int ret = spl_init_log((char *)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
-#ifndef UNIX_LINUX
-	//ret = spl_init_log((char*)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
-	snprintf(input.folder, SPL_PATH_FOLDER, "C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
-#else
-	//ret = spl_init_log((char*)"simplelog.cfg");
-	snprintf(input.folder, SPL_PATH_FOLDER, "simplelog.cfg");
-#endif
-	ret = spl_init_log_ext(&input);
-	
-	//spl_milli_sleep(1000 * 5);
-	for (int i = 0; i < count; ++i) {
-		//spl_console_log("spl_milli_sleep ------------------------------ ");
-		//spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), 0);
-		spllog(SPL_LOG_INFO, "test log test log test log test log %d", i);
-		spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sys");
-		splloglib(SPL_LOG_INFO, "test log: %llu, topic: %s", time(0), "lib");
-		spllogexe(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "exe");
-		spllognaxyax(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "nayax");
-		spllogsksgn(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sksg");
-	}
-	//spl_milli_sleep( 1000 * 100);
-	spl_finish_log();
-	//spl_milli_sleep(100 * 1000);
-	return 0;
-}
