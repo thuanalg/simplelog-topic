@@ -142,3 +142,9 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 
 1. My family, friends.
 2. My colleagues: Lê Duy Cường, Bùi Khánh Duy, Nguyễn Công Đức , ... in my old company FPT (https://fpt.com/).
+
+---
+
+Reference & Dedication:
+   - https://www.amazon.com/UNIX-Network-Programming-Interprocess-Communications/dp/0130810819
+   - https://www.amazon.com/Unix-Network-Programming-Sockets-Networking/dp/0131411551
