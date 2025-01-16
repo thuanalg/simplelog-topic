@@ -114,10 +114,22 @@ This tool is a **tribute to his legacy**—a small way to express **gratitude** 
 **Open-Source on GitHub**  (https://github.com/thuanalg/simplelog-topic/)
 SimpleLog-Topic is open-source and available on GitHub. Feel free to contribute, modify, or integrate it into your projects, and be part of a community that values **simplicity**, **performance**, and the principles of **Unix**.
 
----
-
 By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solution—you’re embracing the legacy of **Richard Stevens**, honoring his work in **Unix network programming**, and following his principles of creating clear, efficient, and practical tools.
 
+---
+
+**APIs - Focus on Simplicity and Ease of Use**:  
+  - **4 simple APIs** for usage:  
+    - **Initialization** (at the start of `main`):  
+	    		    - `spl_init_log_ext(SPL_INPUT_ARG *input)`  
+    - **Logging** (in any thread):  
+	    	    - `spllog(level, fmt, ...)`  
+	    	    - **Levels**: `SPL_LOG_DEBUG`, `SPL_LOG_INFO`, `SPL_LOG_WARNING`, `SPL_LOG_ERROR`, `SPL_LOG_FATAL`  
+    - **Topic-based Logging**:  
+	    	    - `spllogtopic(level, topic_index, fmt, ...)`  
+    - **Finalization** (at the end of `main`):  
+		   - `spl_finish_log()`  
+    - **Sample**: (https://gist.github.com/thuanalg/75946524cb1bf6f1ea4eaac4f0778f19)
 ---
 
 **Video Install/Demo:**  
@@ -130,3 +142,9 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 
 1. My family, friends.
 2. My colleagues: Lê Duy Cường, Bùi Khánh Duy, Nguyễn Công Đức , ... in my old company FPT (https://fpt.com/).
+
+---
+
+Reference & Dedication:
+   - "UNIX Network Programming, Volume 2: Interprocess Communications, Second Edition": https://www.amazon.com/UNIX-Network-Programming-Interprocess-Communications/dp/0130810819
+   - "Unix Network Programming: The Sockets Networking API": https://www.amazon.com/Unix-Network-Programming-Sockets-Networking/dp/0131411551

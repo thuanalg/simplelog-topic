@@ -16,10 +16,13 @@ void* posix_thread_routine(void* lpParam);
 void dotest();
 int num_threads = 10;
 int loop_count = 1000 * 1000;
+int topicindex = 0;
 
 #define		TNUMBEER_OF_THREADS					"--nthread="	
 #define		TCONFIG_FILE						"--cfg="	
 #define		TLOOP_COUNT							"--loopcount="	
+#define		TMASTER_MODE						"--is_master="	
+#define		TTOPIC_INDEX						"--topic_index="
 
 int main(int argc, char* argv[]) {
 	int ret = 0, i = 0;
@@ -72,14 +75,14 @@ void dotest() {
 	//https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitformultipleobjects
 	//https://learn.microsoft.com/en-us/windows/win32/sync/waiting-for-multiple-objects
 	dwEvent = WaitForMultipleObjects(
-		num_threads,           // number of objects in array
+		num_threads,			// number of objects in array
 		hpThread,				// array of objects
 		TRUE,					// wait for any object
 		INFINITE);				// five-second wait
 	free(dwpThreadId);
 	free(hpThread);
 #else
-	//https://man7.org/linux/man-pages/man3/pthread_create.3.htG830ml
+	//https://man7.org/linux/man-pages/man3/pthread_create.3.html
 	pthread_t* pidds = 0;
 	pidds = (pthread_t*)malloc(num_threads * sizeof(pthread_t));
 	if (!pidds) {
@@ -88,7 +91,7 @@ void dotest() {
 	for (i = 0; i < num_threads; ++i) {
 		int err = pthread_create(pidds + i, 0, posix_thread_routine, 0);
 	}
-	for (i = 0; i < num_threads; i++) {
+	for (int i = 0; i < num_threads; i++) {
 		int s = pthread_join(pidds[i], 0);
 		if (s != 0) {
 			spl_console_log("pthread_join error.\n");
@@ -111,38 +114,21 @@ DWORD WINAPI win32_thread_routine(LPVOID lpParam) {
 #else
 void* posix_thread_routine(void* lpParam) {
 #endif // !UNIX_LINUX
-	int k = 0;
-	int tpic = 0;
-	//while (1) {
 	int count = 0;
-
-	while (count < loop_count) {
-		spllog(SPL_LOG_INFO, "My test log : %d", count);
-		//spllog(SPL_LOG_INFO, "");
-		//tpic = (spl_milli_now() % 3);
-		//spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
-		//splloglib(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "lib");
-		//spllogexe(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
-		//spllognaxyax(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
-		//spllogsksgn(SPL_LOG_INFO, "test log: %llu, topic: %d.", (LLU)time(0), tpic);
-		//spl_sleep(1);
-		++count;
+/*#define SPL_TEST_FMT			"test log test log test log: %d"*/
+	#define SPL_TEST_FMT			"My test log : %d"
+	if (topicindex < 1) {
+		while (count < loop_count) {
+			spllog(SPL_LOG_INFO, SPL_TEST_FMT, count);
+			++count;
+		}
 	}
-	//spl_console_log("Main close: End.\n");
-	//break;
-//}
+	else {
+		while (count < loop_count) {
+			spllogtopic(SPL_LOG_INFO, topicindex - 1, SPL_TEST_FMT, count);
+			++count;
+		}
+	}
 	return 0;
 }
 
-//int __main(int argc, char* argv[]) {
-//	//int ret = spl_init_log((char *)"C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
-//	int ret = spl_init_log((char*)"simplelog.cfg");
-//	int count = 10;
-//	int i = 0;
-//	for (i = 0; i < count; ++i) {
-//		spllog(SPL_LOG_INFO, "test log : %d", i);
-//		spllogsys(SPL_LOG_INFO, "test log: %llu, topic: %s.", (LLU)time(0), "sys");
-//	}
-//	spl_finish_log();
-//	return 0;
-//}
