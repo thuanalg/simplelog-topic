@@ -129,7 +129,7 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 	    	    - `spllogtopic(level, topic_index, fmt, ...)`  
     - **Finalization** (at the end of `main`):  
 		   - `spl_finish_log()`  
-    - **Sample**: (https://chatgpt.com/share/67889e7d-2d6c-800c-ae25-99aaca322686)
+    - **Sample**: (https://gist.github.com/thuanalg/75946524cb1bf6f1ea4eaac4f0778f19)
 ---
 
 **Video Install/Demo:**  

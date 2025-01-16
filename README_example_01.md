@@ -1,7 +1,7 @@
 #include "simplelog.h"
 
 int my_callback(SPL_CALLBACL_DATA* data) {
-    // Example: Process callback data here
+    return 0;
 }
 
 int main() {
