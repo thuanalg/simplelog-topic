@@ -616,34 +616,6 @@ int spl_init_log( char *pathcfg)
 }
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-/*
-void* spl_mutex_create() {
-	void *ret = 0;
-	do {
-#ifndef UNIX_LINUX
-	#ifndef SPL_USING_SPIN_LOCK
-		ret = (void*) CreateMutexA(0, 0, 0);
-	#else
-		ret = (void*) & spl_rw_spin;
-	#endif
-#else
-#ifndef SPL_USING_SPIN_LOCK
-		spl_malloc(sizeof(pthread_mutex_t), ret, void);
-		if (!ret) {
-			break;
-		}
-		memset(ret, 0, sizeof(pthread_mutex_t));
-		pthread_mutex_init((pthread_mutex_t*)ret, 0);
-#else
-		ret = (void *) &spl_rw_spin;
-		pthread_spin_init((pthread_spinlock_t*)ret, PTHREAD_PROCESS_PRIVATE);
-#endif
-#endif 
-	} while (0);
-	return ret;
-}
-/*
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 int spl_mutex_lock(void* obj) {
 	int ret = 0;
 #ifndef UNIX_LINUX
