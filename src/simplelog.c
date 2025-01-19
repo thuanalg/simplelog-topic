@@ -259,9 +259,12 @@ static int
 	spl_gen_sync_tool();
 static int 
 	spl_clean_sync_tool();
+static int
+	spl_set_off(int);
+static int
+	spl_standardize_path(char* fname);
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 SIMPLE_LOG_ST* spl_control_obj() {
-	//spl_con
 	return (SIMPLE_LOG_ST*)&__simple_log_static__;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
@@ -330,15 +333,7 @@ int spl_local_time_now(spl_local_time_st*stt) {
 	} while (0);
 	return ret;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-int spl_set_log_levwel(int val) {
-	__simple_log_static__.llevel = val;
-	return 0;
-}
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-int spl_get_log_levwel() {
-	return __simple_log_static__.llevel;
-}
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 int spl_set_off(int isoff) {
 	int ret = 0;
@@ -379,6 +374,7 @@ int spl_set_off(int isoff) {
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 	int ret = SPL_NO_ERROR;
+	SIMPLE_LOG_ST* t = (SIMPLE_LOG_ST*)&__simple_log_static__;
 	do {
 
 		if (strcmp(key, SPLOG_PATHFOLDR) == 0) {
@@ -397,7 +393,8 @@ int spl_init_log_parse(char* buff, char *key, char *isEnd) {
 				ret = SPL_LOG_LEVEL_ERROR;
 				break;
 			}
-			spl_set_log_levwel(n);
+			/*spl_set_log_levwel(n);*/
+			t->llevel = n;
 			break;
 		}
 		if (strcmp(key, SPLOG_BUFF_SIZE) == 0) {
@@ -618,34 +615,6 @@ int spl_init_log( char *pathcfg)
 	return ret;
 }
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-/*
-void* spl_mutex_create() {
-	void *ret = 0;
-	do {
-#ifndef UNIX_LINUX
-	#ifndef SPL_USING_SPIN_LOCK
-		ret = (void*) CreateMutexA(0, 0, 0);
-	#else
-		ret = (void*) & spl_rw_spin;
-	#endif
-#else
-#ifndef SPL_USING_SPIN_LOCK
-		spl_malloc(sizeof(pthread_mutex_t), ret, void);
-		if (!ret) {
-			break;
-		}
-		memset(ret, 0, sizeof(pthread_mutex_t));
-		pthread_mutex_init((pthread_mutex_t*)ret, 0);
-#else
-		ret = (void *) &spl_rw_spin;
-		pthread_spin_init((pthread_spinlock_t*)ret, PTHREAD_PROCESS_PRIVATE);
-#endif
-#endif 
-	} while (0);
-	return ret;
-}
-/*
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 int spl_mutex_lock(void* obj) {
 	int ret = 0;
@@ -1173,14 +1142,7 @@ int spl_gen_file(SIMPLE_LOG_ST* t, int *sz, int limit, int *index) {
 	} while (0);
 	return ret;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-void* spl_get_mtx() {
-	return __simple_log_static__.mtx_rw;
-}
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-void* spl_get_sem_rwfile() {
-	return __simple_log_static__.sem_rwfile;
-}
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 LLU	spl_get_threadid() {
 #ifndef UNIX_LINUX
