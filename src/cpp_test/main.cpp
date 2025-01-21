@@ -36,6 +36,10 @@ int main(int argc, char* argv[]) {
 			ret = sscanf(argv[i], TLOOP_COUNT"%d", &loop_count);
 			continue;
 		}
+		if (strstr(argv[i], TTOPIC_INDEX) == argv[i]) {
+			ret = sscanf(argv[i], TTOPIC_INDEX"%d", &topicindex);
+			continue;
+		}
 	}
 #ifndef UNIX_LINUX
 	snprintf(cfgpath, 1024, "C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
