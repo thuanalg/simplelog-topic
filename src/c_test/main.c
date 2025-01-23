@@ -91,7 +91,7 @@ void dotest() {
 	for (i = 0; i < num_threads; ++i) {
 		int err = pthread_create(pidds + i, 0, posix_thread_routine, 0);
 	}
-	for (int i = 0; i < num_threads; i++) {
+	for (i = 0; i < num_threads; i++) {
 		int s = pthread_join(pidds[i], 0);
 		if (s != 0) {
 			spl_console_log("pthread_join error.\n");
