@@ -229,8 +229,11 @@ static int
 static int
 	spl_fflush_err(int t, void *fpp);
 
-static int 
-	spl_create_thread(THREAD_ROUTINE f, void* arg);
+#ifndef UNIX_LINUX
+static int spl_create_thread(THREAD_ROUTINE f, void* arg, HANDLE* outhd);
+#else
+static int spl_create_thread(THREAD_ROUTINE f, void* arg, pthread_t* outid);
+#endif
 
 
 #ifndef UNIX_LINUX
@@ -736,7 +739,12 @@ void* spl_written_thread_routine(void* lpParam)
 	
 	char** main_src_thrd_buf = 0;
 	char*** src_topic_thrd_buf = 0;
-	
+
+#ifndef UNIX_LINUX
+	HANDLE trigger_handle_id = 0;
+#else
+	pthread_t trigger_handle_id = 0;
+#endif
 
 	char* only_buf = 0;
 	generic_dta_st* only_cast = 0;
@@ -771,7 +779,7 @@ void* spl_written_thread_routine(void* lpParam)
 
 	/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 	if (t->trigger_thread > 0) {
-		spl_create_thread(spl_trigger_routine, t);
+		spl_create_thread(spl_trigger_routine, t, &trigger_handle_id);
 	}
 	do {
 		if (is_off) {
@@ -908,6 +916,29 @@ void* spl_written_thread_routine(void* lpParam)
 	spl_free(only_buf);
 	/*//spl_del_memory((void *) only_buf);*/
 	/*Send a signal to the waiting thread.*/
+	if (t->trigger_thread) {
+#ifndef UNIX_LINUX
+		if (trigger_handle_id) {
+			int rs = (int)TerminateThread(trigger_handle_id, 0);
+			if (!rs) {
+				spl_console_log("TerminateThread error.");
+			}
+			else {
+				spl_console_log("TerminateThread OK.");
+			}
+		}
+#else
+		if (trigger_handle_id) {
+			int rs = pthread_cancel(trigger_handle_id);
+			if (rs) {
+				spl_console_log("pthread_cancel error.");
+			}
+			else {
+				spl_console_log("pthread_cancel OK.");
+			}
+		}
+#endif
+	}
 	spl_rel_sem(__simple_log_static__.sem_rwfile);
 	if (!t->isProcessMode) {
 		spl_rel_sem(__simple_log_static__.sem_off);
@@ -1591,8 +1622,12 @@ void* spl_trigger_routine(void* arg)
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
-
-int spl_create_thread(THREAD_ROUTINE f, void* arg) {
+#ifndef UNIX_LINUX
+int spl_create_thread(THREAD_ROUTINE f, void* arg, HANDLE* outhd)
+#else
+int spl_create_thread(THREAD_ROUTINE f, void* arg, pthread_t* outid)
+#endif
+{
 	int ret = 0;
 	//spl_console_log("===============================================f: %p, arg: %p", f, arg);
 #ifndef UNIX_LINUX
@@ -1603,6 +1638,7 @@ int spl_create_thread(THREAD_ROUTINE f, void* arg) {
 		ret = SPL_LOG_THREAD_W32_CREATE;
 		spl_console_log("CreateThread error: %d", (int) GetLastError());
 	}
+	*outhd = hThread;
 #else
 	pthread_t tidd = 0;
 	ret = pthread_create(&tidd, 0, f, arg);
@@ -1610,6 +1646,7 @@ int spl_create_thread(THREAD_ROUTINE f, void* arg) {
 		ret = SPL_LOG_THREAD_PX_CREATE;
 		spl_console_log("pthread_create: ret: %d, errno: %d, text: %s.", ret, errno, strerror(errno));
 	}
+	*outid = tidd;
 #endif
 	return ret;
 }
