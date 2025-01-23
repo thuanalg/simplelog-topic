@@ -357,9 +357,9 @@ __p__ = __FILE__;} while(0);
 	if(__t__->llevel <= (__lv__) && ___fmttt___[0] && __t__->arr_topic) \
 	{\
 		;short __tpp__ = 0;int len = 0;unsigned short r = 0;;const char *pfn = 0;;\
-		;int __outlen__ = 0;;char *__pprefmt__ = 0;; char tnow[SPL_RL_BUF];;__tpp__ = __tpic__%__t__->n_topic;;;\
+		;int __outlen__ = 0;;char *__pprefmt__ = 0;; char __tnow__[SPL_RL_BUF];;__tpp__ = __tpic__%__t__->n_topic;;;\
 		; __FILLE__(pfn);;\
-		;__pprefmt__ = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r, &__outlen__);;\
+		;__pprefmt__ = spl_fmt_now_ext(__tnow__, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r, &__outlen__);;\
 		do\
 		{\
 			;;\
@@ -389,7 +389,7 @@ __p__ = __FILE__;} while(0);
 			;r++; r%=__t__->ncpu;;continue;\
 		}\
 		while(1);\
-		if(!__t__->trigger_thread)spl_rel_sem(__t__->sem_rwfile);;if(__pprefmt__ != tnow) { spl_free(__pprefmt__);}\
+		if(!__t__->trigger_thread)spl_rel_sem(__t__->sem_rwfile);;if(__pprefmt__ != __tnow__) { spl_free(__pprefmt__);}\
 	}\
 }
 
