@@ -357,9 +357,9 @@ __p__ = __FILE__;} while(0);
 	if(__t__->llevel <= (__lv__) && ___fmttt___[0] && __t__->arr_topic) \
 	{\
 		;short __tpp__ = 0;int len = 0;unsigned short r = 0;;const char *pfn = 0;;\
-		;int outlen = 0;;char *__pprefmt__ = 0;; char tnow[SPL_RL_BUF];;__tpp__ = __tpic__%__t__->n_topic;;;\
+		;int __outlen__ = 0;;char *__pprefmt__ = 0;; char tnow[SPL_RL_BUF];;__tpp__ = __tpic__%__t__->n_topic;;;\
 		; __FILLE__(pfn);;\
-		;__pprefmt__ = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r, &outlen);;\
+		;__pprefmt__ = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r, &__outlen__);;\
 		do\
 		{\
 			;;\
@@ -369,15 +369,15 @@ __p__ = __FILE__;} while(0);
 					/*if(__t__->arr_topic){*/;;\
 						;;\
 						if(__t__->range > STSPLOGBUFTOPIC_RANGE(__t__,__tpp__, r)->pl) {\
-							;memcpy(STSPLOGBUFTOPIC_RANGE(__t__,__tpp__, r)->data + STSPLOGBUFTOPIC_RANGE(__t__,__tpp__, r)->pl, __pprefmt__, outlen);\
-							;STSPLOGBUFTOPIC_RANGE(__t__, __tpp__, r)->pl += outlen;;\
+							;memcpy(STSPLOGBUFTOPIC_RANGE(__t__,__tpp__, r)->data + STSPLOGBUFTOPIC_RANGE(__t__,__tpp__, r)->pl, __pprefmt__, __outlen__);\
+							;STSPLOGBUFTOPIC_RANGE(__t__, __tpp__, r)->pl += __outlen__;;\
 							;len = snprintf(STSPLOGBUFTOPIC_RANGE(__t__,__tpp__, r)->data + STSPLOGBUFTOPIC_RANGE(__t__,__tpp__, r)->pl, \
 								__t__->krange - STSPLOGBUFTOPIC_RANGE(__t__, __tpp__, r)->pl, \
 								___fmttt___, ##__VA_ARGS__);\
 							;/*spl_console_log("--------------lllllllennnnnnnnnnnnnnnnn---r: %d, len: %d", (int)r, len);*/;\
 							if(len > 0) {\
-								;outlen = SPL_MIN_AB(len, __t__->krange - STSPLOGBUFTOPIC_RANGE(__t__, __tpp__, r)->pl);;\
-								;STSPLOGBUFTOPIC_RANGE(__t__, __tpp__, r)->pl += outlen;\
+								;__outlen__ = SPL_MIN_AB(len, __t__->krange - STSPLOGBUFTOPIC_RANGE(__t__, __tpp__, r)->pl);;\
+								;STSPLOGBUFTOPIC_RANGE(__t__, __tpp__, r)->pl += __outlen__;\
 							}\
 						}\
 					/*}*/\
