@@ -310,10 +310,10 @@ __p__ = __FILE__;} while(0);
 	if(__t__->llevel <= (__lv__) && ___fmttt___[0])\
 	{\
 		;\
-		;int outlen = 0;;const char *pfn = 0;/*char __isOof = 0;*/ ;\
+		;int __outlen__ = 0;;const char *pfn = 0;/*char __isOof = 0;*/ ;\
 		;unsigned short r = 0;;char tnow[SPL_RL_BUF]; char *pprefmt = 0; \
 		;;\
-		;__FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r, &outlen);;\
+		;__FILLE__(pfn);pprefmt = spl_fmt_now_ext(tnow, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r, &__outlen__);;\
 		{\
 			do{\
 				;int len = 0;; \
@@ -322,13 +322,13 @@ __p__ = __FILE__;} while(0);
 				spl_mutex_lock(__t__->arr_mtx[r]);\
 					;\
 						if(__t__->range > SPLKEYBUF(__t__, r)->pl) {\
-							;memcpy(SPLKEYBUF(__t__, r)->data + SPLKEYBUF(__t__, r)->pl, pprefmt, outlen);\
-							;SPLKEYBUF(__t__, r)->pl += outlen;\
+							;memcpy(SPLKEYBUF(__t__, r)->data + SPLKEYBUF(__t__, r)->pl, pprefmt, __outlen__);\
+							;SPLKEYBUF(__t__, r)->pl += __outlen__;\
 							;len = snprintf( SPLKEYBUF(__t__, r)->data + SPLKEYBUF(__t__, r)->pl, __t__->krange - SPLKEYBUF(__t__, r)->pl, \
 								___fmttt___, ##__VA_ARGS__);\
 							;if(len > 0) {\
-								;outlen = SPL_MIN_AB(len, __t__->krange - SPLKEYBUF(__t__, r)->pl);\
-								;SPLKEYBUF(__t__, r)->pl += outlen;\
+								;__outlen__ = SPL_MIN_AB(len, __t__->krange - SPLKEYBUF(__t__, r)->pl);\
+								;SPLKEYBUF(__t__, r)->pl += __outlen__;\
 								;\
 							};\
 							\
