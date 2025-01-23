@@ -923,12 +923,18 @@ void* spl_written_thread_routine(void* lpParam)
 			if (!rs) {
 				spl_console_log("TerminateThread error.");
 			}
+			else {
+				spl_console_log("TerminateThread OK.");
+			}
 		}
 #else
 		if (trigger_handle_id) {
 			int rs = pthread_cancel(trigger_handle_id);
 			if (rs) {
 				spl_console_log("pthread_cancel error.");
+			}
+			else {
+				spl_console_log("pthread_cancel OK.");
 			}
 		}
 #endif
