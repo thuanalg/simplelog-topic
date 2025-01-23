@@ -356,10 +356,10 @@ __p__ = __FILE__;} while(0);
 {;SIMPLE_LOG_ST *__t__ = spl_control_obj();;\
 	if(__t__->llevel <= (__lv__) && ___fmttt___[0] && __t__->arr_topic) \
 	{\
-		;short __tpp__ = 0;int len = 0;unsigned short r = 0;;const char *pfn = 0;;\
+		;short __tpp__ = 0;int len = 0;unsigned short r = 0;;const char *__pfn__ = 0;;\
 		;int __outlen__ = 0;;char *__pprefmt__ = 0;; char __tnow__[SPL_RL_BUF];;__tpp__ = __tpic__%__t__->n_topic;;;\
-		; __FILLE__(pfn);;\
-		;__pprefmt__ = spl_fmt_now_ext(__tnow__, SPL_RL_BUF, __lv__, pfn, __FUNCTION__, __LINE__, &r, &__outlen__);;\
+		; __FILLE__(__pfn__);;\
+		;__pprefmt__ = spl_fmt_now_ext(__tnow__, SPL_RL_BUF, __lv__, __pfn__, __FUNCTION__, __LINE__, &r, &__outlen__);;\
 		do\
 		{\
 			;;\
