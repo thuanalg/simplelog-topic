@@ -48,10 +48,11 @@
 	#include <sys/stat.h> /* For mode constants */
 	#include <fcntl.h> /* For O_* constants */
 	#include <errno.h>
-#ifdef __MACH__
-#include <mach/clock.h>
-#include <mach/mach.h>
-#endif	
+	#ifdef __MACH__
+		#include <mach/mach.h>
+		#include <mach/clock.h>
+		#include <mach/clock_types.h>
+	#endif	
 	#define YEAR_PADDING				1900
 	#define MONTH_PADDING				1
 
@@ -292,6 +293,10 @@ int spl_local_time_now(spl_local_time_st*stt) {
 #else
 	struct tm* lt, rlt;
 	struct timespec nanosec;
+	#ifdef __MACH__
+		clock_serv_t cclock;
+		mach_timespec_t mts;
+	#endif
 #endif
 	do {
 		if (!stt) {
@@ -323,11 +328,9 @@ int spl_local_time_now(spl_local_time_st*stt) {
 		/*No need freeing, 
 		//https://stackoverflow.com/questions/35031647/do-i-need-to-free-the-returned-pointer-from-localtime-function*/
 #ifdef __MACH__
-		clock_serv_t cclock;
-		mach_timespec_t mts;
 		host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
 		clock_get_time(cclock, &mts);
-		mach_port_deallocate(mach_task_self(), cclock);
+		/*mach_port_deallocate(mach_task_self(), cclock);*/
 		nanosec.tv_sec = mts.tv_sec;
 		nanosec.tv_nsec = mts.tv_nsec;
 #else
