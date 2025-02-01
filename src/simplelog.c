@@ -246,6 +246,10 @@ static int spl_create_thread(THREAD_ROUTINE f, void* arg, pthread_t* outid);
 	static DWORD WINAPI
 		spl_trigger_routine(void* arg);
 #else
+	#ifdef __MACH__
+		static int
+			spl_osx_sync_create();
+	#endif
 	static int
 		spl_mtx_init(void* mtx, char shared);
 	static void*
@@ -1857,15 +1861,27 @@ int spl_calculate_size() {
 		semsize = 0;
 	#endif
 #else
-	#ifdef SPL_USING_SPIN_LOCK
-		step_size = sizeof(pthread_spinlock_t);
+	#ifdef __MACH__
+		#ifdef SPL_USING_SPIN_LOCK
+				step_size = sizeof(pthread_spinlock_t);
+		#else
+				step_size = sizeof(pthread_mutex_t);
+		#endif
+				mtxsize = 0;
+				/*1: For semrw.*/
+				/*1: For semOnOff.*/
+				semsize = 0;
 	#else
-		step_size = sizeof(pthread_mutex_t);
+		#ifdef SPL_USING_SPIN_LOCK
+			step_size = sizeof(pthread_spinlock_t);
+		#else
+			step_size = sizeof(pthread_mutex_t);
+		#endif
+			mtxsize = (1 + t->ncpu) * step_size;
+			/*1: For semrw.*/
+			/*1: For semOnOff.*/
+			semsize = 2 * sizeof(sem_t);
 	#endif
-		mtxsize = (1 + t->ncpu) * step_size;
-		/*1: For semrw.*/
-		/*1: For semOnOff.*/
-		semsize = 2 * sizeof(sem_t);
 #endif
 		/*k: For buffer.*/
 		/*mtxsize: mutex size.*/
@@ -1957,30 +1973,34 @@ int spl_calculate_size() {
 			}
 		}
 	#endif
-		/*Semaphore UNIX_LINUX*/
-		p = buff + k + mtxsize;
-		t->sem_rwfile = (void *)p;
-		t->sem_off = (void *)(p + sizeof(sem_t));
-		/*
-		* https://linux.die.net/man/3/sem_init
-		* #include <semaphore.h>
-		* int sem_init(sem_t *sem, int pshared, unsigned int value);
-		*/
-		if (t->sem_rwfile && t->sem_off) {
-			int err = 0;
-			err = sem_init((sem_t *)t->sem_rwfile, (int)t->isProcessMode, 0);
-			if (err) {
-				ret = SPL_LOG_SEM_INIT_UNIX;
-				spl_console_log("sem_init, errno: %d, errno_text: %s.", errno, strerror(errno));
-				break;
+		#ifdef __MACH__
+			ret = spl_osx_sync_create();
+		#else
+			/*Semaphore UNIX_LINUX*/
+			p = buff + k + mtxsize;
+			t->sem_rwfile = (void *)p;
+			t->sem_off = (void *)(p + sizeof(sem_t));
+			/*
+			* https://linux.die.net/man/3/sem_init
+			* #include <semaphore.h>
+			* int sem_init(sem_t *sem, int pshared, unsigned int value);
+			*/
+			if (t->sem_rwfile && t->sem_off) {
+				int err = 0;
+				err = sem_init((sem_t *)t->sem_rwfile, (int)t->isProcessMode, 0);
+				if (err) {
+					ret = SPL_LOG_SEM_INIT_UNIX;
+					spl_console_log("sem_init, errno: %d, errno_text: %s.", errno, strerror(errno));
+					break;
+				}
+				err = sem_init((sem_t*)t->sem_off, (int)t->isProcessMode, 0);
+				if (err) {
+					ret = SPL_LOG_SEM_INIT_UNIX;
+					spl_console_log("sem_init, errno: %d, errno_text: %s.", errno, strerror(errno));
+					break;
+				}
 			}
-			err = sem_init((sem_t*)t->sem_off, (int)t->isProcessMode, 0);
-			if (err) {
-				ret = SPL_LOG_SEM_INIT_UNIX;
-				spl_console_log("sem_init, errno: %d, errno_text: %s.", errno, strerror(errno));
-				break;
-			}
-		}
+		#endif
 #endif
 	} while (0);
 
@@ -2093,6 +2113,57 @@ int spl_win32_sync_create() {
 	return ret;
 }
 #else
+#ifdef __MACH__
+int spl_osx_sync_create() {
+	int ret = 0;
+	SIMPLE_LOG_ST* t = &__simple_log_static__;
+	char nameobj[SPL_SHARED_NAME_LEN];
+	do {
+#ifdef SPL_USING_SPIN_LOCK
+#else
+#endif
+		if (t->isProcessMode) {
+			sem_t *hd = 0;
+			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_RW, t->shared_key);
+			hd = sem_open(nameobj, O_CREAT, 0644, 1);
+			if (hd == SEM_FAILED) {
+				spl_console_log("sem_open, errno: %d, errno_text: %s.", errno, strerror(errno));
+				ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
+				break;
+			}
+			t->sem_rwfile = hd;
+			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_OFF, t->shared_key);
+			hd = sem_open(nameobj, O_CREAT, 0644, 1);
+			if (hd == SEM_FAILED) {
+				spl_console_log("sem_open, errno: %d, errno_text: %s.", errno, strerror(errno));
+				ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
+				break;
+			}
+			t->sem_off = hd;
+		}
+		else {
+			sem_t* hd = 0;
+			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_RW, t->shared_key);
+			hd = sem_open(nameobj, O_CREAT, 0644, 1);
+			if (hd == SEM_FAILED) {
+				spl_console_log("sem_open, errno: %d, errno_text: %s.", errno, strerror(errno));
+				ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
+				break;
+			}
+			t->sem_rwfile = hd;
+			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_OFF, t->shared_key);
+			hd = sem_open(nameobj, O_CREAT, 0644, 1);
+			if (hd == SEM_FAILED) {
+				spl_console_log("sem_open, errno: %d, errno_text: %s.", errno, strerror(errno));
+				ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
+				break;
+			}
+			t->sem_off = hd;
+		}
+	} while (0);
+	return ret;
+}
+#endif
 int spl_mtx_init(void* obj, char shared) 
 {
 	int ret = 0;
