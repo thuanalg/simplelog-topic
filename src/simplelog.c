@@ -546,7 +546,7 @@ int spl_init_log( char *pathcfg)
 	char c = 0;
 	int count = 0;
 	char buf[1024];
-	void* obj = 0;
+	/*void* obj = 0;*/
 	char isEnd = 0;
 	__simple_log_static__.ncpu = 1;
 	do {
@@ -1703,10 +1703,10 @@ int spl_create_thread(THREAD_ROUTINE f, void* arg, pthread_t* outid)
 int spl_del_memory()
 {
 	int ret = 0;
-	int isWell = 0;
 	SIMPLE_LOG_ST *t = &__simple_log_static__;
 	do {
 #ifndef UNIX_LINUX
+		int isWell = 0;
 		isWell = (int)UnmapViewOfFile((void*)t->buf);
 		if (!isWell) {
 			spl_console_log("UnmapViewOfFile error: %d", (int)GetLastError());
