@@ -2131,6 +2131,7 @@ int spl_osx_sync_create() {
 				ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
 				break;
 			}
+			sem_init(hd, t->isProcessMode, 0);
 			t->sem_rwfile = hd;
 			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_OFF, t->shared_key);
 			hd = sem_open(nameobj, O_CREAT, 0644, 1);
@@ -2139,6 +2140,7 @@ int spl_osx_sync_create() {
 				ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
 				break;
 			}
+			sem_init(hd, t->isProcessMode, 0);
 			t->sem_off = hd;
 		}
 		else {
@@ -2150,6 +2152,7 @@ int spl_osx_sync_create() {
 				ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
 				break;
 			}
+			sem_init(hd, t->isProcessMode, 0);
 			t->sem_rwfile = hd;
 			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_OFF, t->shared_key);
 			hd = sem_open(nameobj, O_CREAT, 0644, 1);
@@ -2158,6 +2161,7 @@ int spl_osx_sync_create() {
 				ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
 				break;
 			}
+			sem_init(hd, t->isProcessMode, 0);
 			t->sem_off = hd;
 		}
 	} while (0);
