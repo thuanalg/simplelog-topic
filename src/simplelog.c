@@ -296,6 +296,7 @@ int spl_local_time_now(spl_local_time_st*stt) {
 	#ifdef __MACH__
 		clock_serv_t cclock;
 		mach_timespec_t mts;
+		kern_return_t result;
 	#endif
 #endif
 	do {
@@ -316,8 +317,6 @@ int spl_local_time_now(spl_local_time_st*stt) {
 		stt->sec = (unsigned char)lt.wSecond;
 		stt->nn = (unsigned int)lt.wMilliseconds * SPL_MILLION + counter.QuadPart % SPL_MILLION;
 #else
-/* https://linux.die.net/man/3/localtime*/
-/* https://linux.die.net/man/3/clock_gettime*/
 		time_t t = time(0);
 		lt = localtime_r(&t, &rlt);
 		if (!lt) {
@@ -328,12 +327,24 @@ int spl_local_time_now(spl_local_time_st*stt) {
 		/*No need freeing, 
 		//https://stackoverflow.com/questions/35031647/do-i-need-to-free-the-returned-pointer-from-localtime-function*/
 #ifdef __MACH__
-		host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
-		clock_get_time(cclock, &mts);
-		/*mach_port_deallocate(mach_task_self(), cclock);*/
+		result = host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+		if (result != KERN_SUCCESS) {
+			ret = SPL_LOG_MACH_CLOCK_SERVICE_ERROR;
+			spl_console_log("SPL_LOG_MACH_CLOCK_SERVICE_ERROR.");
+			break;
+		}		
+		result = clock_get_time(cclock, &mts);
+		if (result != KERN_SUCCESS) {
+			ret = SPL_LOG_MACH_GETTIME_ERROR;
+			spl_console_log("SPL_LOG_MACH_GETTIME_ERROR.");
+			break;
+		}
+		mach_port_deallocate(mach_task_self(), cclock);
 		nanosec.tv_sec = mts.tv_sec;
 		nanosec.tv_nsec = mts.tv_nsec;
 #else
+/* https://linux.die.net/man/3/localtime*/
+/* https://linux.die.net/man/3/clock_gettime*/
 		ret = clock_gettime(CLOCK_REALTIME, &nanosec);
 		if (ret) {
 			ret = SPL_LOG_TIME_NANO_NULL_ERROR;
@@ -1565,12 +1576,29 @@ spl_milli_now() {
 		GetLocalTime(&lt);
 		ret = t0 * 1000 + lt.wMilliseconds;
 #else
-		int err = 0;
 		struct timespec nanosec;
+#ifdef __MACH__	
+		kern_return_t result;
+		clock_serv_t cclock;
+		mach_timespec_t mts;
+		result = host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+		if (result != KERN_SUCCESS) {
+			break;
+		}
+		result = clock_get_time(cclock, &mts);
+		if (result != KERN_SUCCESS) {
+			break;
+		}		
+		mach_port_deallocate(mach_task_self(), cclock);
+		nanosec.tv_sec = mts.tv_sec;
+		nanosec.tv_nsec = mts.tv_nsec;		
+#else	
+		int err = 0;
 		err = clock_gettime(CLOCK_REALTIME, &nanosec);
 		if (err) {
 			break;
 		}
+#endif
 		ret = t0 * 1000 + (nanosec.tv_nsec / SPL_MILLION);
 #endif	
 	} while (0);
