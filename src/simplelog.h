@@ -59,7 +59,8 @@ extern "C" {
 #define					SPL_RL_BUF							256
 #define					SPL_PATH_FOLDER						1024
 #define					SPL_IDD_NAME						64
-
+/*#define UNIX_LINUX*/
+/*#define __MACH__*/
 #ifndef  UNIX_LINUX
 	#ifndef __SIMPLE_STATIC_LOG__
 		#ifdef EXPORT_DLL_API_SIMPLE_LOG
