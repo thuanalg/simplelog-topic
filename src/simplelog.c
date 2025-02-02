@@ -1220,8 +1220,7 @@ LLU	spl_get_threadid() {
 int spl_rel_sem(void *sem) {
 	int ret = 0;
 #ifndef UNIX_LINUX
-#else
-	int err = 0, val = 0;
+#else	
 #endif
 	do {
 		if (!sem) {
@@ -1231,12 +1230,17 @@ int spl_rel_sem(void *sem) {
 #ifndef UNIX_LINUX
 		ReleaseSemaphore(sem, 1, 0);
 #else
-		err = sem_getvalue((sem_t*)sem, &val);
-		if (!err) {
-			if (val < 1) {
-				SPL_sem_post(sem);
-			}
-		}
+    #ifdef __MACH__
+        SPL_sem_post(sem);
+    #else
+        int val = 0;
+        int err = sem_getvalue((sem_t*)sem, &val);
+        if (!err) {
+            if (val < 1) {
+                SPL_sem_post(sem);
+            }
+        }
+    #endif
 #endif 
 	} while (0);
 	return ret;
@@ -2123,7 +2127,7 @@ int spl_osx_sync_create() {
 #ifdef SPL_USING_SPIN_LOCK
 #else
 #endif
-		int err = 0;
+				
 		if (t->isProcessMode) {
 			sem_t *hd = 0;
 			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_RW, t->shared_key);
@@ -2133,11 +2137,13 @@ int spl_osx_sync_create() {
 				ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
 				break;
 			}
+            /*
 			err = sem_init(hd, t->isProcessMode, 0);
 			if(err) {
 				ret = SPL_LOG_SEM_INIT_OSX;
 				spl_console_log("sem_init, errno: %d, errno_text: %s.", errno, strerror(errno));
 			}
+            */
 			t->sem_rwfile = hd;
 			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_OFF, t->shared_key);
 			hd = sem_open(nameobj, O_CREAT, 0644, 1);
@@ -2146,11 +2152,13 @@ int spl_osx_sync_create() {
 				ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
 				break;
 			}
+            /*
 			err = sem_init(hd, t->isProcessMode, 0);
 			if(err) {
 				ret = SPL_LOG_SEM_INIT_OSX;
 				spl_console_log("sem_init, errno: %d, errno_text: %s.", errno, strerror(errno));
-			}			
+			}
+            */
 			t->sem_off = hd;
 		}
 		else {
@@ -2162,11 +2170,13 @@ int spl_osx_sync_create() {
 				ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
 				break;
 			}
+            /*
 			err = sem_init(hd, t->isProcessMode, 0);
 			if(err) {
 				ret = SPL_LOG_SEM_INIT_OSX;
 				spl_console_log("sem_init, errno: %d, errno_text: %s.", errno, strerror(errno));
-			}			
+			}
+            */
 			t->sem_rwfile = hd;
 			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_OFF, t->shared_key);
 			hd = sem_open(nameobj, O_CREAT, 0644, 1);
@@ -2175,11 +2185,13 @@ int spl_osx_sync_create() {
 				ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
 				break;
 			}
+            /*
 			err = sem_init(hd, t->isProcessMode, 0);
 			if(err) {
 				ret = SPL_LOG_SEM_INIT_OSX;
 				spl_console_log("sem_init, errno: %d, errno_text: %s.", errno, strerror(errno));
-			}			
+			}
+            */
 			t->sem_off = hd;
 		}
 	} while (0);
