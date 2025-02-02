@@ -19,7 +19,7 @@
 *		<2025-Jan-10>
 *		<2025-Feb-01>
 * Decription:
-*		The (only) main header file to export 5 APIs: [spl_init_log, spl_init_log_ext, spllog, spllogtopic, spl_finish_log].
+*		The (only) main header file to export 4 APIs: [spl_init_log_ext, spllog, spllogtopic, spl_finish_log].
 */
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 #ifndef ___SIMPLE_LOG__
