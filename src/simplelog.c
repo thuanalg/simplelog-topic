@@ -2128,24 +2128,61 @@ int spl_osx_sync_create() {
 #endif
 				
 		if (t->isProcessMode || 1) {
+            int retry = 0;
 			sem_t *hd = 0;
 			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_RW, t->shared_key);
-			hd = sem_open(nameobj, SPL_LOG_UNIX_CREATE_MODE, SPL_LOG_UNIX__SHARED_MODE, 1);
-			if (hd == SEM_FAILED) {
-				spl_console_log("sem_open, errno: %d, errno_text: %s.", errno, strerror(errno));
-				ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
-				break;
-			}
-
+            do {
+                hd = sem_open(nameobj, SPL_LOG_UNIX_CREATE_MODE, SPL_LOG_UNIX__SHARED_MODE, 1);
+                if (hd == SEM_FAILED) {
+                    spl_console_log("sem_open, errno: %d, errno_text: %s.", errno, strerror(errno));
+                    ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
+                    if(retry) {
+                        break;
+                    } else {
+                        ret = sem_unlink(nameobj);
+                        if(ret) {
+                            spl_console_log("sem_unlink, errno: %d, errno_text: %s.", errno, strerror(errno));
+                            ret = SPL_LOG_SEM_OSX_UNLINK_ERROR;
+                            break;
+                        }
+                        retry++;
+                        continue;
+                    }
+                }
+                break;
+            } while(1);
+            
+            if(ret) {
+                break;
+            }
 			t->sem_rwfile = hd;
+            
+            retry = 0;
 			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_OFF, t->shared_key);
-			hd = sem_open(nameobj, SPL_LOG_UNIX_CREATE_MODE, SPL_LOG_UNIX__SHARED_MODE, 1);
-			if (hd == SEM_FAILED) {
-				spl_console_log("sem_open, errno: %d, errno_text: %s.", errno, strerror(errno));
-				ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
-				break;
-			}
-
+            do {
+                hd = sem_open(nameobj, SPL_LOG_UNIX_CREATE_MODE, SPL_LOG_UNIX__SHARED_MODE, 1);
+                if (hd == SEM_FAILED) {
+                    spl_console_log("sem_open, errno: %d, errno_text: %s.", errno, strerror(errno));
+                    ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
+                    if(retry) {
+                        break;
+                    }
+                    else {
+                        ret = sem_unlink(nameobj);
+                        if(ret) {
+                            spl_console_log("sem_unlink, errno: %d, errno_text: %s.", errno, strerror(errno));
+                            ret = SPL_LOG_SEM_OSX_UNLINK_ERROR;
+                            break;
+                        }
+                        retry++;
+                        continue;
+                    }
+                }
+                break;
+            } while(1);
+            if(ret) {
+                break;
+            }
 			t->sem_off = hd;
 		}
 		else {
