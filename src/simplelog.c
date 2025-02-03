@@ -1731,12 +1731,21 @@ int spl_del_memory()
 			ret = SPL_LOG_WIN_SHM_CLOSE;
 		}
 #else
+    #ifdef __MACH__
+        ret = munmap((void*)t->buf, (size_t) t->map_mem_size);
+        if (ret) {
+            ret = SPL_LOG_SHM_UNIX_UNMAP;
+            spl_console_log("shm_unlink: err: %d, errno: %d, text: %s, name: %s.", ret, errno, strerror(errno), "__name__");
+        }
+        spl_shm_unlink(t->shared_key, ret);
+    #else
 		ret = munmap((void*)t->buf, (size_t) t->map_mem_size);
 		if (ret) {
 			ret = SPL_LOG_SHM_UNIX_UNMAP;
 			spl_console_log("shm_unlink: err: %d, errno: %d, text: %s, name: %s.", ret, errno, strerror(errno), "__name__");
 		}
 		spl_shm_unlink(t->shared_key, ret);
+    #endif
 #endif
 	} while (0);
 	return ret;
@@ -2421,6 +2430,9 @@ int spl_clean_sync_tool() {
 #endif
 		spl_free(t->arr_mtx);
 		if (t->isProcessMode) {
+        #ifdef __MACH__
+            ret = spl_osx_sync_del();
+        #endif
 			ret = spl_del_memory();
 		}
 		else {
