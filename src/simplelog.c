@@ -2183,7 +2183,8 @@ int spl_osx_sync_create() {
             if(ret) {
                 break;
             }
-			t->sem_off = hd;
+            sem_wait(hd);
+            t->sem_off = hd;
         }
         else
         {
