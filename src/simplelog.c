@@ -2184,28 +2184,28 @@ int spl_osx_sync_create() {
                 break;
             }
 			t->sem_off = hd;
-		}
-		else {
-			sem_t* hd = 0;
-			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_RW, t->shared_key);
-			hd = sem_open(nameobj, SPL_LOG_UNIX_OPEN_MODE);
-			if (hd == SEM_FAILED) {
-				spl_console_log("sem_open, errno: %d, errno_text: %s.", errno, strerror(errno));
-				ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
-				break;
+        }
+        else
+        {
+            sem_t* hd = 0;
+            snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_RW, t->shared_key);
+            hd = sem_open(nameobj, SPL_LOG_UNIX_OPEN_MODE);
+            if (hd == SEM_FAILED) {
+                spl_console_log("sem_open, errno: %d, errno_text: %s.", errno, strerror(errno));
+                ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
+                break;
+            }
+            t->sem_rwfile = hd;
+            
+            snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_OFF, t->shared_key);
+            hd = sem_open(nameobj, SPL_LOG_UNIX_OPEN_MODE);
+            if (hd == SEM_FAILED) {
+                spl_console_log("sem_open, errno: %d, errno_text: %s.", errno, strerror(errno));
+                ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
+                break;
 			}
-
-			t->sem_rwfile = hd;
-			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_OFF, t->shared_key);
-			hd = sem_open(nameobj, SPL_LOG_UNIX_OPEN_MODE);
-			if (hd == SEM_FAILED) {
-				spl_console_log("sem_open, errno: %d, errno_text: %s.", errno, strerror(errno));
-				ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
-				break;
-			}
-
-			t->sem_off = hd;
-		}
+            t->sem_off = hd;
+        }
 	} while (0);
 	return ret;
 }
