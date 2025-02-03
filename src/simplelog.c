@@ -940,7 +940,7 @@ void* spl_written_thread_routine(void* lpParam)
 
 		
 	} while (0);
-	/*//spl_free(thrd_buffer);*/
+	/* spl_free(thrd_buffer); */
 	spl_free(main_src_thrd_buf);
 	if (t->arr_topic) {
 		for (i = 0; i < t->n_topic; ++i) {
@@ -949,8 +949,8 @@ void* spl_written_thread_routine(void* lpParam)
 		spl_free(src_topic_thrd_buf);
 	}
 	spl_free(only_buf);
-	/*//spl_del_memory((void *) only_buf);*/
-	/*Send a signal to the waiting thread.*/
+	/* spl_del_memory((void *) only_buf); */
+	/* Send a signal to the waiting thread. */
 	if (t->trigger_thread) {
 #ifndef UNIX_LINUX
 		if (trigger_handle_id) {
@@ -1018,44 +1018,47 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 	int ret = 0;
 	spl_local_time_st stt;
 	int n = 0;
+	LLU threadiid = 0;
+	
+	threadiid = (LLU)spl_get_threadid();
 	*outlen = 0;
-    LLU threadiid = (LLU)spl_get_threadid();
-
-		ret = spl_local_time_now(&stt);
-		if (ret) {
-			return p;
-		}
+	ret = spl_local_time_now(&stt);
+	if (ret) {
+		return p;
+	}
 #ifndef __MODE_STRAIGHT__
 		*r = (stt.nn  % __simple_log_static__.ncpu);
 #else
         *r = (threadiid  % __simple_log_static__.ncpu);
 #endif
-		n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X"[%c] [tid\t%llu]\t",
-			stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day,
-			stt.hour, stt.minute, stt.sec, (int)stt.nn, spl_text_gb_c[lv % SPL_LOG_PEAK], threadiid);
-		if (n < 1) {
-			ret = SPL_LOG_PRINTF_ERROR;
-			return p;
+	n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X"[%c] [tid\t%llu]\t",
+		stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day,
+		stt.hour, stt.minute, stt.sec, (int)stt.nn, spl_text_gb_c[lv % SPL_LOG_PEAK], threadiid);
+	if (n < 1) {
+		ret = SPL_LOG_PRINTF_ERROR;
+		return p;
+	}
+	*outlen = n;
+	
+	/* 
+	*outlen += snprintf(fmtt + n, len - n, "[%s:%s:%d] [r: %d]\t",
+		filename, funcname, line, (int)*r); */
+	*outlen += snprintf(fmtt + n, SPL_RL_BUF - n, "[%s:%s:%d] ",
+		filename, funcname, line);
+	if (*outlen > len) {
+		spl_malloc((*outlen + 1), p, char);
+		if (!p) {
+			exit(1);
 		}
+		memcpy(p, fmtt, n);
 		*outlen = n;
-		
-		//*outlen += snprintf(fmtt + n, len - n, "[%s:%s:%d] [r: %d]\t",
-		//	filename, funcname, line, (int)*r);
+		/* 
+			*outlen += sprintf(p + n, "[%s:%s:%d] [r: %d]\t",
+			filename, funcname, line, (int)*r); 
+		*/
 		*outlen += snprintf(fmtt + n, SPL_RL_BUF - n, "[%s:%s:%d] ",
 			filename, funcname, line);
-		if (*outlen > len) {
-			spl_malloc((*outlen + 1), p, char);
-			if (!p) {
-				exit(1);
-			}
-			memcpy(p, fmtt, n);
-			*outlen = n;
-			//*outlen += sprintf(p + n, "[%s:%s:%d] [r: %d]\t",
-			//	filename, funcname, line, (int)*r);
-			*outlen += snprintf(fmtt + n, SPL_RL_BUF - n, "[%s:%s:%d] ",
-				filename, funcname, line);
-		}
-		
+	}
 
 	return p;
 }
@@ -1097,7 +1100,7 @@ int spl_fmmt_now(char* fmtt, int len) {
 int spl_gen_file(SIMPLE_LOG_ST* t, int *sz, int limit, int *index) {
 	int ret = 0;
 	spl_local_time_st lt,* plt = 0;;
-	//int renew = SPL_NO_CHANGE_NAME;
+	/* int renew = SPL_NO_CHANGE_NAME; */
 	char path[1024];
 	char fmt_file_name[SPL_FNAME_LEN];
 	int ferr = 0;
@@ -1199,7 +1202,7 @@ int spl_gen_file(SIMPLE_LOG_ST* t, int *sz, int limit, int *index) {
 		}
 		spl_standardize_path(path);
 		spl_standardize_path(t->path_template);
-		//t->fp = fopen(path, "a+");
+		/* t->fp = fopen(path, "a+"); */
 		FFOPEN(t->fp, path, "a+");
 		if (sz) {
 			*sz = 0;
@@ -1881,14 +1884,14 @@ int spl_calculate_size() {
 #else
 	#ifdef __MACH__
 		#ifdef SPL_USING_SPIN_LOCK
-				step_size = sizeof(pthread_spinlock_t);
+			step_size = sizeof(pthread_spinlock_t);
 		#else
-				step_size = sizeof(pthread_mutex_t);
+			step_size = sizeof(pthread_mutex_t);
 		#endif
-				mtxsize = 0;
-				/*1: For semrw.*/
-				/*1: For semOnOff.*/
-				semsize = 0;
+			mtxsize = (1 + t->ncpu) * step_size;
+			/*1: For semrw.*/
+			/*1: For semOnOff.*/
+			semsize = 0;
 	#else
 		#ifdef SPL_USING_SPIN_LOCK
 			step_size = sizeof(pthread_spinlock_t);
@@ -1908,7 +1911,7 @@ int spl_calculate_size() {
 		n = k + mtxsize + semsize;		
 		t->map_mem_size = n;
 		/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-		//int spl_create_memory(void** output, char* shared_key, int size_shared, char isCreating) {
+		/* int spl_create_memory(void** output, char* shared_key, int size_shared, char isCreating) */
 		if (t->isProcessMode) {
 			spl_create_memory((void**) & buff, t->shared_key, n, t->is_master);
 		}
