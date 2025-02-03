@@ -1017,17 +1017,20 @@ char* spl_fmt_now_ext(char* fmtt, int len, int lv,
 	spl_local_time_st stt;
 	int n = 0;
 	*outlen = 0;
+    LLU threadiid = (LLU)spl_get_threadid();
 
 		ret = spl_local_time_now(&stt);
 		if (ret) {
 			return p;
 		}
-
+#ifndef __MODE_STRAIGHT__
 		*r = (stt.nn  % __simple_log_static__.ncpu);
-
+#else
+        *r = (threadiid  % __simple_log_static__.ncpu);
+#endif
 		n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X"[%c] [tid\t%llu]\t",
 			stt.year + YEAR_PADDING, stt.month + MONTH_PADDING, stt.day,
-			stt.hour, stt.minute, stt.sec, (int)stt.nn, spl_text_gb_c[lv % SPL_LOG_PEAK], spl_get_threadid());
+			stt.hour, stt.minute, stt.sec, (int)stt.nn, spl_text_gb_c[lv % SPL_LOG_PEAK], threadiid);
 		if (n < 1) {
 			ret = SPL_LOG_PRINTF_ERROR;
 			return p;
