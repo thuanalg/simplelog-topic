@@ -329,10 +329,9 @@ int spl_local_time_now(spl_local_time_st*stt) {
 			break;
 		}
 		lt = (struct tm*) &rlt;
-		/*No need freeing, 
-		//https://stackoverflow.com/questions/35031647/do-i-need-to-free-the-returned-pointer-from-localtime-function*/
+		/* No need freeing, https://stackoverflow.com/questions/35031647/do-i-need-to-free-the-returned-pointer-from-localtime-function  */
 #ifdef __MACH__
-		result = host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+		result = host_get_clock_service(mach_host_self(), REALTIME_CLOCK, &cclock);
 		if (result != KERN_SUCCESS) {
 			ret = SPL_LOG_MACH_CLOCK_SERVICE_ERROR;
 			spl_console_log("SPL_LOG_MACH_CLOCK_SERVICE_ERROR.");
@@ -348,8 +347,8 @@ int spl_local_time_now(spl_local_time_st*stt) {
 		nanosec.tv_sec = mts.tv_sec;
 		nanosec.tv_nsec = mts.tv_nsec;
 #else
-/* https://linux.die.net/man/3/localtime*/
-/* https://linux.die.net/man/3/clock_gettime*/
+/* https://linux.die.net/man/3/localtime */
+/* https://linux.die.net/man/3/clock_gettime */
 		ret = clock_gettime(CLOCK_REALTIME, &nanosec);
 		if (ret) {
 			ret = SPL_LOG_TIME_NANO_NULL_ERROR;
@@ -1590,7 +1589,7 @@ spl_milli_now() {
 		kern_return_t result;
 		clock_serv_t cclock;
 		mach_timespec_t mts;
-		result = host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &cclock);
+		result = host_get_clock_service(mach_host_self(), REALTIME_CLOCK, &cclock);
 		if (result != KERN_SUCCESS) {
 			break;
 		}
