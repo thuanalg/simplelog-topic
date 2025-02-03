@@ -1886,6 +1886,17 @@ int spl_calculate_size() {
 		#ifdef SPL_USING_SPIN_LOCK
 			step_size = sizeof(pthread_spinlock_t);
 			#error "not yet implemented."
+			/*
+				- https://developer.apple.com/documentation/os/os_unfair_lock_t : iOS 10.0+
+					iPadOS 10.0+
+					Mac Catalyst 13.1+
+					macOS 10.12+
+					tvOS 10.0+
+					visionOS 1.0+
+					watchOS 3.0+
+				- https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/OSSpinLockTry.3.html
+					- May 26, 2004   Darwin
+			*/
 		#else
 			step_size = sizeof(pthread_mutex_t);
 		#endif
