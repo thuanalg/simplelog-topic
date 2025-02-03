@@ -827,7 +827,9 @@ void* spl_written_thread_routine(void* lpParam)
 		if (!t->sem_rwfile) {
 			exit(1);
 		}
+		/*
 		//spl_console_log("Semaphore: 0x%p.\n", t->sem_rwfile);
+		*/
 		if (!t->mtx_rw) {
 			exit(1);
 		}
@@ -861,13 +863,13 @@ void* spl_written_thread_routine(void* lpParam)
 				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				for (i = 0; i < t->ncpu; ++i) {
 					spl_mutex_lock(t->arr_mtx[i]);
-					//do {
+					/* //do { */
 						if (MYCASTGEN(main_src_thrd_buf[i])->pl > 0) {
 							memcpy(only_cast->data + only_cast->pl, MYCASTGEN(main_src_thrd_buf[i])->data, MYCASTGEN(main_src_thrd_buf[i])->pl);
 							only_cast->pl += MYCASTGEN(main_src_thrd_buf[i])->pl;
 							MYCASTGEN(main_src_thrd_buf[i])->pl = 0;
 						}
-					//} while (0);
+					/* //} while (0); */
 					spl_mutex_unlock(t->arr_mtx[i]);
 				}
 				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
@@ -1323,8 +1325,10 @@ int spl_folder_sup(char* folder, spl_local_time_st* lctime, char* year_month) {
 			}
 		}
 #else
-	/*https://linux.die.net/man/3/mkdir
-	//https://linux.die.net/man/2/stat*/
+	/*
+		https://linux.die.net/man/3/mkdir
+		https://linux.die.net/man/2/stat 
+	*/
 		memset(&buf, 0, sizeof(buf));
 		stat(path, &buf);
 		if (!S_ISDIR(buf.st_mode)) {
@@ -1456,9 +1460,11 @@ spl_stdz_topics
 		spl_console_log("Topic.\n");	
 
 	} while(0);
+	/*
 	//if (p) {
 	//	spl_free(p);
 	//}
+	*/
 	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
@@ -1466,12 +1472,16 @@ int
 spl_gen_topics(SIMPLE_LOG_ST* t) {
 	int ret = 0;
 	char path[1024];
+	/*
 	//int renew = 0;
+	*/
 	LLU cszize = 0;
 	do {
 		int i = 0;
 		if (t->n_topic < 1) {
+			/*
 			//ret = SPL_LOG_TOPIC_ZERO;
+			*/
 			break;
 		}
 		for (i = 0; i < t->n_topic; ++i) 
@@ -1524,7 +1534,9 @@ spl_gen_topics(SIMPLE_LOG_ST* t) {
 					t->arr_topic[i].index = 0;
 					t->arr_topic[i].fizize = 0;
 					snprintf(path, 1024, "%s-%s-%.7d.log", t->path_template, t->arr_topic[i].topic, t->arr_topic[i].index);
+					/*
 					//t->arr_topic[i].fp = fopen(path, "a+");
+					*/
 					FFOPEN(t->arr_topic[i].fp, path, "a+");
 					if (!t->arr_topic[i].fp) {
 						ret = SPL_LOG_TOPIC_FOPEN;
@@ -1538,7 +1550,6 @@ spl_gen_topics(SIMPLE_LOG_ST* t) {
 			break;
 		}
 		for (i = 0; i < t->n_topic; ) {
-			//TO-TEST
 			if ((t->arr_topic[i].fizize) < t->file_limit_size) {
 				++i;
 				continue;
@@ -1555,7 +1566,9 @@ spl_gen_topics(SIMPLE_LOG_ST* t) {
 				t->arr_topic[i].fizize = 0;
 				
 				snprintf(path, 1024, "%s-%s-%.7d.log", t->path_template, t->arr_topic[i].topic, t->arr_topic[i].index);
+				/*
 				//t->arr_topic[i].fp = fopen(path, "a+");
+				*/
 				FFOPEN(t->arr_topic[i].fp, path, "a+");
 				if (!t->arr_topic[i].fp) {
 					ret = SPL_LOG_TOPIC_FOPEN;
@@ -1692,7 +1705,6 @@ int spl_create_thread(THREAD_ROUTINE f, void* arg, pthread_t* outid)
 #endif
 {
 	int ret = 0;
-	//spl_console_log("===============================================f: %p, arg: %p", f, arg);
 #ifndef UNIX_LINUX
 	DWORD dwThreadId = 0;
 	HANDLE hThread = 0;
@@ -1769,12 +1781,12 @@ int spl_create_memory(void** output, char* shared_key, int size_shared, char isC
 		}
 		if (isCreating) {
 			hMapFile = CreateFileMappingA(
-				INVALID_HANDLE_VALUE,    // use paging file
-				NULL,                    // default security
-				PAGE_READWRITE,          // read/write access
-				0,                       // maximum object size (high-order DWORD)
-				size_shared,                // maximum object size (low-order DWORD)
-				shared_key);                 // name of mapping object
+				INVALID_HANDLE_VALUE,    /* use paging file */
+				NULL,                    /* // default security */
+				PAGE_READWRITE,          /* // read/write access */
+				0,                       /* // maximum object size (high-order DWORD) */
+				size_shared,             /*   // maximum object size (low-order DWORD) */
+				shared_key);             /*    // name of mapping object */
 
 			if (!hMapFile) {
 				spl_console_log("Cannot create SHM. error: %d\n", (int)GetLastError());
