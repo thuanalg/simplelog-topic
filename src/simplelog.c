@@ -250,6 +250,8 @@ static int spl_create_thread(THREAD_ROUTINE f, void* arg, pthread_t* outid);
 	#ifdef __MACH__
 		static int
 			spl_osx_sync_create();
+        static int
+            spl_osx_sync_del();
 	#endif
 	static int
 		spl_mtx_init(void* mtx, char shared);
@@ -2121,6 +2123,47 @@ int spl_win32_sync_create() {
 }
 #else
 #ifdef __MACH__
+int spl_osx_sync_del() {
+    int ret = 0;
+    SIMPLE_LOG_ST* t = &__simple_log_static__;
+    char nameobj[SPL_SHARED_NAME_LEN];
+    do {
+        if(t->isProcessMode | 1) {
+        	snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_RW, t->shared_key);
+        	if (sem_close((sem_t*)t->sem_rwfile) == -1) {
+        	    spl_console_log("sem_close, errno: %d, errno_text: %s.", errno, strerror(errno));
+        	    ret = SPL_LOG_OSX_SEM_CLOSE;
+        	}
+        	if (sem_unlink(nameobj) == -1) {
+        	    spl_console_log("sem_unlink, errno: %d, errno_text: %s.", errno, strerror(errno));
+        	    ret = SPL_LOG_OSX_SEM_UNLINK;
+        	}
+        	snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_OFF, t->shared_key);
+        	if (sem_close((sem_t*)t->sem_off) == -1) {
+        	    spl_console_log("sem_close, errno: %d, errno_text: %s.", errno, strerror(errno));
+        	    ret = SPL_LOG_OSX_SEM_CLOSE;
+        	}
+        	if (sem_unlink(nameobj) == -1) {
+        	    spl_console_log("sem_unlink, errno: %d, errno_text: %s.", errno, strerror(errno));
+        	    ret = SPL_LOG_OSX_SEM_UNLINK;
+        	}
+        }
+        else {
+            snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_RW, t->shared_key);
+            if (sem_close((sem_t*)t->sem_rwfile) == -1) {
+                spl_console_log("sem_close, errno: %d, errno_text: %s.", errno, strerror(errno));
+                ret = SPL_LOG_OSX_SEM_CLOSE;
+            }
+            snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_OFF, t->shared_key);
+            if (sem_close((sem_t*)t->sem_off) == -1) {
+                spl_console_log("sem_close, errno: %d, errno_text: %s.", errno, strerror(errno));
+                ret = SPL_LOG_OSX_SEM_CLOSE;
+            }
+        }
+    } while(0);
+    return ret;
+}
+
 int spl_osx_sync_create() {
 	int ret = 0;
 	SIMPLE_LOG_ST* t = &__simple_log_static__;
@@ -2130,7 +2173,7 @@ int spl_osx_sync_create() {
 #else
 #endif
 				
-        if (t->isProcessMode || 1) {
+        if (t->isProcessMode | 1) {
             int retry = 0;
             sem_t *hd = 0;
             snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_RW, t->shared_key);
@@ -2381,27 +2424,9 @@ int spl_clean_sync_tool() {
 			ret = spl_del_memory();
 		}
 		else {
-			#ifdef __MACH__
-				char nameobj[SPL_SHARED_NAME_LEN];
-				snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_RW, t->shared_key);
-				if (sem_close((sem_t*)t->sem_rwfile) == -1) {
-					spl_console_log("sem_close, errno: %d, errno_text: %s.", errno, strerror(errno));
-					ret = SPL_LOG_OSX_SEM_CLOSE;
-				}
-				if (sem_unlink(nameobj) == -1) {
-					spl_console_log("sem_unlink, errno: %d, errno_text: %s.", errno, strerror(errno));
-					ret = SPL_LOG_OSX_SEM_UNLINK;
-				}
-				snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_OFF, t->shared_key);
-				if (sem_close((sem_t*)t->sem_off) == -1) {
-					spl_console_log("sem_close, errno: %d, errno_text: %s.", errno, strerror(errno));
-					ret = SPL_LOG_OSX_SEM_CLOSE;
-				}
-				if (sem_unlink(nameobj) == -1) {
-					spl_console_log("sem_unlink, errno: %d, errno_text: %s.", errno, strerror(errno));
-					ret = SPL_LOG_OSX_SEM_UNLINK;
-				}
-			#endif
+        #ifdef __MACH__
+            ret = spl_osx_sync_del();
+        #endif
 			spl_free(t->buf);
 		}
 	} while (0);
