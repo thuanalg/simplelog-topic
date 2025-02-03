@@ -1885,6 +1885,7 @@ int spl_calculate_size() {
 	#ifdef __MACH__
 		#ifdef SPL_USING_SPIN_LOCK
 			step_size = sizeof(pthread_spinlock_t);
+			#error "not yet implemented."
 		#else
 			step_size = sizeof(pthread_mutex_t);
 		#endif
