@@ -394,12 +394,12 @@ int spl_set_off(int isoff) {
 #ifndef UNIX_LINUX
 		errCode = (int) WaitForSingleObject(t->sem_off, INFINITE);
 		if (errCode == WAIT_FAILED) {
-			spl_console_log("------- errCode: %d\n", (int)GetLastError());
+			spl_console_log("------- WaitForSingleObject errCode: %d\n", (int)GetLastError());
 		}
 #else
 		errCode = SPL_sem_wait(t->sem_off);
 		if (errCode) {
-			spl_console_log("------- errCode: %d\n", (int)errCode);
+			spl_console_log("------- SPL_sem_wait errCode: %d\n", (int)errCode);
 		}
 #endif
 #ifdef SPL_SHOW_CONSOLE
@@ -1939,6 +1939,7 @@ int spl_calculate_size() {
 		/*mtxsize: mutex size.*/
 		/*semsize: sem size.*/
 		/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+        spl_console_log("buf size: %d, mtxsize: %d, semsize: %d", (int)k, (int) mtxsize, (int) semsize);
 		n = k + mtxsize + semsize;		
 		t->map_mem_size = n;
 		/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
