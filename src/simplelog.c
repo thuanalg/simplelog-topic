@@ -2463,8 +2463,8 @@ int spl_clean_sync_tool() {
 #else	
 	#ifdef __MACH__
 		/* Clear semaphore of MAC OSX. */
-        ret = spl_osx_sync_del();
-    #endif
+		ret = spl_osx_sync_del();
+	#endif
 #endif
 		spl_free(t->arr_mtx);
 		if (t->isProcessMode) {
