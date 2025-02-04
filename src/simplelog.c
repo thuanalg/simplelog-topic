@@ -332,7 +332,11 @@ int spl_local_time_now(spl_local_time_st*stt) {
 		}
 		lt = (struct tm*) &rlt;
 		/* No need freeing, https://stackoverflow.com/questions/35031647/do-i-need-to-free-the-returned-pointer-from-localtime-function  */
+<<<<<<< HEAD
 #ifdef __MACH__
+=======
+	#ifdef __MACH__
+>>>>>>> 9f505a192d23e6ff344d634b48aa80d6f1fd4864
 		result = host_get_clock_service(mach_host_self(), REALTIME_CLOCK, &cclock);
 		if (result != KERN_SUCCESS) {
 			ret = SPL_LOG_MACH_CLOCK_SERVICE_ERROR;
@@ -348,7 +352,11 @@ int spl_local_time_now(spl_local_time_st*stt) {
 		mach_port_deallocate(mach_task_self(), cclock);
 		nanosec.tv_sec = mts.tv_sec;
 		nanosec.tv_nsec = mts.tv_nsec;
+<<<<<<< HEAD
 #else
+=======
+	#else
+>>>>>>> 9f505a192d23e6ff344d634b48aa80d6f1fd4864
 /* https://linux.die.net/man/3/localtime */
 /* https://linux.die.net/man/3/clock_gettime */
 		ret = clock_gettime(CLOCK_REALTIME, &nanosec);
@@ -357,7 +365,11 @@ int spl_local_time_now(spl_local_time_st*stt) {
 			break;
 		}
 
+<<<<<<< HEAD
 #endif
+=======
+	#endif
+>>>>>>> 9f505a192d23e6ff344d634b48aa80d6f1fd4864
 		stt->year = lt->tm_year;
 		stt->month = lt->tm_mon;
 		stt->day = lt->tm_mday;
@@ -2461,19 +2473,16 @@ int spl_clean_sync_tool() {
 		SPL_CloseHandle(t->sem_rwfile);
 		SPL_CloseHandle(t->sem_off);
 #else	
-		
+	#ifdef __MACH__
+		/* Clear semaphore of MAC OSX. */
+		ret = spl_osx_sync_del();
+	#endif
 #endif
 		spl_free(t->arr_mtx);
 		if (t->isProcessMode) {
-        #ifdef __MACH__
-            ret = spl_osx_sync_del();
-        #endif
 			ret = spl_del_memory();
 		}
 		else {
-        #ifdef __MACH__
-            ret = spl_osx_sync_del();
-        #endif
 			spl_free(t->buf);
 		}
 	} while (0);
