@@ -67,8 +67,8 @@ One of the core objectives of SimpleLog-Topic is to provide exceptional **perfor
 
 4. **OSX/Apple clang version 11.0.3 (clang-1103.0.32.29) with 10 Threads and 10 Million Records:**
 
-   - **SimpleLog-Topic:** **37.1 seconds** 
-   - **spdlog:** **26 seconds** (https://github.com/thuanalg/simplelog-topic/blob/main/MSVC-2022-performance.txt) 
+   - **SimpleLog-Topic: 37.1 seconds** 
+   - **spdlog: 26 seconds** (https://github.com/thuanalg/simplelog-topic/blob/main/MacOSX-performance-2-Core.txt) 
 
    In this environment **spdlog** is faster at **11.1s (~43%)** than **simplelog-topic**. However, I shall re-verify with PC with more CPU cores.
 
