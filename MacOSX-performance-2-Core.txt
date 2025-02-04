@@ -1,0 +1,86 @@
+#---------------------------------------------------------------------------------------------------------------------
+
+If you have a problem of configuration/running or suspecting about honesty.
+	Please contact me: <nguyenthaithuanalg@gmail.com>/Skype:<nguyenthaithuanalg>/Phone: +084.799.324.179
+
+#---------------------------------------------------------------------------------------------------------------------
+Spdlog test file: https://github.com/thuanalg/simplelog-topic/blob/main/src/spd_example.cpp
+
+simplelog-challenge: https://github.com/thuanalg/simplelog-challenge/blob/main/src/cpp_test/main.cpp
+	Configuration file: src/mach/simplelog.cfg
+	
+Environment for both:
+		Thuans-Mac-mini-2:example ntthuan$ gcc -v
+			Configured with: --prefix=/Applications/Xcode.app/Contents/Developer/usr --with-gxx-include-dir=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/4.2.1
+			Apple clang version 11.0.3 (clang-1103.0.32.29)
+			Target: x86_64-apple-darwin19.4.0
+			Thread model: posix
+			InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+		Thuans-Mac-mini-2:example ntthuan$	
+	- 10 threads/10(ten) million records.
+------------------
+System Information
+------------------
+	- Hardware Overview:
+
+			Model Name: Mac mini(Late 2012)
+			Model Identifier: Macmini6,1
+			Processor Name: Dual-Core Intel Core i5
+			Processor Speed: 2.5 GHz
+			Number of Processors: 1
+			Total Number of Cores: 2
+			L2 Cache (per Core): 256 KB
+			L3 Cache: 3 MB
+			Hyper-Threading Technology: Enabled
+			Memory: 16 GB
+			Boot ROM Version: 283.0.0.0.0
+			SMC Version (system): 2.7f1
+			Serial Number (system): C07MW15LDWYL
+			Hardware UUID: 6FD4500E-700C-52F6-A9E0-78964B60125D
+#---------------------------------------------------------------------------------------------------------------------
+Spdlog 01 (first round)
+[2025-02-03 15:37:44.628] [A] [info] [example.cpp:log_messages:435] [Threadid 123145557639168] test log: 999999
+[2025-02-03 15:37:17.995] [A] [info] [example.cpp:log_messages:435] [Threadid 123145556029440] test log: 0
+Size of the file: 1118888900
+26.7s
+
+
+
+simplelog-challenge 01 (first round)
+[2025-02-03 15:57:57.229015334] [I] [tid        123145452261376]        [main.cpp:posix_thread_routine:126] test log test log test log: 999981
+[2025-02-03 15:57:20.909486015] [I] [tid        123145452797952]        [main.cpp:posix_thread_routine:126] test log test log test log: 3
+Size of the file: 1288888900
+36.3s
+#---------------------------------------------------------------------------------------------------------------------
+Spdlog 02  (second round)
+[2025-02-03 15:40:19.349] [A] [info] [example.cpp:log_messages:435] [Threadid 123145528803328] test log: 999999
+[2025-02-03 15:39:53.536] [A] [info] [example.cpp:log_messages:435] [Threadid 123145526120448] test log: 0
+Size of the file: 1118888900
+25.8s
+
+
+
+simplelog-challenge 02 (second round)
+[2025-02-03 16:01:07.859951646] [I] [tid        123145368989696]        [main.cpp:posix_thread_routine:126] test log test log test log: 999997
+[2025-02-03 16:00:30.541329555] [I] [tid        123145368989696]        [main.cpp:posix_thread_routine:126] test log test log test log: 0
+Size of the file: 1288888900
+37.3s
+#---------------------------------------------------------------------------------------------------------------------
+Spdlog 03 (third round)
+[2025-02-03 15:44:14.319] [A] [info] [example.cpp:log_messages:435] [Threadid 123145313828864] test log: 999999
+[2025-02-03 15:43:48.731] [A] [info] [example.cpp:log_messages:435] [Threadid 123145308999680] test log: 0
+Size of the file: 1118888900
+25.6s
+
+
+
+simplelog-challenge 01 (third round)
+[2025-02-03 16:08:17.964391055] [I] [tid        123145466990592]        [main.cpp:posix_thread_routine:126] test log test log test log: 999999
+[2025-02-03 16:07:40.484824135] [I] [tid        123145467527168]        [main.cpp:posix_thread_routine:126] test log test log test log: 1
+Size of the file: 1288888900
+37.5s
+#---------------------------------------------------------------------------------------------------------------------
+Conclusion:
+- Average time of spdlog: 26s
+- Average time of simplelog-topic: 37.1s
+	In this environment spdlog is faster at 11.1s (~43%) than simplelog-topic.

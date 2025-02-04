@@ -1,14 +1,14 @@
-target=libsimplelog.so
+target=libsimplelog.dylib
 debugFlag=-g -fPIC -Wall -shared 
 releaseFlag=-fPIC -Wall -shared
 LIBS+=-lpthread
-src=../simplelog.c ../simplelog.h
+src=../simplelog.c
 INC=-I../
 #CFLAGS=-ansi
-CFLAGS=-std=gnu89 -D UNIX_LINUX
+CFLAGS=-std=gnu89 -D UNIX_LINUX -D __MACH__
 #CPPFLAGS=-std=c++98 
 #CPPFLAGS=-std=c++98 -D UNIX_LINUX -D __UNIX_LINUX_CPP11_AND_NEWERS
-CPPFLAGS=-D UNIX_LINUX -D __UNIX_LINUX_CPP11_AND_NEWERS__
+CPPFLAGS=-D UNIX_LINUX -D __UNIX_LINUX_CPP11_AND_NEWERS__ -D __MACH__
 
 debug:
 	gcc ${debugFlag} -o ${target} ${src} ${LIBS} ${CFLAGS}
@@ -23,4 +23,4 @@ release:
 	g++ -o simplelog_cpp_direct_sample  ../cpp_test/main.cpp ${src} ${LIBS} ${INC} ${CPPFLAGS}
 
 clean:
-	rm -rf ${target} libsimplelog.so simplelog_sample simplelog_cpp_sample simplelog_cpp_direct_sample
+	rm -rf ${target}  simplelog_sample simplelog_cpp_sample simplelog_cpp_direct_sample
