@@ -23,4 +23,4 @@ release:
 	g++ -o simplelog_cpp_direct_sample  ../cpp_test/main.cpp ${src} ${LIBS} ${INC} ${CPPFLAGS}
 
 clean:
-	rm -rf ${target} libsimplelog.so simplelog_sample simplelog_cpp_sample simplelog_cpp_direct_sample
+	rm -rf ${target}  simplelog_sample simplelog_cpp_sample simplelog_cpp_direct_sample

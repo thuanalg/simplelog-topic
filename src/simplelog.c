@@ -363,9 +363,9 @@ int spl_local_time_now(spl_local_time_st*stt) {
 		stt->day = lt->tm_mday;
 
 		stt->hour = lt->tm_hour;
-		stt->minute = lt->tm_min;
+		stt->minute = (spl_uchar)lt->tm_min;
 		stt->sec = lt->tm_sec;
-		stt->nn = (nanosec.tv_nsec);
+		stt->nn = (spl_uint)nanosec.tv_nsec;
 
 #endif
 	} while (0);
@@ -602,7 +602,9 @@ int spl_init_log( char *pathcfg)
 						ret = spl_init_log_parse(p, node, &isEnd);
 						break;
 					}
-					j++;
+					/*
+                        j++;
+                     */
 				}
 
 				if (ret) {
@@ -663,6 +665,7 @@ int spl_mutex_lock(void* obj) {
 	do {
 		if (!obj) {
 			ret = SPL_LOG_MUTEX_NULL_ERROR;
+            spl_console_log("Mutex is NULL.");
 			break;
 		}
 #ifndef UNIX_LINUX
@@ -696,6 +699,7 @@ int spl_mutex_unlock(void* obj) {
 	do {
 		if (!obj) {
 			ret = SPL_LOG_MUTEX_NULL_ERROR;
+            spl_console_log("Mutex is NULL.");
 			break;
 		}
 #ifndef UNIX_LINUX
@@ -723,9 +727,11 @@ int spl_verify_folder(char* folder) {
 	int ret = 0;
 	do {
 #ifdef WIN32
-		/*https://learn.microsoft.com/en-us/windows/win32/fileio/retrieving-and-changing-file-attributes
-		// https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createdirectorya
-		// ERROR_ALREADY_EXISTS, ERROR_PATH_NOT_FOUND */
+		/*
+            https://learn.microsoft.com/en-us/windows/win32/fileio/retrieving-and-changing-file-attributes
+            https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createdirectorya
+            ERROR_ALREADY_EXISTS, ERROR_PATH_NOT_FOUND
+         */
 		BOOL result = CreateDirectoryA(folder, NULL);
 		if (!result) {
 			DWORD werr = GetLastError();
@@ -1142,7 +1148,7 @@ int spl_gen_file(SIMPLE_LOG_ST* t, int *sz, int limit, int *index) {
 					break;
 				}
 				FFSEEK(t->fp, 0, SEEK_END);
-				cszize = FFTELL(t->fp);
+				cszize = (int)FFTELL(t->fp);
 				if (cszize < limit) {
 					*sz = cszize;
 					break;
