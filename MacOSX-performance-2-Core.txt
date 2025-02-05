@@ -6,7 +6,7 @@ If you have a problem of configuration/running or suspecting about honesty.
 #---------------------------------------------------------------------------------------------------------------------
 Spdlog test file: https://github.com/thuanalg/simplelog-topic/blob/main/src/spd_example.cpp
 
-simplelog-challenge: https://github.com/thuanalg/simplelog-challenge/blob/main/src/cpp_test/main.cpp
+simplelog-topic: https://github.com/thuanalg/simplelog-topic/blob/main/src/cpp_test/main.cpp
 	Configuration file: src/mach/simplelog.cfg
 	
 Environment for both:
@@ -46,7 +46,7 @@ Size of the file: 1118888900
 
 
 
-simplelog-challenge 01 (first round)
+simplelog-topic 01 (first round)
 [2025-02-03 15:57:57.229015334] [I] [tid        123145452261376]        [main.cpp:posix_thread_routine:126] test log test log test log: 999981
 [2025-02-03 15:57:20.909486015] [I] [tid        123145452797952]        [main.cpp:posix_thread_routine:126] test log test log test log: 3
 Size of the file: 1288888900
@@ -60,7 +60,7 @@ Size of the file: 1118888900
 
 
 
-simplelog-challenge 02 (second round)
+simplelog-topic 02 (second round)
 [2025-02-03 16:01:07.859951646] [I] [tid        123145368989696]        [main.cpp:posix_thread_routine:126] test log test log test log: 999997
 [2025-02-03 16:00:30.541329555] [I] [tid        123145368989696]        [main.cpp:posix_thread_routine:126] test log test log test log: 0
 Size of the file: 1288888900
@@ -74,7 +74,7 @@ Size of the file: 1118888900
 
 
 
-simplelog-challenge 01 (third round)
+simplelog-topic 01 (third round)
 [2025-02-03 16:08:17.964391055] [I] [tid        123145466990592]        [main.cpp:posix_thread_routine:126] test log test log test log: 999999
 [2025-02-03 16:07:40.484824135] [I] [tid        123145467527168]        [main.cpp:posix_thread_routine:126] test log test log test log: 1
 Size of the file: 1288888900
