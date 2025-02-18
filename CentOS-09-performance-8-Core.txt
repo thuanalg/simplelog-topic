@@ -12,6 +12,7 @@ simplelog-topic: https://github.com/thuanalg/simplelog-topic/blob/main/src/cpp_t
 Environment for both:
 	- CentOS 09, 8 Cores
 	- 10 threads
+	- 10(ten) million records.
 ------------------
 System Information
 ------------------
@@ -104,4 +105,4 @@ Spdlog 03 (third round)
 Conclusion:
 - Average time of simplelog-topic: 3.331s
 - Average time of spdlog: 7.051s
-	In this environment spdlog is faster at 3.72s (~110%, 2x) than simplelog-topic.
+	In this environment simplelog-topic is faster at 3.72s (~110%, 2x) than spdlog.
