@@ -57,7 +57,7 @@ One of the core objectives of SimpleLog-Topic is to provide exceptional **perfor
 	- **spdlog: ~17 seconds**  
    
 	**With CPU-8 Cores / PC:**	
-	- **SimpleLog-Topic: ~3.331 seconds** (https://github.com/thuanalg/simplelog-topic/blob/main/CentOS-09-performance-8-Core.txt)
+	- **SimpleLog-Topic: ~3.331 seconds** (https://github.com/thuanalg/simplelog-topic/blob/main/CentOS-09-performance-8-Core.txt) Here, **simplelog-topic** is faster **2x** spdlog.
 	- **spdlog: ~7.051 seconds** 
    
    On **Linux** is faster than Windows. If **number of CPUs** are more, then SimpleLog-Topic becomes more effective.
