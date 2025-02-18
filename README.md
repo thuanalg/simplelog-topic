@@ -63,7 +63,8 @@ One of the core objectives of SimpleLog-Topic is to provide exceptional **perfor
    On **Linux** is faster than Windows. If **number of CPUs** are more, then SimpleLog-Topic becomes more effective.
 
 3. **Large-Scale Logging Test (1 Billion Records, 10 Threads):** 
-	**Windows 10 - CPU 8 Cores**
+	
+	**Windows 10 - CPU 8 Cores** 
    - **Time Taken:** **36 minutes and 3 seconds** (**2163 seconds**)
    - **Log Size:** **113 GB** or refer to another case: (https://github.com/thuanalg/simplelog-topic/blob/main/One_Billion_records-performance.txt)
 
