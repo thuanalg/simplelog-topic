@@ -1,0 +1,46 @@
+#---------------------------------------------------------------------------------------------------------------------
+
+If you have a problem of configuration/running or suspecting about honesty.
+	Please contact me: <nguyenthaithuanalg@gmail.com>/Skype:<nguyenthaithuanalg>/Phone: +084.799.324.179
+
+#---------------------------------------------------------------------------------------------------------------------
+Spdlog test file: https://github.com/thuanalg/simplelog-topic/blob/main/src/spd_example.cpp
+
+simplelog-topic: https://github.com/thuanalg/simplelog-topic/blob/main/src/cpp_test/main.cpp
+	Configuration file: src/mach/simplelog.cfg
+	
+Environment for both:
+	- CentOS 09, 8 Cores
+	- 10 threads
+	- 10(ten) million records.
+------------------
+System Information
+------------------
+      System Manufacturer: Gigabyte Technology Co., Ltd.
+             System Model: Z87M-D3H
+                     BIOS: F9 (type: UEFI)
+                Processor: Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz (8 CPUs), ~3.4GHz
+                   Memory: 16384MB RAM
+      Available OS Memory: 16272MB RAM
+                Page File: 10589MB used, 8113MB available
+	- 10 threads/10(ten) million records.
+
+#---------------------------------------------------------------------------------------------------------------------
+1 BILLION records/centOS/gcc
+
+[2025-02-18 07:56:07.629604460] [simplelog.c:spl_calculate_size:1942] [thid: 140601889003328] buf size: 3000000, mtxsize: 640, semsize: 64
+[2025-02-18 07:56:07.630344291] [main.c:main:47] [thid: 140601889003328] ====================Start.
+
+[2025-02-18 08:11:02.991892275] [main.c:main:49] [thid: 140601889003328] ==================End.
+
+[2025-02-18 08:11:03.015889597] [simplelog.c:spl_written_thread_routine:981] [thid: 140601883502144] pthread_cancel OK.
+[thuannt@localhost linux]$
+
+-->> 15 minutes
+
+File size: 107G log_simple, 114888893030 log_simple
+
+simple_c_example.exe --nthread=10 --loopcount=100000000
+#---------------------------------------------------------------------------------------------------------------------
+Conclusion:
+- Speed: 1.1 million records per second.

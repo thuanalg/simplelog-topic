@@ -46,22 +46,31 @@ One of the core objectives of SimpleLog-Topic is to provide exceptional **perfor
 
    In this test, **SimpleLog-Topic** logged **10 million records** in just **16 seconds**, compared to **66 seconds** taken by **spdlog**. This demonstrates **4x faster performance** in multithreaded environments, showing that SimpleLog-Topic efficiently manages logging tasks without unnecessary performance bottlenecks.
 
-2. **Linux Performance Benchmark (10 Threads and 10 Million Records), VM CentOs9:**  
+2. **Linux Performance Benchmark (10 Threads and 10 Million Records), VM CentOs9/PC:**  
 	
-	**With 3CPUs:**
+	**With CPU-3 Cores / VM:**
    - **SimpleLog-Topic:** **15-16 seconds**
    - **spdlog:** **15 seconds** (https://github.com/thuanalg/simplelog-topic/blob/main/LinuxCentOs09-performance.txt)  
 	
-	**With 5CPUs:**	
+	**With CPU-5 Cores / VM:**	
 	- **SimpleLog-Topic: ~13 seconds** (https://github.com/thuanalg/simplelog-topic/blob/main/LinuxCentOs09-performance.txt)
 	- **spdlog: ~17 seconds**  
    
-   On **Linux**, both SimpleLog-Topic and spdlog performed similarly, completing the test in **16 seconds**. This consistency across platforms demonstrates that SimpleLog-Topic provides **reliable performance** in both Windows and Linux environments. If **number of CPUs** are more, then SimpleLog-Topic becomes more effective.
+	**With CPU-8 Cores / PC:**	
+	- **SimpleLog-Topic: ~3.331 seconds** (https://github.com/thuanalg/simplelog-topic/blob/main/CentOS-09-performance-8-Core.txt) Here, **simplelog-topic** is faster **2x** spdlog. Speed: **3 million records a second**. simplelog-topic is faster 2x spdlog.
+	- **spdlog: ~7.051 seconds**. Speed: **1.4 million records a second**.
+   
+   On **Linux** is faster than Windows. If **number of CPUs** are more, then SimpleLog-Topic becomes more effective.
 
-3. **Large-Scale Logging Test (1 Billion Records, 10 Threads):**
-
+3. **Large-Scale Logging Test (1 Billion Records, 10 Threads):** 
+	
+	**Windows 10 - CPU 8 Cores** 
    - **Time Taken:** **36 minutes and 3 seconds** (**2163 seconds**)
    - **Log Size:** **113 GB** or refer to another case: (https://github.com/thuanalg/simplelog-topic/blob/main/One_Billion_records-performance.txt)
+
+	**CentOs 09 - CPU 8 Cores**
+   - **Time Taken:** **15 minutes** (**900 seconds**)
+   - **Log Size:** **107GB, 114888893030 bytes** or refer to another case: (https://github.com/thuanalg/simplelog-topic/blob/main/CentOS-09-performance-8-Core-1Billion.txt)
 
    In an extreme scenario, SimpleLog-Topic processed **1 billion records** across **10 threads**, generating **113 GB of log data** in just **36 minutes**. This performance indicates that SimpleLog-Topic can scale to handle **massive volumes** of log data, making it suitable for both **high-frequency** and **large-scale logging** applications.
 
