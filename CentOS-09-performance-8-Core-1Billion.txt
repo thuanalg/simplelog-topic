@@ -43,6 +43,4 @@ File size: 107G log_simple, 114888893030 log_simple
 simple_c_example.exe --nthread=10 --loopcount=100000000
 #---------------------------------------------------------------------------------------------------------------------
 Conclusion:
-- Average time of simplelog-topic: 3.331s
-- Average time of spdlog: 7.051s
-	In this environment simplelog-topic is faster at 3.72s (~110%, 2x) than spdlog.
+- Speed: 1.1 million records per second.
