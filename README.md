@@ -70,7 +70,7 @@ One of the core objectives of SimpleLog-Topic is to provide exceptional **perfor
 
 	**CentOs 09 - CPU 8 Cores**
    - **Time Taken:** **15 minutes** (**900 seconds**)
-   - **Log Size:** **107GB, 114888893030 bytes** or refer to another case: (https://github.com/thuanalg/simplelog-topic/blob/main/CentOS-09-performance-8-Core-1Billion.txt)
+   - **Log Size:** **107GB, 114888893030 bytes**: (https://github.com/thuanalg/simplelog-topic/blob/main/CentOS-09-performance-8-Core-1Billion.txt)
 
    In an extreme scenario, SimpleLog-Topic processed **1 billion records** across **10 threads**, generating **113 GB of log data** in just **36 minutes**. This performance indicates that SimpleLog-Topic can scale to handle **massive volumes** of log data, making it suitable for both **high-frequency** and **large-scale logging** applications.
 
