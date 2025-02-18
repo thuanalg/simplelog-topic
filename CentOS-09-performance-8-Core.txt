@@ -7,7 +7,7 @@ If you have a problem of configuration/running or suspecting about honesty.
 Spdlog test file: https://github.com/thuanalg/simplelog-topic/blob/main/src/spd_example.cpp
 
 simplelog-topic: https://github.com/thuanalg/simplelog-topic/blob/main/src/cpp_test/main.cpp
-	Configuration file: src/mach/simplelog.cfg
+	Configuration file: src/linux/simplelog.cfg
 	
 Environment for both:
 	- CentOS 09, 8 Cores
