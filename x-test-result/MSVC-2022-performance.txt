@@ -1,8 +1,12 @@
 #---------------------------------------------------------------------------------------------------------------------
+
+If you have a problem of configuration/running or suspecting about honesty.
+	Please contact me: <nguyenthaithuanalg@gmail.com>/Skype:<nguyenthaithuanalg>/Phone: +084.799.324.179
+#---------------------------------------------------------------------------------------------------------------------
 Spdlog test file: https://github.com/thuanalg/simplelog-topic/blob/main/src/spd_example.cpp
 
 simplelog-topic: https://github.com/thuanalg/simplelog-topic/blob/main/src/c_test/main.c
-	configred file: https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog-win64-msvc-2022.cfg
+	configred file: https://github.com/thuanalg/simplelog-topic/blob/main/x-cfg/simplelog-win64-msvc-2022.cfg
 	
 Environment for both:
 	- MSVC 2022, ISO C++14/++20 Standard
