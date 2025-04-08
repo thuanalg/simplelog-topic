@@ -1,0 +1,12 @@
+target=libsimplelog
+CFLAGS_d=-g -fPIC -Wall -shared -D__SIMPLE_STATIC_LOG__ -static-libgcc -Wl,--out-implib,${target}.lib
+CFLAGS_r=-fPIC -Wall -shared -D__SIMPLE_STATIC_LOG__  -static-libgcc -Wl,--out-implib,${target}.lib
+SRC=../simplelog.c
+INC=-I../
+
+debug:
+	gcc ${CFLAGS_d} -o ${target}.dll ${INC}
+release:
+	gcc ${CFLAGS_r} -o ${target}.dll ${INC}
+clean:
+	rm -f ${target}.*
