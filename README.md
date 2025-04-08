@@ -148,18 +148,9 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
     - **Sample**: (https://gist.github.com/thuanalg/75946524cb1bf6f1ea4eaac4f0778f19)
 ---
 
-**Build and install with cmake:**	  
+**Build and install with cmake**:	  
 	- Install **cmake**.	 
-	- Come to root folder.	 
-	- Create a **build** folder.	 
-	- cd to "build" folder.	 
-		+ For windows:	 
-			- win32: cmake .. -G "Visual Studio 17 2022" -A win32	 
-			- win64: cmake .. -G "Visual Studio 17 2022"	 
-		+ For Linux:	 
-			- cmake .. -DUNIX_LINUX=1	 
-		+ For MAC-OSX/Apple:	 
-			- cmake .. -DUNIX_LINUX=1 -DMACOSX=1	 
+ 
 
 **Video Install/Demo:**  
 	- For Windows 10 64bit: (https://drive.google.com/file/d/1Ls4aD8fd65qcc7qgRKns2SlWw6RAhH5l/view?usp=sharing)  
