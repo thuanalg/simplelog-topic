@@ -7,17 +7,17 @@ set(SOURCE_BINCPP_FILES_DIRECT src/cpp_test/main.cpp src/simplelog.c )
 
 # Add executable target with source files listed in SOURCE_FILES variable
 
-#add_compile_definitions(EXPORT_DLL_API_SIMPLE_LOG simpleloglib)
-#add_compile_definitions(_CRT_SECURE_NO_WARNINGS simpleloglib)
+#add_compile_definitions(EXPORT_DLL_API_SIMPLE_LOG simplelog)
+#add_compile_definitions(_CRT_SECURE_NO_WARNINGS simplelog)
 
 
 include_directories(./include)
-add_library(simpleloglib SHARED ${SOURCE_LIB_FILES})
+add_library(simplelog SHARED ${SOURCE_LIB_FILES})
 if(DEFINED UNIX_LINUX)
-	target_compile_definitions(simpleloglib PUBLIC UNIX_LINUX=1)
+	target_compile_definitions(simplelog PUBLIC UNIX_LINUX=1)
 else()
-	target_compile_definitions(simpleloglib PRIVATE EXPORT_DLL_API_SIMPLE_LOG=1)
-	target_compile_definitions(simpleloglib PUBLIC _CRT_SECURE_NO_WARNINGS=1)
+	target_compile_definitions(simplelog PRIVATE EXPORT_DLL_API_SIMPLE_LOG=1)
+	target_compile_definitions(simplelog PUBLIC _CRT_SECURE_NO_WARNINGS=1)
 endif()
 
 
@@ -64,17 +64,21 @@ else()
 endif()
 
 
+if(DEFINED UNIX_LINUX)
+	install(TARGETS simplelog LIBRARY DESTINATION lib)
+	install(FILES include/simplelog.h DESTINATION include)
+endif()
 
 
 target_link_libraries(simple_c_example 
-	simpleloglib
+	simplelog
 )
 
 
 
 
 target_link_libraries(simple_cpp_example 
-	simpleloglib
+	simplelog
 )
 
 
