@@ -152,7 +152,6 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 	- Install **cmake**.	 
 	- Come to root folder, **mkdir build && cd build**.	 
 	- For windows-32: **cmake .. -G "Visual Studio 17 2022" -A win32**.	 
-	- For windows-64: **cmake .. -G "Visual Studio 17 2022"**.	 
  
 
 **Video Install/Demo:**  
