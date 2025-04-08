@@ -1,9 +1,9 @@
 # Add main.cpp file of the project root directory as a source file
 project(simplelog_topic_project)
 set(SOURCE_LIB_FILES src/simplelog.c )
-set(SOURCE_BIN_FILES src/c_test/main.c)
-set(SOURCE_BINCPP_FILES src/cpp_test/main.cpp)
-set(SOURCE_BINCPP_FILES_DIRECT src/cpp_test/main.cpp src/simplelog.c )
+set(SOURCE_BIN_FILES tests/c_test/main.c)
+set(SOURCE_BINCPP_FILES tests/cpp_test/main.cpp)
+set(SOURCE_BINCPP_FILES_DIRECT tests/cpp_test/main.cpp src/simplelog.c )
 
 # Add executable target with source files listed in SOURCE_FILES variable
 
