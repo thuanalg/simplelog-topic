@@ -150,9 +150,9 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 
 **Build and install with cmake**:	  
 	- Install **cmake**.	 
-	- Come to root folder, **mkdir build && cd build**.	 
-	- Come to root folder, **mkdir build && cd build**.	 
-	- Come to root folder, **mkdir build && cd build**.	 
+	- Come to root folder, **mkdir build && cd build**.  
+	- Come to root folder, **mkdir build && cd build**.  
+	- Come to root folder, **mkdir build && cd build**.  
  
 
 **Video Install/Demo:**  
