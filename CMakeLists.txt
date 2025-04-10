@@ -91,4 +91,9 @@ target_link_libraries(simple_cpp_example
 )
 
 
+if(DEFINED UNIX_LINUX)
+target_link_libraries(simplelog 
+	pthread
+)
+endif()
 
