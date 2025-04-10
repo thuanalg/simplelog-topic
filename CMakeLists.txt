@@ -18,6 +18,10 @@ if(DEFINED UNIX_LINUX)
 	if(DEFINED MACOSX)
 		target_compile_definitions(simplelog PUBLIC __MACH__=1)
 	endif()
+	set_target_properties(simplelog PROPERTIES  
+		VERSION 1.0 
+		SOVERSION 1 
+	)
 else()
 	target_compile_definitions(simplelog PRIVATE EXPORT_DLL_API_SIMPLE_LOG=1)
 	target_compile_definitions(simplelog PUBLIC _CRT_SECURE_NO_WARNINGS=1)
