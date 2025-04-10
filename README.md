@@ -105,7 +105,7 @@ One of the core objectives of SimpleLog-Topic is to provide exceptional **perfor
 
 - **Simple and Easy to Use:** The **minimalistic API** keeps things simple, adhering to the Unix philosophy of **KISS**, making it easy to integrate and maintain.
 
-### **A Tribute to W. Richard Stevens**
+### **A Tribute to W. Richard Stevens (1951 - 1999)**
 
 **W. Richard Stevens** was a pioneer in the field of **network programming** and **systems design**, best known for his influential work, *Unix Network Programming*. His writing, characterized by clarity, precision, and practical insight, has shaped the way developers approach system-level programming. **SimpleLog-Topic** is inspired by Stevens' philosophy of simplicity, efficiency, and clarity.
 
