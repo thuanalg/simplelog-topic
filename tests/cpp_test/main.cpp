@@ -46,11 +46,7 @@ main(int argc, char *argv[])
 			continue;
 		}
 	}
-#ifndef UNIX_LINUX
-	snprintf(cfgpath, 1024, "C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
-#else
 	snprintf(cfgpath, 1024, "simplelog.cfg");
-#endif
 	ret = spl_init_log(cfgpath);
 
 	spl_console_log("====================Start.\n");
