@@ -47,7 +47,9 @@ main(int argc, char *argv[])
 			continue;
 		}
 		if (strstr(argv[i], TCONFIG_FILE) == argv[i]) {
-			ret = sscanf(argv[i], TCONFIG_FILE"%s", cfgpath);
+			memset(cfgpath, 0, sizeof(cfgpath));
+			ret = snprintf(cfgpath, 1024, "%s", argv[i] + sizeof(TCONFIG_FILE) - 1);
+			spl_console_log("cfgpath: %s.", cfgpath);
 			continue;
 		}
 
