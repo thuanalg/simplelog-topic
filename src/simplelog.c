@@ -522,9 +522,11 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 				break;
 			}
 			__simple_log_static__.ncpu = n;
+			/*
 			// if (__simple_log_static__.ncpu < 1) {
 			//	__simple_log_static__.ncpu = 1;
 			// }
+			*/
 			break;
 		}
 		if (strcmp(key, SPLOG_TRIGGER) == 0) {
@@ -583,7 +585,9 @@ spl_init_log(char *pathcfg)
 	__simple_log_static__.ncpu = 1;
 	do {
 		memset(buf, 0, sizeof(buf));
+		/*
 		// fp = fopen(pathcfg, "r");
+		*/
 		FFOPEN(fp, pathcfg, "r");
 		if (!fp) {
 			ret = 1;
@@ -613,7 +617,7 @@ spl_init_log(char *pathcfg)
 						++j;
 						continue;
 					}
-					// if (pp)
+					/*// if (pp)*/
 					{
 						char *p = 0;
 						size_t k = 0;
@@ -1576,7 +1580,6 @@ spl_gen_topics(SIMPLE_LOG_ST *t)
 		}
 		/*--------------*/
 		if (t->renew > SPL_CHANGE_FILE_SIZE) {
-			// TO-TEST
 			for (i = 0; i < t->n_topic; ++i) {
 				do {
 					int err = 0;

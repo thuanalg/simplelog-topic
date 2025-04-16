@@ -34,10 +34,10 @@
 #define SPL_MAX_AB(a, b) ((a) > (b)) ? (a) : (b)
 
 #ifndef SPL_USING_SPIN_LOCK
-// #define SPL_USING_SPIN_LOCK
+ /*// #define SPL_USING_SPIN_LOCK*/
 #endif // !SPL_USING_SPIN_LOCK
 
-// #define __UNIX_LINUX_CPP11_AND_NEWERS__
+/*// #define __UNIX_LINUX_CPP11_AND_NEWERS__*/
 
 #ifndef __UNIX_LINUX_CPP11_AND_NEWERS__
 #else
@@ -57,7 +57,7 @@ extern "C" {
 #define SPL_LOG_FATAL 5
 #define SPL_LOG_PEAK 6
 
-// #define					SPL_RL_BUF						50
+/*// #define					SPL_RL_BUF						50*/
 #define SPL_RL_BUF 256
 #define SPL_PATH_FOLDER 1024
 #define SPL_IDD_NAME 64
