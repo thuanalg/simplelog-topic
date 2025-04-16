@@ -223,7 +223,9 @@ typedef struct __SIMPLE_LOG_ST__ {
 	int
 #endif
 	    hd; /* Handle of shared memory.*/
-	char shared_key[SPL_SHARED_KEY_LEN]; /* Name of shared key.*/
+	char shared_key[SPL_SHARED_KEY_LEN]; /* Name of shared key.
+		For safety, you should have a different key for your app,
+		although it just need for MACOSX.*/
 	char id_name[SPL_IDD_NAME]; /*To avoid duplicating of file name.*/
 	char isProcessMode; /*For cross processes mode.*/
 	int map_mem_size; /*Total mapped memory.*/
