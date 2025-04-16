@@ -32,21 +32,27 @@ main(int argc, char *argv[])
 {
 	int ret = 0, i = 0;
 	char cfgpath[1024];
+	snprintf(cfgpath, 1024, "simplelog.cfg");
 	for (i = 1; i < argc; ++i) {
 		if (strstr(argv[i], TNUMBEER_OF_THREADS) == argv[i]) {
-			ret = sscanf(argv[i], TNUMBEER_OF_THREADS "%d", &num_threads);
+			ret = sscanf(argv[i], TNUMBEER_OF_THREADS"%d", &num_threads);
 			continue;
 		}
 		if (strstr(argv[i], TLOOP_COUNT) == argv[i]) {
-			ret = sscanf(argv[i], TLOOP_COUNT "%d", &loop_count);
+			ret = sscanf(argv[i], TLOOP_COUNT"%d", &loop_count);
 			continue;
 		}
+		if (strstr(argv[i], TTOPIC_INDEX) == argv[i]) {
+			ret = sscanf(argv[i], TTOPIC_INDEX"%d", &topicindex);
+			continue;
+		}
+		if (strstr(argv[i], TCONFIG_FILE) == argv[i]) {
+			ret = sscanf(argv[i], TCONFIG_FILE"%s", cfgpath);
+			continue;
+		}
+
 	}
-#ifndef UNIX_LINUX
-	snprintf(cfgpath, 1024, "C:/z/simplelog-topic/win64/Debug/simplelog.cfg");
-#else
-	snprintf(cfgpath, 1024, "simplelog.cfg");
-#endif
+
 	ret = spl_init_log(cfgpath);
 
 	spl_console_log("====================Start.\n");
