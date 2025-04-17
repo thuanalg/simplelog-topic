@@ -80,6 +80,7 @@ endif()
 if(DEFINED UNIX_LINUX)
 	install(TARGETS simplelog LIBRARY DESTINATION lib)
 	install(FILES include/simplelog.h DESTINATION include)
+	install(FILES src/simplelog.cfg DESTINATION include)
 endif()
 
 
