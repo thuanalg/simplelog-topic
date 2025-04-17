@@ -14,13 +14,13 @@ debug:
 	gcc ${debugFlag} -o ${target} ${src} ${LIBS} ${CFLAGS} ${INC}
 	gcc -g -o simple_c_example  ../c_test/main.c ${src} ${LIBS} ${INC} ${CFLAGS}
 	g++ -g -o simple_cpp_example  ../cpp_test/main.cpp ${LIBS} ${CPPFLAGS} ${INC} -L./ -lsimplelog
-	g++ -g -o simple_cpp_direct_example  ../cpp_test/main.cpp ${src} ${LIBS} ${INC} ${CPPFLAGS}
+	g++ -g -o simple_cpp_example_direct  ../cpp_test/main.cpp ${src} ${LIBS} ${INC} ${CPPFLAGS}
 
 release:
 	gcc ${releaseFlag} -o ${target} ${src} ${LIBS} ${CFLAGS} ${INC}
 	gcc -o simple_c_example  ../c_test/main.c ${src} ${LIBS} ${INC} ${CFLAGS}
 	g++ -o simple_cpp_example  ../cpp_test/main.cpp ${LIBS} ${INC} ${CPPFLAGS} -L./ -lsimplelog
-	g++ -o simple_cpp_direct_example  ../cpp_test/main.cpp ${src} ${LIBS} ${INC} ${CPPFLAGS}
+	g++ -o simple_cpp_example_direct  ../cpp_test/main.cpp ${src} ${LIBS} ${INC} ${CPPFLAGS}
 
 clean:
-	rm -rf ${target}  simple_c_example simple_cpp_example simple_cpp_direct_example
+	rm -rf ${target}  simple_c_example simple_cpp_example simple_cpp_example_direct
