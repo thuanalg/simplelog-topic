@@ -48,7 +48,7 @@ main(int argc, char *argv[])
 		}
 
 		if (strstr(argv[i], TCONFIG_FILE) == argv[i]) {
-			ret = sscanf(argv[i], TCONFIG_FILE"%s", cfgpath);
+			memset(cfgpath, 0, sizeof(cfgpath));
 			snprintf(cfgpath, 1024, "%s", argv[i] + sizeof(TCONFIG_FILE) - 1);
 			continue;
 		}

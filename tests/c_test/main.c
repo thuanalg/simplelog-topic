@@ -46,10 +46,10 @@ main(int argc, char *argv[])
 			ret = sscanf(argv[i], TTOPIC_INDEX"%d", &topicindex);
 			continue;
 		}
+
 		if (strstr(argv[i], TCONFIG_FILE) == argv[i]) {
 			memset(cfgpath, 0, sizeof(cfgpath));
-			ret = snprintf(cfgpath, 1024, "%s", argv[i] + sizeof(TCONFIG_FILE) - 1);
-			spl_console_log("cfgpath: %s.", cfgpath);
+			snprintf(cfgpath, 1024, "%s", argv[i] + sizeof(TCONFIG_FILE) - 1);
 			continue;
 		}
 
