@@ -168,7 +168,8 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 **Thanks a lot to:**
 
 1. My family, friends.
-2. My colleagues: Lê Duy Cường, Bùi Khánh Duy, Nguyễn Công Đức , ... in my old company FPT (https://fpt.com/).
+2. My colleagues: Lê Duy Cường, Bùi Khánh Duy, Nguyễn Công Đức , ... .
+2. Jan Flik from Intel (https://www.intel.com).
 
 ---
 
