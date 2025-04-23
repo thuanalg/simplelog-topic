@@ -19,7 +19,7 @@ if(DEFINED UNIX_LINUX)
 		target_compile_definitions(simplelog PUBLIC __MACH__=1)
 	endif()
 	set_target_properties(simplelog PROPERTIES  
-		VERSION 1.0.4 
+		VERSION 1.0.6 
 		SOVERSION 1 
 	)
 else()
