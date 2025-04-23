@@ -1,5 +1,5 @@
 export LD_LIBRARY_PATH=./
-rm -rf lod_simple
+rm -rf log_simple
 #./simple_cpp_example --nthread=10 --loopcount=1000000
 #./simple_cpp_example_direct --nthread=10 --loopcount=1000000
 #./simple_c_example --nthread=10 --loopcount=1000000 --topic_index=5 --cfg=z.cfg
