@@ -6,10 +6,10 @@ src=../simplelog.c
 INC=-I../ -I../../include
 PREFIX_SRC=../../tests
 #CFLAGS=-ansi
-CFLAGS=-std=gnu89 -D UNIX_LINUX
+CFLAGS=-std=gnu89 -D UNIX_LINUX -Werror=format
 #CPPFLAGS=-std=c++98 
 #CPPFLAGS=-std=c++98 -D UNIX_LINUX -D __UNIX_LINUX_CPP11_AND_NEWERS
-CPPFLAGS=-D UNIX_LINUX -D __UNIX_LINUX_CPP11_AND_NEWERS__ -Wno-register
+CPPFLAGS=-D UNIX_LINUX -D __UNIX_LINUX_CPP11_AND_NEWERS__ -Wno-register -Werror=format
 
 debug:
 	gcc ${debugFlag} -o ${target} ${src} ${LIBS} ${CFLAGS} ${INC}
