@@ -76,7 +76,6 @@ extern "C" {
 #define SPL_LOG_FATAL                   5
 #define SPL_LOG_PEAK                    6
 
-
 #if 0
 #ifndef SPL_RL_BUF
 #define SPL_RL_BUF                      50
@@ -94,7 +93,6 @@ extern "C" {
 #define SPL_TEMPLATE_LEN                (SPL_PATH_FOLDER + SPL_FNAME_LEN + 32)
 #define SPL_FULLPATH_LEN                (SPL_TEMPLATE_LEN + 32 + 16)
 #define SPL_MILLION                     1000000
-
 
 #ifndef UNIX_LINUX
 #ifndef __SIMPLE_STATIC_LOG__

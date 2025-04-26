@@ -145,15 +145,16 @@
 #define SPL_MTX_NAME_OFF          "_MTX_OFF"
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
-#define SPLOG_PATHFOLDR           "pathfoder="
-#define SPLOG_LEVEL               "level="
-#define SPLOG_BUFF_SIZE           "buffsize="
+#define SPL_LOG_PATHFOLDR         "pathfoder="
+#define SPL_LOG_LEVEL             "level="
+#define SPL_LOG_BUFF_SIZE         "buffsize="
 #define SPL_MAX_SZ_MSG            "max_sz_msg="
-#define SPLOG_ROT_SIZE            "rotation_size="
-#define SPLOG_TOPIC               "topic="
-#define SPLOG_NCPU                "ncpu="
-#define SPLOG_TRIGGER             "trigger="
-#define SPLOG_END_CFG             "end_configuring="
+#define SPL_LOG_ROT_SIZE          "rotation_size="
+#define SPL_LOG_TOPIC             "topic="
+#define SPL_LOG_NCPU              "ncpu="
+#define SPL_LOG_TRIGGER           "trigger="
+#define SPL_LOG_SHARED_KEY        "shared_key="
+#define SPL_LOG_END_CFG           "end_configuring="
 
 #define SPL_FILE_NAME_FMT         "%s\\%s\\%s_%.8d.log"
 #define SPL_FILE_NAME_FMT_TOPIC   "%s\\%s\\%s"
@@ -203,8 +204,8 @@ typedef enum __CHANGE_NAME_E__ {
 } __CHANGE_NAME_E__;
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-static const char *__splog_pathfolder[] = {SPLOG_PATHFOLDR, SPLOG_LEVEL, SPLOG_BUFF_SIZE, SPL_MAX_SZ_MSG, SPLOG_ROT_SIZE,
-    SPLOG_TOPIC, SPLOG_NCPU, SPLOG_TRIGGER, SPLOG_END_CFG, 0};
+static const char *__splog_pathfolder[] = {SPL_LOG_PATHFOLDR, SPL_LOG_LEVEL, SPL_LOG_BUFF_SIZE, SPL_MAX_SZ_MSG,
+    SPL_LOG_ROT_SIZE, SPL_LOG_TOPIC, SPL_LOG_NCPU, SPL_LOG_TRIGGER, SPL_LOG_SHARED_KEY, SPL_LOG_END_CFG, 0};
 
 static SIMPLE_LOG_ST __simple_log_static__;
 ;
@@ -436,15 +437,15 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 	int ret = SPL_NO_ERROR;
 	SIMPLE_LOG_ST *t = (SIMPLE_LOG_ST *)&__simple_log_static__;
 	do {
-		if (strcmp(key, SPLOG_PATHFOLDR) == 0) {
+		if (strcmp(key, SPL_LOG_PATHFOLDR) == 0) {
 			if (!buff[0]) {
 				ret = SPL_INIT_PATH_FOLDER_EMPTY_ERROR;
 				break;
 			}
-			snprintf(__simple_log_static__.folder, SPL_PATH_FOLDER, "%s", buff);
+			snprintf(t->folder, SPL_PATH_FOLDER, "%s", buff);
 			break;
 		}
-		if (strcmp(key, SPLOG_LEVEL) == 0) {
+		if (strcmp(key, SPL_LOG_LEVEL) == 0) {
 			int n = 0;
 			int count = 0;
 			count = sscanf(buff, "%d", &n);
@@ -456,7 +457,7 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 			t->llevel = n;
 			break;
 		}
-		if (strcmp(key, SPLOG_BUFF_SIZE) == 0) {
+		if (strcmp(key, SPL_LOG_BUFF_SIZE) == 0) {
 			int n = 0;
 			int sz = 0;
 			sz = sscanf(buff, "%d", &n);
@@ -464,7 +465,7 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 				ret = SPL_LOG_BUFF_SIZE_ERROR;
 				break;
 			}
-			__simple_log_static__.buff_size = n;
+			t->buff_size = n;
 			break;
 		}
 		if (strcmp(key, SPL_MAX_SZ_MSG) == 0) {
@@ -478,10 +479,10 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 			if (n < SPL_MEMO_PADDING) {
 				n = SPL_MEMO_PADDING;
 			}
-			__simple_log_static__.max_sz_msg = n;
+			t->max_sz_msg = n;
 			break;
 		}
-		if (strcmp(key, SPLOG_ROT_SIZE) == 0) {
+		if (strcmp(key, SPL_LOG_ROT_SIZE) == 0) {
 			int n = 0;
 			int sz = 0;
 			sz = sscanf(buff, "%d", &n);
@@ -489,14 +490,14 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 				ret = SPL_LOG_ROT_SIZE_ERROR;
 				break;
 			}
-			__simple_log_static__.file_limit_size = n;
+			t->file_limit_size = n;
 #ifdef SPL_SHOW_CONSOLE
 			spl_console_log(
-			    "__simple_log_static__.file_limit_size: %d.\n", __simple_log_static__.file_limit_size);
+			    "t->file_limit_size: %d.\n", t->file_limit_size);
 #endif
 			break;
 		}
-		if (strcmp(key, SPLOG_TOPIC) == 0) {
+		if (strcmp(key, SPL_LOG_TOPIC) == 0) {
 			int n = 0, count = 0;
 			char *p = 0;
 			n = (int)strlen(buff);
@@ -507,37 +508,44 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 			if (ret) {
 				break;
 			}
-			__simple_log_static__.n_topic = count;
-			__simple_log_static__.topics = p;
+			t->n_topic = count;
+			t->topics = p;
 			break;
 		}
-		if (strcmp(key, SPLOG_NCPU) == 0) {
+		if (strcmp(key, SPL_LOG_NCPU) == 0) {
 			int sz = 0;
 			int n = 0;
 			sz = sscanf(buff, "%d", &n);
 			if (sz < 1) {
-				__simple_log_static__.ncpu = 1;
+				t->ncpu = 1;
 				break;
 			}
-			__simple_log_static__.ncpu = n;
-			/*
-			// if (__simple_log_static__.ncpu < 1) {
-			//	__simple_log_static__.ncpu = 1;
-			// }
-			*/
+			t->ncpu = n;
 			break;
 		}
-		if (strcmp(key, SPLOG_TRIGGER) == 0) {
+		if (strcmp(key, SPL_LOG_TRIGGER) == 0) {
 			int n = 0, sz = 0;
 			sz = sscanf(buff, "%d", &n);
 			if (sz < 1) {
-				__simple_log_static__.trigger_thread = 0;
+				t->trigger_thread = 0;
 				break;
 			}
-			__simple_log_static__.trigger_thread = n;
+			t->trigger_thread = n;
 			break;
 		}
-		if (strcmp(key, SPLOG_END_CFG) == 0) {
+		if (strcmp(key, SPL_LOG_SHARED_KEY) == 0) {
+			int n = 0;
+			n = (int)strlen(buff);
+			if (n < 1) {
+				break;
+			}
+			snprintf(t->shared_key, SPL_SHARED_KEY_LEN, "%s", buff);
+		#if SPL_SHOW_CONSOLE
+			spl_console_log("t->shared_key: %s.", t->shared_key);
+		#endif
+			break;
+		}
+		if (strcmp(key, SPL_LOG_END_CFG) == 0) {
 #ifdef SPL_SHOW_CONSOLE
 			spl_console_log("End configuration.\n");
 #endif
