@@ -38,7 +38,7 @@ Created: April 25, 2025
 | `Daily` | **[Mandatory]** |
 | `Log rotation` | **[Mandatory]** [rotation_size=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg)|
 | `Time` | **[Mandatory]** `[yyyy-mm-dd hh-mm-ss.nano]`|
-| `Info` | **[Mandatory]** `[tid] [pid] [file:func:line]`|
+| `Info` | **[Mandatory]** `[tid] [file:func:line]`|
 | `Number of CPU` | **[Mandatory]** [ncpu=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg)|
 | `topic` | **[Optional]** [topic=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg), can comment this feature.|
 | `Log level` | **[Mandatory]** [level=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg).|
@@ -50,7 +50,7 @@ Created: April 25, 2025
   
 ### 🛠️ Exported APIs
 
-SimpleLog-Challenge provides 5 key APIs for initializing, logging, and process control:
+SimpleLog-Topic provides 4 key APIs for initializing, logging, and process control:
 
 | APIs | Description |
 |--------------------|-------------|
@@ -68,7 +68,7 @@ SimpleLog-Challenge provides 5 key APIs for initializing, logging, and process c
 
 ### Organizational
 - Does this proposal require a new repository? No.  
-- Which repositories are expected to be modified to execute this design? `phosphor-logging`  
+- Which repositories are expected to be modified to execute this design? Any.  
 
 ### Testing and Validation
 - [Benchmarks on Windows, Linux, macOS vs spdlog](https://github.com/thuanalg/simplelog-topic/blob/main/README.md#benchmarking-performance)
