@@ -54,7 +54,7 @@ SimpleLog-Topic provides 4 key APIs for initializing, logging, and process contr
 
 | APIs | Description |
 |--------------------|-------------|
-| `int spl_init_log_ext(SPC_INPUT_ARG *input);` | **[Mandatory]** Initialize the logger with extended input settings. |
+| `int spl_init_log_ext(SPL_INPUT_ARG *input);` | **[Mandatory]** Initialize the logger with extended input settings. |
 | `int spl_finish_log();` | **[Mandatory]** Finalize and clean up the logger. |
 | `spllog(log_level, fmt, ...);` | **[Mandatory]** Log a message with the specified level. |
 | `spllogtopic(log_level, topic_index, fmt, ...);` | **[Optional]** Log by [topics=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg) from 1 to n. |
