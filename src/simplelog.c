@@ -598,7 +598,7 @@ spl_init_log(char *pathcfg)
 		*/
 		FFOPEN(fp, pathcfg, "r");
 		if (!fp) {
-			ret = 1;
+			ret = SPL_LOG_OPEN_CFG;
 			spl_console_log("Cannot open file error.");
 			break;
 		}
@@ -708,7 +708,7 @@ spl_mutex_lock(void *obj)
 #ifndef SPL_USING_SPIN_LOCK
 		err = WaitForSingleObject(obj, INFINITE);
 		if (err != WAIT_OBJECT_0) {
-			ret = 1;
+			ret = SPL_LOG_WIN32_WAIT_OBJECT;
 			break;
 		}
 #else
@@ -744,7 +744,7 @@ spl_mutex_unlock(void *obj)
 #ifndef SPL_USING_SPIN_LOCK
 		done = ReleaseMutex(obj);
 		if (!done) {
-			ret = 1;
+			ret = SPL_LOG_WIN32_MUTEX_RELEASE;
 			break;
 		}
 #else
@@ -776,7 +776,6 @@ spl_verify_folder(char *folder)
 		if (!result) {
 			DWORD werr = GetLastError();
 			if (werr == ERROR_ALREADY_EXISTS) {
-				// ret = 1;
 				break;
 			}
 			ret = SPL_LOG_FOLDER_ERROR;
@@ -1878,7 +1877,7 @@ spl_create_memory(void **output, char *shared_key, int size_shared, char isCreat
 
 			if (!hMapFile) {
 				spl_console_log("Cannot create SHM. error: %d\n", (int)GetLastError());
-				ret = 1;
+				ret = SPL_LOG_WIN32_MAP_FILE;
 				break;
 			}
 		} else {
@@ -2650,7 +2649,10 @@ spl_err_txt_init()
 	__spl_err_text__[SPL_LOG_SEM_OSX_CREATED_ERROR] = "SPL_LOG_SEM_OSX_CREATED_ERROR";
 	__spl_err_text__[SPL_LOG_SEM_INIT_OSX] = "SPL_LOG_SEM_INIT_OSX";
 	__spl_err_text__[SPL_LOG_SEM_OSX_UNLINK_ERROR] = "SPL_LOG_SEM_OSX_UNLINK_ERROR";
-
+	__spl_err_text__[SPL_LOG_OPEN_CFG] = "SPL_LOG_OPEN_CFG";
+	__spl_err_text__[SPL_LOG_WIN32_WAIT_OBJECT] = "SPL_LOG_WIN32_WAIT_OBJECT";
+	__spl_err_text__[SPL_LOG_WIN32_MUTEX_RELEASE] = "SPL_LOG_WIN32_MUTEX_RELEASE";
+	__spl_err_text__[SPL_LOG_WIN32_MAP_FILE] = "SPL_LOG_WIN32_MAP_FILE";
 
 	__spl_err_text__[SPL_END_ERROR] = "SPL_END_ERROR";
 }
