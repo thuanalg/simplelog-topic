@@ -209,7 +209,8 @@ static const char *__splog_pathfolder[] = {SPL_LOG_PATHFOLDR, SPL_LOG_LEVEL, SPL
 
 static SIMPLE_LOG_ST __simple_log_static__;
 ;
-
+void
+spl_err_txt_init();
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
 static int
@@ -564,6 +565,7 @@ int
 spl_init_log_ext(SPL_INPUT_ARG *input)
 {
 	int ret = 0;
+	spl_err_txt_init();
 	do {
 		memcpy(__simple_log_static__.id_name, input->id_name, SPL_IDD_NAME);
 		ret = spl_init_log(input->folder);
@@ -2577,7 +2579,93 @@ spl_clean_sync_tool()
 	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+static const char *__spl_err_text__[SPL_END_ERROR + 1];
 
+void
+spl_err_txt_init()
+{
+	__spl_err_text__[SPL_NO_ERROR] = "SPL_NO_ERROR";
+	__spl_err_text__[SPL_INIT_PATH_FOLDER_EMPTY_ERROR] = "SPL_INIT_PATH_FOLDER_EMPTY_ERROR";
+	__spl_err_text__[SPL_LOG_LEVEL_ERROR] = "SPL_LOG_LEVEL_ERROR";
+	__spl_err_text__[SPL_ERROR_CREATE_MUTEX] = "SPL_ERROR_CREATE_MUTEX";
+	__spl_err_text__[SPL_ERROR_CREATE_SEM] = "SPL_ERROR_CREATE_SEM";
+	__spl_err_text__[SPL_LOG_BUFF_SIZE_ERROR] = "SPL_LOG_BUFF_SIZE_ERROR";
+	__spl_err_text__[SPL_LOG_BUFF_MALLOC_ERROR] = "SPL_LOG_BUFF_MALLOC_ERROR";
+	__spl_err_text__[SPL_LOG_MAX_SZ_MSG_ERROR] = "SPL_LOG_MAX_SZ_MSG_ERROR";
+	__spl_err_text__[SPL_LOG_FOLDER_ERROR] = "SPL_LOG_FOLDER_ERROR";
+	__spl_err_text__[SPL_LOG_CREATE_THREAD_ERROR] = "SPL_LOG_CREATE_THREAD_ERROR";
+	__spl_err_text__[SPL_LOG_FMT_NULL_ERROR] = "SPL_LOG_FMT_NULL_ERROR";
+	__spl_err_text__[SPL_LOG_MEM_GEN_FILE_ERROR] = "SPL_LOG_MEM_GEN_FILE_ERROR";
+	__spl_err_text__[SPL_LOG_MEM_MALLOC_ERROR] = "SPL_LOG_MEM_MALLOC_ERROR";
+	__spl_err_text__[SPL_LOG_OPEN_FILE_ERROR] = "SPL_LOG_OPEN_FILE_ERROR";
+	__spl_err_text__[SPL_LOG_OPEN1_FILE_ERROR] = "SPL_LOG_OPEN1_FILE_ERROR";
+	__spl_err_text__[SPL_LOG_CLOSE_FILE_ERROR] = "SPL_LOG_CLOSE_FILE_ERROR";
+	__spl_err_text__[SPL_LOG_SEM_NULL_ERROR] = "SPL_LOG_SEM_NULL_ERROR";
+	__spl_err_text__[SPL_LOG_SEM_WIN32_CREATED_ERROR] = "SPL_LOG_SEM_WIN32_CREATED_ERROR";
+	__spl_err_text__[SPL_LOG_MTX_WIN32_CREATED_ERROR] = "SPL_LOG_MTX_WIN32_CREATED_ERROR";
+	__spl_err_text__[SPL_LOG_ROT_SIZE_ERROR] = "SPL_LOG_ROT_SIZE_ERROR";
+	__spl_err_text__[SPL_LOG_TOPIC_EMPTY] = "SPL_LOG_TOPIC_EMPTY";
+	__spl_err_text__[SPL_LOG_TOPIC_NULL] = "SPL_LOG_TOPIC_NULL";
+	__spl_err_text__[SPL_LOG_MEM_FILE_MALLOC_ERROR] = "SPL_LOG_MEM_FILE_MALLOC_ERROR";
+	__spl_err_text__[SPL_LOG_CHECK_FOLDER_ERROR] = "SPL_LOG_CHECK_FOLDER_ERROR";
+	__spl_err_text__[SPL_LOG_CHECK_FOLDER_YEAR_ERROR] = "SPL_LOG_CHECK_FOLDER_YEAR_ERROR";
+	__spl_err_text__[SPL_LOG_CHECK_FILE_YEAR_ERROR] = "SPL_LOG_CHECK_FILE_YEAR_ERROR";
+	__spl_err_text__[SPL_LOG_CHECK_FOLDER_NULL_ERROR] = "SPL_LOG_CHECK_FOLDER_NULL_ERROR";
+	__spl_err_text__[SPL_LOG_MUTEX_NULL_ERROR] = "SPL_LOG_MUTEX_NULL_ERROR";
+	__spl_err_text__[SPL_LOG_ST_NAME_NULL_ERROR] = "SPL_LOG_ST_NAME_NULL_ERROR";
+	__spl_err_text__[SPL_LOG_TIME_NULL_ERROR] = "SPL_LOG_TIME_NULL_ERROR";
+	__spl_err_text__[SPL_LOG_TIME_NANO_NULL_ERROR] = "SPL_LOG_TIME_NANO_NULL_ERROR";
+	__spl_err_text__[SPL_LOG_STAT_FOLDER_ERROR] = "SPL_LOG_STAT_FOLDER_ERROR";
+	__spl_err_text__[SPL_LOG_PRINTF_ERROR] = "SPL_LOG_PRINTF_ERROR";
+	__spl_err_text__[SPL_LOG_TOPIC_ZERO] = "SPL_LOG_TOPIC_ZERO";
+	__spl_err_text__[SPL_LOG_TOPIC_MEMORY] = "SPL_LOG_TOPIC_MEMORY";
+	__spl_err_text__[SPL_LOG_TOPIC_FOPEN] = "SPL_LOG_TOPIC_FOPEN";
+	__spl_err_text__[SPL_LOG_TOPIC_FLUSH] = "SPL_LOG_TOPIC_FLUSH";
+	__spl_err_text__[SPL_LOG_TOPIC_BUFF_MEM] = "SPL_LOG_TOPIC_BUFF_MEM";
+	__spl_err_text__[SPL_LOG_ALOCK_NUM] = "SPL_LOG_ALOCK_NUM";
+	__spl_err_text__[SPL_LOG_ALOCK_NULL] = "SPL_LOG_ALOCK_NULL";
+	__spl_err_text__[SPL_LOG_SHM_CREATE_NULL] = "SPL_LOG_SHM_CREATE_NULL";
+	__spl_err_text__[SPL_LOG_SHM_WIN_UNMAP] = "SPL_LOG_SHM_WIN_UNMAP";
+	__spl_err_text__[SPL_LOG_SHM_UNIX_OPEN] = "SPL_LOG_SHM_UNIX_OPEN";
+	__spl_err_text__[SPL_LOG_SHM_UNIX_TRUNC] = "SPL_LOG_SHM_UNIX_TRUNC";
+	__spl_err_text__[SPL_LOG_SHM_UNIX_MAP_FAILED] = "SPL_LOG_SHM_UNIX_MAP_FAILED";
+	__spl_err_text__[SPL_LOG_WIN_SHM_CLOSE] = "SPL_LOG_WIN_SHM_CLOSE";
+	__spl_err_text__[SPL_LOG_SHM_UNIX_UNMAP] = "SPL_LOG_SHM_UNIX_UNMAP";
+	__spl_err_text__[SPL_LOG_VAR_NULL] = "SPL_LOG_VAR_NULL";
+	__spl_err_text__[SPL_LOG_ARR_MTX_NULL] = "SPL_LOG_ARR_MTX_NULL";
+	__spl_err_text__[SPL_LOG_ARR_BUFF_NULL] = "SPL_LOG_ARR_BUFF_NULL";
+	__spl_err_text__[SPL_LOG_MTX_ATT_SHARED_MODE] = "SPL_LOG_MTX_ATT_SHARED_MODE";
+	__spl_err_text__[SPL_LOG_MTX_ATT_SHARED_MODE_SET] = "SPL_LOG_MTX_ATT_SHARED_MODE_SET";
+	__spl_err_text__[SPL_LOG_MTX_INIT_ERR] = "SPL_LOG_MTX_INIT_ERR";
+	__spl_err_text__[SPL_LOG_SHM_UNIX_INIT_MUTEX] = "SPL_LOG_SHM_UNIX_INIT_MUTEX";
+	__spl_err_text__[SPL_LOG_SPINLOCK_INIT_SHARED] = "SPL_LOG_SPINLOCK_INIT_SHARED";
+	__spl_err_text__[SPL_LOG_SPINLOCK_INIT_PRIVATE] = "SPL_LOG_SPINLOCK_INIT_PRIVATE";
+	__spl_err_text__[SPL_LOG_SEM_INIT_UNIX] = "SPL_LOG_SEM_INIT_UNIX";
+	__spl_err_text__[SPL_LOG_THREAD_W32_CREATE] = "SPL_LOG_THREAD_W32_CREATE";
+	__spl_err_text__[SPL_LOG_THREAD_PX_CREATE] = "SPL_LOG_THREAD_PX_CREATE";
+	__spl_err_text__[SPL_LOG_MACH_GETTIME_ERROR] = "SPL_LOG_MACH_GETTIME_ERROR";
+	__spl_err_text__[SPL_LOG_MACH_CLOCK_SERVICE_ERROR] = "SPL_LOG_MACH_CLOCK_SERVICE_ERROR";
+	__spl_err_text__[SPL_LOG_OSX_SEM_CLOSE] = "SPL_LOG_OSX_SEM_CLOSE";
+	__spl_err_text__[SPL_LOG_OSX_SEM_UNLINK] = "SPL_LOG_OSX_SEM_UNLINK";
+	__spl_err_text__[SPL_LOG_SEM_OSX_CREATED_ERROR] = "SPL_LOG_SEM_OSX_CREATED_ERROR";
+	__spl_err_text__[SPL_LOG_SEM_INIT_OSX] = "SPL_LOG_SEM_INIT_OSX";
+	__spl_err_text__[SPL_LOG_SEM_OSX_UNLINK_ERROR] = "SPL_LOG_SEM_OSX_UNLINK_ERROR";
+
+
+	__spl_err_text__[SPL_END_ERROR] = "SPL_END_ERROR";
+}
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+const char *
+spl_err_txt(int i)
+{
+	if (i < 0) {
+		return "UNKNOW - less than 0.";
+	}
+	if (i > SPL_END_ERROR) {
+		return "UNKNOW - greater than SPL_END_ERROR.";
+	}
+	return __spl_err_text__[i];
+}
 #ifndef UNIX_LINUX
 #else
 #endif

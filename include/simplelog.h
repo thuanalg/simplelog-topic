@@ -556,6 +556,8 @@ DLL_API_SIMPLE_LOG
 SIMPLE_LOG_ST *
 spl_control_obj();
 
+DLL_API_SIMPLE_LOG const char *
+spl_err_txt(int i);
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
 
 #ifdef __cplusplus
