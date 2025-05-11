@@ -1862,7 +1862,9 @@ spl_create_memory(void **output, char *shared_key, int size_shared, char isCreat
 	do {
 #ifndef UNIX_LINUX
 		HANDLE hMapFile = 0;
-		char *p = 0;
+
+		/* char *p = 0;*/
+
 		if (!output) {
 			ret = SPL_LOG_SHM_CREATE_NULL;
 			break;
