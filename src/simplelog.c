@@ -1,5 +1,5 @@
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 /* Email:
  *		<nguyenthaithuanalg@gmail.com> - Nguyễn Thái Thuận
  * Mobile:
@@ -24,7 +24,7 @@
  * Decription:
  *		The (only) main file to implement simple log.
  */
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 #include "simplelog.h"
 #include <stdio.h>
@@ -65,7 +65,7 @@
 #define SPL_LOG_UNIX_PROT_FLAGS   (PROT_READ | PROT_WRITE | PROT_EXEC)
 #endif
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 #define SPL_FCLOSE(__fp__, __n)                                                                                             \
 	{                                                                                                                   \
@@ -137,13 +137,13 @@
 			spl_console_log("pthread_mutex_unlock errcode: %d. %s\n", (__err), (__err) ? "FALIED" : "DONE");    \
 	}
 #endif
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #define SPL_SEM_NAME_RW           "_SEM_RW"
 #define SPL_SEM_NAME_OFF          "_SEM_OFF"
 
 #define SPL_MTX_NAME_RW           "_MTX_RW"
 #define SPL_MTX_NAME_OFF          "_MTX_OFF"
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 #define SPL_LOG_PATHFOLDR         "pathfoder="
 #define SPL_LOG_LEVEL             "level="
@@ -173,7 +173,7 @@
 #define SPL_TEXT_FATAL            "F"
 
 #define SPL_CASTGEN(__t__) ((spl_gen_data_st *)__t__)
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #ifndef UNIX_LINUX
 // DLL_API_SIMPLE_LOG
 static void
@@ -191,7 +191,7 @@ splUnlockSpinlock(volatile long *p);
 /*pthread_spinlock_t	spl_rw_spin; */
 typedef void *(*THREAD_ROUTINE)(void *);
 #endif
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 typedef enum __CHANGE_NAME_E__ {
 	SPL_NO_CHANGE_NAME = 0,
@@ -203,14 +203,15 @@ typedef enum __CHANGE_NAME_E__ {
 	SPL_CHANGE_FINISH
 } __CHANGE_NAME_E__;
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 static const char *__splog_pathfolder[] = {SPL_LOG_PATHFOLDR, SPL_LOG_LEVEL, SPL_LOG_BUFF_SIZE, SPL_MAX_SZ_MSG,
     SPL_LOG_ROT_SIZE, SPL_LOG_TOPIC, SPL_LOG_NCPU, SPL_LOG_TRIGGER, SPL_LOG_SHARED_KEY, SPL_LOG_END_CFG, 0};
 
 static SIMPLE_LOG_ST __simple_log_static__;
 ;
-
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+void
+spl_err_txt_init();
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 static int
 spl_init_log_parse(char *buff, char *key, char *);
@@ -291,13 +292,13 @@ static int
 spl_set_off(int);
 static int
 spl_standardize_path(char *fname);
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 SIMPLE_LOG_ST *
 spl_control_obj()
 {
 	return (SIMPLE_LOG_ST *)&__simple_log_static__;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 static const char spl_text_gb_c[SPL_LOG_PEAK] = {
     'A',
@@ -308,7 +309,7 @@ static const char spl_text_gb_c[SPL_LOG_PEAK] = {
     'F',
 };
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_local_time_now(spl_local_time_st *stt)
 {
@@ -392,7 +393,7 @@ spl_local_time_now(spl_local_time_st *stt)
 	return ret;
 }
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_set_off(int isoff)
 {
@@ -430,7 +431,7 @@ spl_set_off(int isoff)
 	return ret;
 }
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_init_log_parse(char *buff, char *key, char *isEnd)
 {
@@ -558,12 +559,13 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 	return ret;
 }
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 int
 spl_init_log_ext(SPL_INPUT_ARG *input)
 {
 	int ret = 0;
+	spl_err_txt_init();
 	do {
 		memcpy(__simple_log_static__.id_name, input->id_name, SPL_IDD_NAME);
 		ret = spl_init_log(input->folder);
@@ -576,7 +578,7 @@ spl_init_log_ext(SPL_INPUT_ARG *input)
 	return ret;
 }
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 int
 spl_init_log(char *pathcfg)
@@ -596,7 +598,7 @@ spl_init_log(char *pathcfg)
 		*/
 		FFOPEN(fp, pathcfg, "r");
 		if (!fp) {
-			ret = 1;
+			ret = SPL_LOG_OPEN_CFG;
 			spl_console_log("Cannot open file error.");
 			break;
 		}
@@ -687,7 +689,7 @@ spl_init_log(char *pathcfg)
 	return ret;
 }
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_mutex_lock(void *obj)
 {
@@ -706,7 +708,7 @@ spl_mutex_lock(void *obj)
 #ifndef SPL_USING_SPIN_LOCK
 		err = WaitForSingleObject(obj, INFINITE);
 		if (err != WAIT_OBJECT_0) {
-			ret = 1;
+			ret = SPL_LOG_WIN32_WAIT_OBJECT;
 			break;
 		}
 #else
@@ -723,7 +725,7 @@ spl_mutex_lock(void *obj)
 	} while (0);
 	return ret;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_mutex_unlock(void *obj)
 {
@@ -742,7 +744,7 @@ spl_mutex_unlock(void *obj)
 #ifndef SPL_USING_SPIN_LOCK
 		done = ReleaseMutex(obj);
 		if (!done) {
-			ret = 1;
+			ret = SPL_LOG_WIN32_MUTEX_RELEASE;
 			break;
 		}
 #else
@@ -758,7 +760,7 @@ spl_mutex_unlock(void *obj)
 	} while (0);
 	return ret;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_verify_folder(char *folder)
 {
@@ -774,7 +776,6 @@ spl_verify_folder(char *folder)
 		if (!result) {
 			DWORD werr = GetLastError();
 			if (werr == ERROR_ALREADY_EXISTS) {
-				// ret = 1;
 				break;
 			}
 			ret = SPL_LOG_FOLDER_ERROR;
@@ -784,7 +785,7 @@ spl_verify_folder(char *folder)
 	return ret;
 }
 /*https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsystemtime*/
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_get_fname_now(char *name)
 {
@@ -803,7 +804,7 @@ spl_get_fname_now(char *name)
 	return ret;
 }
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #ifndef UNIX_LINUX
 DWORD WINAPI
 spl_written_thread_routine(LPVOID lpParam)
@@ -846,7 +847,7 @@ spl_written_thread_routine(void *lpParam)
 		main_src_thrd_buf[i] = p + t->buff_size * i;
 	}
 
-	/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 	if (t->arr_topic) {
 		spl_malloc(t->n_topic * sizeof(char *), src_topic_thrd_buf, char **);
@@ -859,7 +860,7 @@ spl_written_thread_routine(void *lpParam)
 		}
 	}
 
-	/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 	if (t->trigger_thread > 0) {
 		spl_create_thread(spl_trigger_routine, t, &trigger_handle_id);
 	}
@@ -900,13 +901,13 @@ spl_written_thread_routine(void *lpParam)
 					continue;
 				}
 
-				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				if (!is_off) {
 					spl_mutex_lock(t->mtx_rw);
 					is_off = t->off;
 					spl_mutex_unlock(t->mtx_rw);
 				}
-				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				for (i = 0; i < t->ncpu; ++i) {
 					spl_mutex_lock(t->arr_mtx[i]);
 					/* //do { */
@@ -920,7 +921,7 @@ spl_written_thread_routine(void *lpParam)
 					/* //} while (0); */
 					spl_mutex_unlock(t->arr_mtx[i]);
 				}
-				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				if (only_cast->pl > 0) {
 					k = (int)fwrite(only_cast->data, 1, only_cast->pl, t->fp);
 					only_cast->pl = 0;
@@ -932,7 +933,7 @@ spl_written_thread_routine(void *lpParam)
 					spl_console_log("--fflush, ret: %d --\n", err);
 					break;
 				}
-				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				if (t->n_topic > 0) {
 					char *src = 0;
 					for (i = 0; i < t->n_topic; ++i) {
@@ -963,7 +964,7 @@ spl_written_thread_routine(void *lpParam)
 						}
 					}
 				}
-				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				if (is_off) {
 					break;
 				}
@@ -1034,7 +1035,7 @@ spl_written_thread_routine(void *lpParam)
 	}
 	return 0;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_simple_log_thread(SIMPLE_LOG_ST *t)
 {
@@ -1061,7 +1062,7 @@ spl_simple_log_thread(SIMPLE_LOG_ST *t)
 	} while (0);
 	return ret;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 char *
 spl_fmt_now_ext(
     char *fmtt, int len, int lv, const char *filename, const char *funcname, int line, unsigned short *r, int *outlen)
@@ -1112,7 +1113,7 @@ spl_fmt_now_ext(
 	return p;
 }
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_fmmt_now(char *fmtt, int len)
 {
@@ -1146,7 +1147,7 @@ spl_fmmt_now(char *fmtt, int len)
 	return ret;
 }
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 int
 spl_gen_file(SIMPLE_LOG_ST *t, int *sz, int limit, int *index)
@@ -1271,7 +1272,7 @@ spl_gen_file(SIMPLE_LOG_ST *t, int *sz, int limit, int *index)
 	return ret;
 }
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 LLU
 spl_get_threadid()
 {
@@ -1281,7 +1282,7 @@ spl_get_threadid()
 	return (LLU)pthread_self();
 #endif
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_rel_sem(void *sem)
 {
@@ -1313,7 +1314,7 @@ spl_rel_sem(void *sem)
 	return ret;
 }
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_finish_log()
 {
@@ -1330,7 +1331,7 @@ spl_finish_log()
 	return ret;
 }
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 /*https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createdirectorya*/
 int
 spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month)
@@ -1432,7 +1433,7 @@ spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month)
 	} while (0);
 	return ret;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 void
 spl_sleep(unsigned int sec)
 {
@@ -1442,7 +1443,7 @@ spl_sleep(unsigned int sec)
 	sleep(sec);
 #endif
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 void
 spl_milli_sleep(unsigned int mill_sec)
 {
@@ -1452,7 +1453,7 @@ spl_milli_sleep(unsigned int mill_sec)
 	usleep(mill_sec * 1000);
 #endif
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_standardize_path(char *fname)
 {
@@ -1466,7 +1467,7 @@ spl_standardize_path(char *fname)
 	}
 	return ret;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_stdz_topics(char *buff, int *inoutlen, int *ntopics, char **pchar)
 {
@@ -1532,7 +1533,7 @@ spl_stdz_topics(char *buff, int *inoutlen, int *ntopics, char **pchar)
 	*/
 	return ret;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_gen_topics(SIMPLE_LOG_ST *t)
 {
@@ -1661,7 +1662,7 @@ spl_gen_topics(SIMPLE_LOG_ST *t)
 	return ret;
 }
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 LLU
 spl_milli_now()
 {
@@ -1701,7 +1702,7 @@ spl_milli_now()
 	} while (0);
 	return ret;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_fclose_err(int terr, void *ffp)
 {
@@ -1719,7 +1720,7 @@ spl_fclose_err(int terr, void *ffp)
 	} while (0);
 	return ret;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_fflush_err(int terr, void *ffp)
 {
@@ -1737,7 +1738,7 @@ spl_fflush_err(int terr, void *ffp)
 	} while (0);
 	return ret;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #ifndef UNIX_LINUX
 void
 splLockSpinlock(volatile long *p)
@@ -1753,7 +1754,7 @@ splUnlockSpinlock(volatile long *p)
 }
 #else
 #endif
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 #ifndef UNIX_LINUX
 DWORD WINAPI
@@ -1770,7 +1771,7 @@ spl_trigger_routine(void *arg)
 	}
 	return 0;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 #ifndef UNIX_LINUX
 int
@@ -1801,7 +1802,7 @@ spl_create_thread(THREAD_ROUTINE f, void *arg, pthread_t *outid)
 #endif
 	return ret;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #define spl_shm_unlink(__name__, __err__)                                                                                   \
 	{                                                                                                                   \
 		__err__ = shm_unlink(__name__);                                                                             \
@@ -1851,7 +1852,7 @@ spl_del_memory()
 	} while (0);
 	return ret;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 int
 spl_create_memory(void **output, char *shared_key, int size_shared, char isCreating)
@@ -1861,7 +1862,9 @@ spl_create_memory(void **output, char *shared_key, int size_shared, char isCreat
 	do {
 #ifndef UNIX_LINUX
 		HANDLE hMapFile = 0;
-		char *p = 0;
+
+		/* char *p = 0;*/
+
 		if (!output) {
 			ret = SPL_LOG_SHM_CREATE_NULL;
 			break;
@@ -1876,7 +1879,7 @@ spl_create_memory(void **output, char *shared_key, int size_shared, char isCreat
 
 			if (!hMapFile) {
 				spl_console_log("Cannot create SHM. error: %d\n", (int)GetLastError());
-				ret = 1;
+				ret = SPL_LOG_WIN32_MAP_FILE;
 				break;
 			}
 		} else {
@@ -1929,7 +1932,7 @@ spl_create_memory(void **output, char *shared_key, int size_shared, char isCreat
 	} while (0);
 	return ret = 0;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 /* (SIMPLE_LOG_ST*)&__simple_log_static__, volatile long, pthread_spinlock_t, pthread_mutex_t */
 
 int
@@ -2137,7 +2140,7 @@ spl_calculate_size()
 
 	return ret;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 #ifndef UNIX_LINUX
 int
@@ -2434,7 +2437,7 @@ spl_mtx_init(void *obj, char shared)
 }
 #endif
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 static void
 spl_fmt_segment(spl_gen_data_st *sgment)
 {
@@ -2478,7 +2481,7 @@ spl_init_segments()
 	} while (0);
 	return ret;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 int
 spl_allocate_topics()
@@ -2517,7 +2520,7 @@ spl_allocate_topics()
 	} while (0);
 	return ret;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_gen_sync_tool()
 {
@@ -2538,7 +2541,7 @@ spl_gen_sync_tool()
 	} while (0);
 	return ret;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 int
 spl_clean_sync_tool()
@@ -2576,8 +2579,97 @@ spl_clean_sync_tool()
 	} while (0);
 	return ret;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+static const char *__spl_err_text__[SPL_END_ERROR + 1];
 
+void
+spl_err_txt_init()
+{
+	__spl_err_text__[SPL_NO_ERROR] = "SPL_NO_ERROR";
+	__spl_err_text__[SPL_INIT_PATH_FOLDER_EMPTY_ERROR] = "SPL_INIT_PATH_FOLDER_EMPTY_ERROR";
+	__spl_err_text__[SPL_LOG_LEVEL_ERROR] = "SPL_LOG_LEVEL_ERROR";
+	__spl_err_text__[SPL_ERROR_CREATE_MUTEX] = "SPL_ERROR_CREATE_MUTEX";
+	__spl_err_text__[SPL_ERROR_CREATE_SEM] = "SPL_ERROR_CREATE_SEM";
+	__spl_err_text__[SPL_LOG_BUFF_SIZE_ERROR] = "SPL_LOG_BUFF_SIZE_ERROR";
+	__spl_err_text__[SPL_LOG_BUFF_MALLOC_ERROR] = "SPL_LOG_BUFF_MALLOC_ERROR";
+	__spl_err_text__[SPL_LOG_MAX_SZ_MSG_ERROR] = "SPL_LOG_MAX_SZ_MSG_ERROR";
+	__spl_err_text__[SPL_LOG_FOLDER_ERROR] = "SPL_LOG_FOLDER_ERROR";
+	__spl_err_text__[SPL_LOG_CREATE_THREAD_ERROR] = "SPL_LOG_CREATE_THREAD_ERROR";
+	__spl_err_text__[SPL_LOG_FMT_NULL_ERROR] = "SPL_LOG_FMT_NULL_ERROR";
+	__spl_err_text__[SPL_LOG_MEM_GEN_FILE_ERROR] = "SPL_LOG_MEM_GEN_FILE_ERROR";
+	__spl_err_text__[SPL_LOG_MEM_MALLOC_ERROR] = "SPL_LOG_MEM_MALLOC_ERROR";
+	__spl_err_text__[SPL_LOG_OPEN_FILE_ERROR] = "SPL_LOG_OPEN_FILE_ERROR";
+	__spl_err_text__[SPL_LOG_OPEN1_FILE_ERROR] = "SPL_LOG_OPEN1_FILE_ERROR";
+	__spl_err_text__[SPL_LOG_CLOSE_FILE_ERROR] = "SPL_LOG_CLOSE_FILE_ERROR";
+	__spl_err_text__[SPL_LOG_SEM_NULL_ERROR] = "SPL_LOG_SEM_NULL_ERROR";
+	__spl_err_text__[SPL_LOG_SEM_WIN32_CREATED_ERROR] = "SPL_LOG_SEM_WIN32_CREATED_ERROR";
+	__spl_err_text__[SPL_LOG_MTX_WIN32_CREATED_ERROR] = "SPL_LOG_MTX_WIN32_CREATED_ERROR";
+	__spl_err_text__[SPL_LOG_ROT_SIZE_ERROR] = "SPL_LOG_ROT_SIZE_ERROR";
+	__spl_err_text__[SPL_LOG_TOPIC_EMPTY] = "SPL_LOG_TOPIC_EMPTY";
+	__spl_err_text__[SPL_LOG_TOPIC_NULL] = "SPL_LOG_TOPIC_NULL";
+	__spl_err_text__[SPL_LOG_MEM_FILE_MALLOC_ERROR] = "SPL_LOG_MEM_FILE_MALLOC_ERROR";
+	__spl_err_text__[SPL_LOG_CHECK_FOLDER_ERROR] = "SPL_LOG_CHECK_FOLDER_ERROR";
+	__spl_err_text__[SPL_LOG_CHECK_FOLDER_YEAR_ERROR] = "SPL_LOG_CHECK_FOLDER_YEAR_ERROR";
+	__spl_err_text__[SPL_LOG_CHECK_FILE_YEAR_ERROR] = "SPL_LOG_CHECK_FILE_YEAR_ERROR";
+	__spl_err_text__[SPL_LOG_CHECK_FOLDER_NULL_ERROR] = "SPL_LOG_CHECK_FOLDER_NULL_ERROR";
+	__spl_err_text__[SPL_LOG_MUTEX_NULL_ERROR] = "SPL_LOG_MUTEX_NULL_ERROR";
+	__spl_err_text__[SPL_LOG_ST_NAME_NULL_ERROR] = "SPL_LOG_ST_NAME_NULL_ERROR";
+	__spl_err_text__[SPL_LOG_TIME_NULL_ERROR] = "SPL_LOG_TIME_NULL_ERROR";
+	__spl_err_text__[SPL_LOG_TIME_NANO_NULL_ERROR] = "SPL_LOG_TIME_NANO_NULL_ERROR";
+	__spl_err_text__[SPL_LOG_STAT_FOLDER_ERROR] = "SPL_LOG_STAT_FOLDER_ERROR";
+	__spl_err_text__[SPL_LOG_PRINTF_ERROR] = "SPL_LOG_PRINTF_ERROR";
+	__spl_err_text__[SPL_LOG_TOPIC_ZERO] = "SPL_LOG_TOPIC_ZERO";
+	__spl_err_text__[SPL_LOG_TOPIC_MEMORY] = "SPL_LOG_TOPIC_MEMORY";
+	__spl_err_text__[SPL_LOG_TOPIC_FOPEN] = "SPL_LOG_TOPIC_FOPEN";
+	__spl_err_text__[SPL_LOG_TOPIC_FLUSH] = "SPL_LOG_TOPIC_FLUSH";
+	__spl_err_text__[SPL_LOG_TOPIC_BUFF_MEM] = "SPL_LOG_TOPIC_BUFF_MEM";
+	__spl_err_text__[SPL_LOG_ALOCK_NUM] = "SPL_LOG_ALOCK_NUM";
+	__spl_err_text__[SPL_LOG_ALOCK_NULL] = "SPL_LOG_ALOCK_NULL";
+	__spl_err_text__[SPL_LOG_SHM_CREATE_NULL] = "SPL_LOG_SHM_CREATE_NULL";
+	__spl_err_text__[SPL_LOG_SHM_WIN_UNMAP] = "SPL_LOG_SHM_WIN_UNMAP";
+	__spl_err_text__[SPL_LOG_SHM_UNIX_OPEN] = "SPL_LOG_SHM_UNIX_OPEN";
+	__spl_err_text__[SPL_LOG_SHM_UNIX_TRUNC] = "SPL_LOG_SHM_UNIX_TRUNC";
+	__spl_err_text__[SPL_LOG_SHM_UNIX_MAP_FAILED] = "SPL_LOG_SHM_UNIX_MAP_FAILED";
+	__spl_err_text__[SPL_LOG_WIN_SHM_CLOSE] = "SPL_LOG_WIN_SHM_CLOSE";
+	__spl_err_text__[SPL_LOG_SHM_UNIX_UNMAP] = "SPL_LOG_SHM_UNIX_UNMAP";
+	__spl_err_text__[SPL_LOG_VAR_NULL] = "SPL_LOG_VAR_NULL";
+	__spl_err_text__[SPL_LOG_ARR_MTX_NULL] = "SPL_LOG_ARR_MTX_NULL";
+	__spl_err_text__[SPL_LOG_ARR_BUFF_NULL] = "SPL_LOG_ARR_BUFF_NULL";
+	__spl_err_text__[SPL_LOG_MTX_ATT_SHARED_MODE] = "SPL_LOG_MTX_ATT_SHARED_MODE";
+	__spl_err_text__[SPL_LOG_MTX_ATT_SHARED_MODE_SET] = "SPL_LOG_MTX_ATT_SHARED_MODE_SET";
+	__spl_err_text__[SPL_LOG_MTX_INIT_ERR] = "SPL_LOG_MTX_INIT_ERR";
+	__spl_err_text__[SPL_LOG_SHM_UNIX_INIT_MUTEX] = "SPL_LOG_SHM_UNIX_INIT_MUTEX";
+	__spl_err_text__[SPL_LOG_SPINLOCK_INIT_SHARED] = "SPL_LOG_SPINLOCK_INIT_SHARED";
+	__spl_err_text__[SPL_LOG_SPINLOCK_INIT_PRIVATE] = "SPL_LOG_SPINLOCK_INIT_PRIVATE";
+	__spl_err_text__[SPL_LOG_SEM_INIT_UNIX] = "SPL_LOG_SEM_INIT_UNIX";
+	__spl_err_text__[SPL_LOG_THREAD_W32_CREATE] = "SPL_LOG_THREAD_W32_CREATE";
+	__spl_err_text__[SPL_LOG_THREAD_PX_CREATE] = "SPL_LOG_THREAD_PX_CREATE";
+	__spl_err_text__[SPL_LOG_MACH_GETTIME_ERROR] = "SPL_LOG_MACH_GETTIME_ERROR";
+	__spl_err_text__[SPL_LOG_MACH_CLOCK_SERVICE_ERROR] = "SPL_LOG_MACH_CLOCK_SERVICE_ERROR";
+	__spl_err_text__[SPL_LOG_OSX_SEM_CLOSE] = "SPL_LOG_OSX_SEM_CLOSE";
+	__spl_err_text__[SPL_LOG_OSX_SEM_UNLINK] = "SPL_LOG_OSX_SEM_UNLINK";
+	__spl_err_text__[SPL_LOG_SEM_OSX_CREATED_ERROR] = "SPL_LOG_SEM_OSX_CREATED_ERROR";
+	__spl_err_text__[SPL_LOG_SEM_INIT_OSX] = "SPL_LOG_SEM_INIT_OSX";
+	__spl_err_text__[SPL_LOG_SEM_OSX_UNLINK_ERROR] = "SPL_LOG_SEM_OSX_UNLINK_ERROR";
+	__spl_err_text__[SPL_LOG_OPEN_CFG] = "SPL_LOG_OPEN_CFG";
+	__spl_err_text__[SPL_LOG_WIN32_WAIT_OBJECT] = "SPL_LOG_WIN32_WAIT_OBJECT";
+	__spl_err_text__[SPL_LOG_WIN32_MUTEX_RELEASE] = "SPL_LOG_WIN32_MUTEX_RELEASE";
+	__spl_err_text__[SPL_LOG_WIN32_MAP_FILE] = "SPL_LOG_WIN32_MAP_FILE";
+
+	__spl_err_text__[SPL_END_ERROR] = "SPL_END_ERROR";
+}
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+const char *
+spl_err_txt(int i)
+{
+	if (i < 0) {
+		return "UNKNOW - less than 0.";
+	}
+	if (i > SPL_END_ERROR) {
+		return "UNKNOW - greater than SPL_END_ERROR.";
+	}
+	return __spl_err_text__[i];
+}
 #ifndef UNIX_LINUX
 #else
 #endif
@@ -2591,4 +2683,4 @@ spl_clean_sync_tool()
 #else
 #endif
 #endif
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/

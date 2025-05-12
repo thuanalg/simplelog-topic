@@ -1,4 +1,4 @@
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 /* Email:
  *		<nguyenthaithuanalg@gmail.com> - Nguyễn Thái Thuận
  * Mobile:
@@ -24,7 +24,7 @@
  * Decription:
  *		The (only) main header file to export 4 APIs: [spl_init_log_ext, spllog, spllogtopic, spl_finish_log].
  */
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #ifndef ___SIMPLE_LOG__
 #define ___SIMPLE_LOG__                 
 #include <stdio.h>
@@ -109,7 +109,7 @@ extern "C" {
 #endif /*! UNIX_LINUX */
 
 typedef enum __SPL_LOG_ERR_CODE__ {
-	SPL_NO_ERROR = 0,
+	SPL_NO_ERROR,
 	SPL_INIT_PATH_FOLDER_EMPTY_ERROR,
 	SPL_LOG_LEVEL_ERROR,
 	SPL_ERROR_CREATE_MUTEX,
@@ -175,10 +175,14 @@ typedef enum __SPL_LOG_ERR_CODE__ {
 	SPL_LOG_SEM_OSX_CREATED_ERROR,
 	SPL_LOG_SEM_INIT_OSX,
 	SPL_LOG_SEM_OSX_UNLINK_ERROR,
+	SPL_LOG_OPEN_CFG,
+	SPL_LOG_WIN32_WAIT_OBJECT,
+	SPL_LOG_WIN32_MUTEX_RELEASE,
+	SPL_LOG_WIN32_MAP_FILE,
 
 	SPL_END_ERROR,
 } SPL_LOG_ERR_CODE;
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 typedef struct __SPL_CALLBACL_DATA__ {
 	int total;
 	int eventid;
@@ -242,7 +246,7 @@ typedef struct __SIMPLE_LOG_ST__ {
 	int ncpu; /*Number of CPU.*/
 	int trigger_thread; /*Use trigger thread or not.*/
 	void **arr_mtx; /*List of lock: Spinlock or Mutex. Must be freed.*/
-	/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #ifndef UNIX_LINUX
 	void *
 #else
@@ -266,7 +270,7 @@ typedef struct __SPL_INPUT_ARG__ {
 	SPL_CALLBACL_FUNCTION fn; /* Callback function pointer (fn(obj)). */
 	SPL_CALLBACL_DATA *obj; /* Data pointer passed to the callback function (fn(obj)). */
 } SPL_INPUT_ARG;
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 #define __FILLE__(__p__)                                                                                                    \
 	do {                                                                                                                \
@@ -330,7 +334,7 @@ typedef struct __SPL_INPUT_ARG__ {
 		(__obj__) = 0;                                                                                              \
 	}
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 #define SPL_KEYBUF(__t__, __i__) ((spl_gen_data_st *)((char *)__t__->buf + (__t__->buff_size * __i__)))
 #define __spl_log_buf_level__(__lv__, ___fmttt___, ...)                                                                     \
@@ -502,7 +506,7 @@ typedef struct __SPL_INPUT_ARG__ {
 		}                                                                                                           \
 	}
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 /* Please demo with spl_init_log */
 DLL_API_SIMPLE_LOG int
@@ -528,20 +532,29 @@ spl_init_log_ext(SPL_INPUT_ARG *input);
 DLL_API_SIMPLE_LOG int
 spl_finish_log();
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 DLL_API_SIMPLE_LOG char *
-spl_fmt_now_ext(char *fmtt, int len, int lv, const char *filename, const char *funcname, int line, unsigned short *r, int *);
+spl_fmt_now_ext(char *fmtt, int len, 
+	int lv, const char *filename, 
+	const char *funcname, int line, 
+	unsigned short *r, int *);
+
 DLL_API_SIMPLE_LOG int
 spl_mutex_lock(void *mtx);
+
 DLL_API_SIMPLE_LOG int
 spl_mutex_unlock(void *mtx);
+
 DLL_API_SIMPLE_LOG int
 spl_fmmt_now(char *fmtt, int len);
+
 DLL_API_SIMPLE_LOG LLU
 spl_get_threadid();
+
 DLL_API_SIMPLE_LOG int
 spl_rel_sem(void *sem);
+
 DLL_API_SIMPLE_LOG
 void
 spl_sleep(unsigned int);
@@ -552,11 +565,14 @@ spl_milli_sleep(unsigned int);
 DLL_API_SIMPLE_LOG
 LLU
 spl_milli_now();
+
 DLL_API_SIMPLE_LOG
 SIMPLE_LOG_ST *
 spl_control_obj();
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+DLL_API_SIMPLE_LOG const char *
+spl_err_txt(int i);
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 #ifdef __cplusplus
 }
