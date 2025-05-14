@@ -31,6 +31,7 @@ int
 main(int argc, char *argv[])
 {
 	int ret = 0, i = 0;
+	int len = 0;
 	char cfgpath[1024];
 	SPL_INPUT_ARG input = {0};
 	snprintf(cfgpath, 1024, "simplelog.cfg");
@@ -55,7 +56,8 @@ main(int argc, char *argv[])
 		}
 
 	}
-	snprintf(input.folder, SPL_PATH_FOLDER, "%s", cfgpath);
+	len = SPL_MIN_AB(SPL_PATH_FOLDER, strlen(cfgpath));
+	snprintf(input.folder, len, "%s", cfgpath);
 	ret = spl_init_log_ext(&input);
 
 	spl_console_log("====================Start.\n");
