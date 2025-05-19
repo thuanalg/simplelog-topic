@@ -56,8 +56,10 @@ main(int argc, char *argv[])
 		}
 
 	}
-	len = SPL_MIN_AB(SPL_PATH_FOLDER, strlen(cfgpath));
+	len = SPL_MIN_AB(SPL_PATH_FOLDER, strlen(cfgpath) + 1);
+	spl_console_log("cfgpath: %s.\n", cfgpath);
 	snprintf(input.folder, len, "%s", cfgpath);
+	spl_console_log("input.folder: %s.\n", input.folder);
 	ret = spl_init_log_ext(&input);
 
 	spl_console_log("====================Start.\n");
