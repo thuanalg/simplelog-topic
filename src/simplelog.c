@@ -1065,7 +1065,9 @@ spl_simple_log_thread(SIMPLE_LOG_ST *t)
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 char *
 spl_fmt_now_ext(
-    char *fmtt, int len, int lv, const char *filename, const char *funcname, int line, unsigned short *r, int *outlen)
+    char *fmtt, int len, int lv, 
+	const char *filename, const char *funcname, 
+	int line, unsigned short *r, int *outlen)
 {
 	char *p = fmtt;
 	int ret = 0;
@@ -1084,8 +1086,11 @@ spl_fmt_now_ext(
 #else
 	*r = (threadiid % __simple_log_static__.ncpu);
 #endif
-	n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X "[%c] [tid\t%llu]\t", stt.year + YEAR_PADDING, stt.month + MONTH_PADDING,
-	    stt.day, stt.hour, stt.minute, stt.sec, (int)stt.nn, spl_text_gb_c[lv % SPL_LOG_PEAK], threadiid);
+	n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X "[%c] [tid\t%llu]\t", 
+		stt.year + YEAR_PADDING, stt.month + MONTH_PADDING,
+	    stt.day, stt.hour, stt.minute, stt.sec, 
+		(int)stt.nn, 
+		spl_text_gb_c[lv % SPL_LOG_PEAK], threadiid);
 	if (n < 1) {
 		ret = SPL_LOG_PRINTF_ERROR;
 		return p;
