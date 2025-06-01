@@ -21,6 +21,7 @@
  *		<2025-Feb-01>
  *		<2025-Apr-11>
  *		<2025-Apr-22>
+ *		<2025-Jun-01>
  * Decription:
  *		The (only) main file to implement simple log.
  */
@@ -71,7 +72,10 @@
 #define spl_err(__fmt__, ...) spl_console_log("[E] errcode: %d, " __fmt__, (int)GetLastError(), ##__VA_ARGS__)
 #else
 
-#define spl_err(__fmt__, ...) {spl_console_log("[E] errno: %d, errtext: %s, " __fmt__, errno, strerror(errno), ##__VA_ARGS__);}
+#define spl_err(__fmt__, ...)                                                                                               \
+	{                                                                                                                   \
+		spl_console_log("[E] errno: %d, errtext: %s, " __fmt__, errno, strerror(errno), ##__VA_ARGS__);             \
+	}
 #endif
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
@@ -84,6 +88,8 @@
 			(__n) = fclose((FILE *)(__fp__));                                                                   \
 			if (__n) {                                                                                          \
 				spl_err("fclose, (%d, 0x%p).", __n, (void *)__ptp__);                                       \
+				(__fp__) = 0;                                                                               \
+				;                                                                                           \
 			} else { /*spl_console_log("Close FILE 0x%p DONE.", (__fp__));*/                                    \
 				;                                                                                           \
 				(__fp__) = 0;                                                                               \
@@ -97,7 +103,8 @@
 		if (__fp__) {                                                                                               \
 			(__n) = fflush((FILE *)(__fp__));                                                                   \
 			if (__n) {                                                                                          \
-				spl_fflush_err(__n, __fp__);                                                                \
+				spl_err("fflush, (err, fp) = (%d, 0x%p).", (__n), (__fp__));                                \
+				/*spl_fflush_err(__n, __fp__); */                                                           \
 			}                                                                                                   \
 		}                                                                                                           \
 	}
@@ -105,8 +112,10 @@
 #define FFOPEN(__fp, __path, __mode)                                                                                        \
 	{                                                                                                                   \
 		(__fp) = fopen((__path), (__mode));                                                                         \
-		if (!(__fp))                                                                                                \
-			spl_console_log("Open FILE error code: 0x%p, %s.\n", (__fp), (__fp) ? "DONE" : "FAILED");           \
+		if (!(__fp)) {                                                                                              \
+			spl_err("fopen, path: %s", (__path));                                                               \
+			/*spl_console_log("Open FILE error code: 0x%p, %s.\n", (__fp), (__fp) ? "DONE" : "FAILED"); */      \
+		}                                                                                                           \
 	}
 
 #define FFTELL(__fp) ftell((FILE *)(__fp))
@@ -257,10 +266,11 @@ spl_written_thread_routine(void *);
 #if 0
 static int
 spl_fclose_err(int t, void *fpp);
-#endif
+
 
 static int
 spl_fflush_err(int t, void *fpp);
+#endif
 
 #ifndef UNIX_LINUX
 static int
@@ -1741,7 +1751,7 @@ spl_fclose_err(int terr, void *ffp)
 	} while (0);
 	return ret;
 }
-#endif
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_fflush_err(int terr, void *ffp)
@@ -1760,6 +1770,7 @@ spl_fflush_err(int terr, void *ffp)
 	} while (0);
 	return ret;
 }
+#endif
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #ifndef UNIX_LINUX
 void
@@ -2284,37 +2295,38 @@ spl_osx_sync_del()
 		if (t->isProcessMode | 1) {
 			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_RW, t->shared_key);
 			if (sem_close((sem_t *)t->sem_rwfile) == -1) {
-				spl_console_log("sem_close, errno: %d, errno_text: %s.", errno, strerror(errno));
+				spl_err("sem_close, name: %s.", nameobj);
 				ret = SPL_LOG_OSX_SEM_CLOSE;
 			}
 			t->sem_rwfile = 0;
 
 			if (sem_unlink(nameobj) == -1) {
 				spl_console_log("sem_unlink, errno: %d, errno_text: %s.", errno, strerror(errno));
+				spl_err("sem_unlink, name: %s.", nameobj);
 				ret = SPL_LOG_OSX_SEM_UNLINK;
 			}
 			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_OFF, t->shared_key);
 			if (sem_close((sem_t *)t->sem_off) == -1) {
-				spl_console_log("sem_close, errno: %d, errno_text: %s.", errno, strerror(errno));
+				spl_err("sem_close, name: %s.", nameobj);
 				ret = SPL_LOG_OSX_SEM_CLOSE;
 			}
 			t->sem_off = 0;
 
 			if (sem_unlink(nameobj) == -1) {
-				spl_console_log("sem_unlink, errno: %d, errno_text: %s.", errno, strerror(errno));
+				spl_err("sem_unlink, name: %s.", nameobj);
 				ret = SPL_LOG_OSX_SEM_UNLINK;
 			}
 		} else {
 			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_RW, t->shared_key);
 			if (sem_close((sem_t *)t->sem_rwfile) == -1) {
-				spl_console_log("sem_close, errno: %d, errno_text: %s.", errno, strerror(errno));
 				ret = SPL_LOG_OSX_SEM_CLOSE;
+				spl_err("sem_close, name: %s, 0x%p.", nameobj, t->sem_rwfile);
 			}
 			t->sem_rwfile = 0;
 
 			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_OFF, t->shared_key);
 			if (sem_close((sem_t *)t->sem_off) == -1) {
-				spl_console_log("sem_close, errno: %d, errno_text: %s.", errno, strerror(errno));
+				spl_err("sem_close, name: %s, 0x%p.", nameobj, t->sem_off);
 				ret = SPL_LOG_OSX_SEM_CLOSE;
 			}
 			t->sem_off = 0;
@@ -2341,15 +2353,14 @@ spl_osx_sync_create()
 			do {
 				hd = sem_open(nameobj, SPL_LOG_UNIX_CREATE_MODE, SPL_LOG_UNIX__SHARED_MODE, 1);
 				if (hd == SEM_FAILED) {
-					spl_console_log("sem_open, errno: %d, errno_text: %s.", errno, strerror(errno));
+					spl_err("sem_open, name: %s.", nameobj);
 					ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
 					if (retry) {
 						break;
 					} else {
 						ret = sem_unlink(nameobj);
 						if (ret) {
-							spl_console_log("sem_unlink, errno: %d, errno_text: %s.", errno,
-							    strerror(errno));
+							spl_err("sem_unlink, name: %s.", nameobj);
 							ret = SPL_LOG_SEM_OSX_UNLINK_ERROR;
 							break;
 						}
@@ -2370,15 +2381,14 @@ spl_osx_sync_create()
 			do {
 				hd = sem_open(nameobj, SPL_LOG_UNIX_CREATE_MODE, SPL_LOG_UNIX__SHARED_MODE, 1);
 				if (hd == SEM_FAILED) {
-					spl_console_log("sem_open, errno: %d, errno_text: %s.", errno, strerror(errno));
+					spl_err("sem_open, name: %s.", nameobj);
 					ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
 					if (retry) {
 						break;
 					} else {
 						ret = sem_unlink(nameobj);
 						if (ret) {
-							spl_console_log("sem_unlink, errno: %d, errno_text: %s.", errno,
-							    strerror(errno));
+							spl_err("sem_unlink, name: %s.", nameobj);
 							ret = SPL_LOG_SEM_OSX_UNLINK_ERROR;
 							break;
 						}
@@ -2398,7 +2408,7 @@ spl_osx_sync_create()
 			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_RW, t->shared_key);
 			hd = sem_open(nameobj, SPL_LOG_UNIX_OPEN_MODE);
 			if (hd == SEM_FAILED) {
-				spl_console_log("sem_open, errno: %d, errno_text: %s.", errno, strerror(errno));
+				spl_err("sem_open, name: %s.", nameobj);
 				ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
 				break;
 			}
@@ -2407,7 +2417,7 @@ spl_osx_sync_create()
 			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_OFF, t->shared_key);
 			hd = sem_open(nameobj, SPL_LOG_UNIX_OPEN_MODE);
 			if (hd == SEM_FAILED) {
-				spl_console_log("sem_open, errno: %d, errno_text: %s.", errno, strerror(errno));
+				spl_err("sem_open, name: %s.", nameobj);
 				ret = SPL_LOG_SEM_OSX_CREATED_ERROR;
 				break;
 			}
@@ -2429,28 +2439,26 @@ spl_mtx_init(void *obj, char shared)
 			err = pthread_mutexattr_init(&psharedm);
 			if (err) {
 				ret = SPL_LOG_MTX_ATT_SHARED_MODE;
-				spl_console_log(
-				    "pthread_mutexattr_init, errno: %d, errno_text: %s.", errno, strerror(errno));
+				spl_err("pthread_mutexattr_init");
 				break;
 			}
 			err = pthread_mutexattr_setpshared(&psharedm, PTHREAD_PROCESS_SHARED);
 			if (err) {
 				ret = SPL_LOG_MTX_ATT_SHARED_MODE_SET;
-				spl_console_log(
-				    "pthread_mutexattr_setpshared, errno: %d, errno_text: %s.", errno, strerror(errno));
+				spl_err("pthread_mutexattr_setpshared");
 				break;
 			}
 			err = pthread_mutex_init(mtx, &psharedm);
 			if (err) {
 				ret = SPL_LOG_SHM_UNIX_INIT_MUTEX;
-				spl_console_log("pthread_mutex_init, errno: %d, errno_text: %s.", errno, strerror(errno));
+				spl_err("pthread_mutex_init");
 				break;
 			}
 		} else {
 			err = pthread_mutex_init(mtx, 0);
 			if (err) {
 				ret = SPL_LOG_MTX_INIT_ERR;
-				spl_console_log("pthread_mutex_init, errno: %d, errno_text: %s.", errno, strerror(errno));
+				spl_err("pthread_mutex_init");
 				break;
 			}
 		}
