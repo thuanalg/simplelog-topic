@@ -104,7 +104,7 @@
 			(__n) = fflush((FILE *)(__fp__));                                                                   \
 			if (__n) {                                                                                          \
 				spl_err("fflush, (err, fp) = (%d, 0x%p).", (__n), (__fp__));                                \
-				/*spl_fflush_err(__n, __fp__); */                                                           \
+				/*;*/                                                                                       \
 			}                                                                                                   \
 		}                                                                                                           \
 	}
@@ -114,7 +114,7 @@
 		(__fp) = fopen((__path), (__mode));                                                                         \
 		if (!(__fp)) {                                                                                              \
 			spl_err("fopen, path: %s", (__path));                                                               \
-			/*spl_console_log("Open FILE error code: 0x%p, %s.\n", (__fp), (__fp) ? "DONE" : "FAILED"); */      \
+			/*;*/                                                                                               \
 		}                                                                                                           \
 	}
 
@@ -1396,6 +1396,7 @@ spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month)
 			DWORD xerr = GetLastError();
 			if (xerr != ERROR_ALREADY_EXISTS) {
 				ret = SPL_LOG_CHECK_FOLDER_ERROR;
+				spl_err("CreateDirectoryA, path: %s", path);
 				break;
 			}
 		}
@@ -1406,6 +1407,7 @@ spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month)
 			DWORD xerr = GetLastError();
 			if (xerr != ERROR_ALREADY_EXISTS) {
 				ret = SPL_LOG_CHECK_FOLDER_YEAR_ERROR;
+				spl_err("CreateDirectoryA, path: %s", path);
 				break;
 			}
 		}
@@ -1415,6 +1417,7 @@ spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month)
 			DWORD xerr = GetLastError();
 			if (xerr != ERROR_ALREADY_EXISTS) {
 				ret = SPL_LOG_CHECK_FILE_YEAR_ERROR;
+				spl_err("CreateDirectoryA, path: %s", path);
 				break;
 			}
 		}
@@ -1431,7 +1434,7 @@ spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month)
 			stat(path, &buf);
 			if (!S_ISDIR(buf.st_mode)) {
 				ret = SPL_LOG_CHECK_FOLDER_ERROR;
-				spl_err("mkdir");
+				spl_err("mkdir, path: %s", path);
 				break;
 			}
 		}
@@ -1443,7 +1446,7 @@ spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month)
 			err = mkdir(path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 			if (err) {
 				ret = SPL_LOG_CHECK_FOLDER_YEAR_ERROR;
-				spl_err("mkdir");
+				spl_err("mkdir, path: %s", path);
 				break;
 			}
 		}
@@ -1453,7 +1456,7 @@ spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month)
 		if (!S_ISDIR(buf.st_mode)) {
 			err = mkdir(path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 			if (err) {
-				spl_err("mkdir");
+				spl_err("mkdir, path: %s", path);
 				ret = SPL_LOG_CHECK_FILE_YEAR_ERROR;
 				break;
 			}
