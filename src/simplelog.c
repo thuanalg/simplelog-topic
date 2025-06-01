@@ -67,12 +67,23 @@
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
+#ifndef UNIX_LINUX
+#define spl_err(__fmt__, ...) spl_console_log("[E] errcode: %d, " __fmt__, (int)GetLastError(), ##__VA_ARGS__)
+#else
+
+#define spl_err(__fmt__, ...) {spl_console_log("[E] errno: %d, errtext: %s, " __fmt__, errno, strerror(errno), ##__VA_ARGS__);}
+#endif
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+
 #define SPL_FCLOSE(__fp__, __n)                                                                                             \
 	{                                                                                                                   \
 		if (__fp__) {                                                                                               \
+			;                                                                                                   \
+			LLU __ptp__ = (LLU)__fp__;                                                                          \
+			;                                                                                                   \
 			(__n) = fclose((FILE *)(__fp__));                                                                   \
 			if (__n) {                                                                                          \
-				spl_fclose_err(__n, __fp__);                                                                \
+				spl_err("fclose, (%d, 0x%p).", __n, (void *)__ptp__);                                       \
 			} else { /*spl_console_log("Close FILE 0x%p DONE.", (__fp__));*/                                    \
 				;                                                                                           \
 				(__fp__) = 0;                                                                               \
@@ -243,8 +254,11 @@ static void *
 spl_written_thread_routine(void *);
 #endif
 
+#if 0
 static int
 spl_fclose_err(int t, void *fpp);
+#endif
+
 static int
 spl_fflush_err(int t, void *fpp);
 
@@ -493,8 +507,7 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 			}
 			t->file_limit_size = n;
 #ifdef SPL_SHOW_CONSOLE
-			spl_console_log(
-			    "t->file_limit_size: %d.\n", t->file_limit_size);
+			spl_console_log("t->file_limit_size: %d.\n", t->file_limit_size);
 #endif
 			break;
 		}
@@ -541,9 +554,9 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 				break;
 			}
 			snprintf(t->shared_key, SPL_SHARED_KEY_LEN, "%s", buff);
-		#if SPL_SHOW_CONSOLE
+#if SPL_SHOW_CONSOLE
 			spl_console_log("t->shared_key: %s.", t->shared_key);
-		#endif
+#endif
 			break;
 		}
 		if (strcmp(key, SPL_LOG_END_CFG) == 0) {
@@ -847,7 +860,7 @@ spl_written_thread_routine(void *lpParam)
 		main_src_thrd_buf[i] = p + t->buff_size * i;
 	}
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+	/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 	if (t->arr_topic) {
 		spl_malloc(t->n_topic * sizeof(char *), src_topic_thrd_buf, char **);
@@ -860,7 +873,7 @@ spl_written_thread_routine(void *lpParam)
 		}
 	}
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+	/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 	if (t->trigger_thread > 0) {
 		spl_create_thread(spl_trigger_routine, t, &trigger_handle_id);
 	}
@@ -1065,9 +1078,7 @@ spl_simple_log_thread(SIMPLE_LOG_ST *t)
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 char *
 spl_fmt_now_ext(
-    char *fmtt, int len, int lv, 
-	const char *filename, const char *funcname, 
-	int line, unsigned short *r, int *outlen)
+    char *fmtt, int len, int lv, const char *filename, const char *funcname, int line, unsigned short *r, int *outlen)
 {
 	char *p = fmtt;
 	int ret = 0;
@@ -1086,11 +1097,8 @@ spl_fmt_now_ext(
 #else
 	*r = (threadiid % __simple_log_static__.ncpu);
 #endif
-	n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X "[%c] [tid\t%llu]\t", 
-		stt.year + YEAR_PADDING, stt.month + MONTH_PADDING,
-	    stt.day, stt.hour, stt.minute, stt.sec, 
-		(int)stt.nn, 
-		spl_text_gb_c[lv % SPL_LOG_PEAK], threadiid);
+	n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X "[%c] [tid\t%llu]\t", stt.year + YEAR_PADDING, stt.month + MONTH_PADDING,
+	    stt.day, stt.hour, stt.minute, stt.sec, (int)stt.nn, spl_text_gb_c[lv % SPL_LOG_PEAK], threadiid);
 	if (n < 1) {
 		ret = SPL_LOG_PRINTF_ERROR;
 		return p;
@@ -1343,6 +1351,7 @@ spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month)
 {
 	int ret = 0;
 	char path[SPL_FULLPATH_LEN + 1];
+	int tyear, tmonth;
 #ifndef UNIX_LINUX
 	int result = 0;
 #else
@@ -1364,6 +1373,13 @@ spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month)
 			break;
 		}
 		snprintf(path, SPL_FULLPATH_LEN, "%s", folder);
+
+		tyear = lctime->year + YEAR_PADDING;
+		tyear %= SPL_RANGE_YEAR;
+
+		tmonth = lctime->month + MONTH_PADDING;
+		tmonth %= SPL_RANGE_MONTH;
+
 #ifndef UNIX_LINUX
 		result = CreateDirectoryA(path, 0);
 		if (!result) {
@@ -1373,7 +1389,8 @@ spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month)
 				break;
 			}
 		}
-		snprintf(path, SPL_FULLPATH_LEN, "%s/%.4u", folder, lctime->year + YEAR_PADDING);
+
+		snprintf(path, SPL_FULLPATH_LEN, "%s/%.4u", folder, tyear);
 		result = CreateDirectoryA(path, 0);
 		if (!result) {
 			DWORD xerr = GetLastError();
@@ -1382,8 +1399,7 @@ spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month)
 				break;
 			}
 		}
-		snprintf(path, SPL_FULLPATH_LEN, "%s/%.4d/%.2d", folder, (int)lctime->year + YEAR_PADDING,
-		    (int)lctime->month + MONTH_PADDING);
+		snprintf(path, SPL_FULLPATH_LEN, "%s/%.4d/%.2d", folder, tyear, tmonth);
 		result = CreateDirectoryA(path, 0);
 		if (!result) {
 			DWORD xerr = GetLastError();
@@ -1411,8 +1427,7 @@ spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month)
 		}
 
 		memset(&buf, 0, sizeof(buf));
-		snprintf(path, SPL_FULLPATH_LEN, "%s/%.4u", folder, 
-			(lctime->year + YEAR_PADDING) % 10000);
+		snprintf(path, SPL_FULLPATH_LEN, "%s/%.4u", folder, tyear);
 		err = stat(path, &buf);
 		if (!S_ISDIR(buf.st_mode)) {
 			err = mkdir(path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
@@ -1423,9 +1438,7 @@ spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month)
 			}
 		}
 		memset(&buf, 0, sizeof(buf));
-		snprintf(path, SPL_FULLPATH_LEN, "%s/%.4d/%.2d", folder, 
-		 	(int)lctime->year + YEAR_PADDING,
-		    (int)lctime->month + MONTH_PADDING);
+		snprintf(path, SPL_FULLPATH_LEN, "%s/%.4d/%.2d", folder, tyear, tmonth);
 		err = stat(path, &buf);
 		if (!S_ISDIR(buf.st_mode)) {
 			err = mkdir(path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
@@ -1436,9 +1449,7 @@ spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month)
 			}
 		}
 #endif
-		snprintf(year_month, 10, "%.4d\\%.2d", 
-			((int)lctime->year + YEAR_PADDING) % 10000, 
-			((int)lctime->month + MONTH_PADDING) % 100);
+		snprintf(year_month, 10, "%.4d\\%.2d", tyear, tmonth);
 	} while (0);
 	return ret;
 }
@@ -1712,6 +1723,7 @@ spl_milli_now()
 	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+#if 0
 int
 spl_fclose_err(int terr, void *ffp)
 {
@@ -1729,6 +1741,7 @@ spl_fclose_err(int terr, void *ffp)
 	} while (0);
 	return ret;
 }
+#endif
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_fflush_err(int terr, void *ffp)

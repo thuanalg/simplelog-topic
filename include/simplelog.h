@@ -93,6 +93,9 @@ extern "C" {
 #define SPL_TEMPLATE_LEN                (SPL_PATH_FOLDER + SPL_FNAME_LEN + 32)
 #define SPL_FULLPATH_LEN                (SPL_TEMPLATE_LEN + 32 + 16)
 #define SPL_MILLION                     1000000
+#define SPL_RANGE_YEAR                  10000
+#define SPL_RANGE_MONTH                 13
+#define SPL_RANGE_DAY                   32
 
 #ifndef UNIX_LINUX
 #ifndef __SIMPLE_STATIC_LOG__
@@ -535,10 +538,7 @@ spl_finish_log();
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 DLL_API_SIMPLE_LOG char *
-spl_fmt_now_ext(char *fmtt, int len, 
-	int lv, const char *filename, 
-	const char *funcname, int line, 
-	unsigned short *r, int *);
+spl_fmt_now_ext(char *fmtt, int len, int lv, const char *filename, const char *funcname, int line, unsigned short *r, int *);
 
 DLL_API_SIMPLE_LOG int
 spl_mutex_lock(void *mtx);
