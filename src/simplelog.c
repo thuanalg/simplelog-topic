@@ -1032,7 +1032,7 @@ spl_written_thread_routine(void *lpParam)
 		if (trigger_handle_id) {
 			int rs = (int)TerminateThread(trigger_handle_id, 0);
 			if (!rs) {
-				spl_console_log("TerminateThread error.");
+				spl_err("TerminateThread");
 			} else {
 				spl_console_log("TerminateThread OK.");
 			}
@@ -1041,7 +1041,7 @@ spl_written_thread_routine(void *lpParam)
 		if (trigger_handle_id) {
 			int rs = pthread_cancel(trigger_handle_id);
 			if (rs) {
-				spl_console_log("pthread_cancel error.");
+				spl_err("pthread_cancel");
 			} else {
 				spl_console_log("pthread_cancel OK.");
 			}
@@ -1431,7 +1431,7 @@ spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month)
 			stat(path, &buf);
 			if (!S_ISDIR(buf.st_mode)) {
 				ret = SPL_LOG_CHECK_FOLDER_ERROR;
-				spl_console_log("Mkdir err path: %s, err: %d\n", path, err);
+				spl_err("mkdir");
 				break;
 			}
 		}
@@ -1443,7 +1443,7 @@ spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month)
 			err = mkdir(path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 			if (err) {
 				ret = SPL_LOG_CHECK_FOLDER_YEAR_ERROR;
-				spl_console_log("Mkdir err path: %s, err: %d\n", path, err);
+				spl_err("mkdir");
 				break;
 			}
 		}
@@ -1453,7 +1453,7 @@ spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month)
 		if (!S_ISDIR(buf.st_mode)) {
 			err = mkdir(path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 			if (err) {
-				spl_console_log("Mkdir err path: %s, err: %d\n", path, err);
+				spl_err("mkdir");
 				ret = SPL_LOG_CHECK_FILE_YEAR_ERROR;
 				break;
 			}
@@ -1821,7 +1821,7 @@ spl_create_thread(THREAD_ROUTINE f, void *arg, pthread_t *outid)
 	hThread = CreateThread(NULL, 0, f, arg, 0, &dwThreadId);
 	if (!hThread) {
 		ret = SPL_LOG_THREAD_W32_CREATE;
-		spl_console_log("CreateThread error: %d", (int)GetLastError());
+		spl_err("CreateThread");
 	}
 	*outhd = hThread;
 #else
@@ -1829,7 +1829,7 @@ spl_create_thread(THREAD_ROUTINE f, void *arg, pthread_t *outid)
 	ret = pthread_create(&tidd, 0, f, arg);
 	if (ret) {
 		ret = SPL_LOG_THREAD_PX_CREATE;
-		spl_console_log("pthread_create: ret: %d, errno: %d, text: %s.", ret, errno, strerror(errno));
+		spl_err("pthread_create");
 	}
 	*outid = tidd;
 #endif
@@ -1855,29 +1855,27 @@ spl_del_memory()
 		int isWell = 0;
 		isWell = (int)UnmapViewOfFile((void *)t->buf);
 		if (!isWell) {
-			spl_console_log("UnmapViewOfFile error: %d", (int)GetLastError());
 			ret = SPL_LOG_SHM_WIN_UNMAP;
+			spl_err("UnmapViewOfFile");
 		}
 		isWell = (int)CloseHandle((HANDLE)t->hd);
 		if (!isWell) {
-			spl_console_log("SPL_LOG_WIN_SHM_CLOSE, err: %d", (int)GetLastError());
 			ret = SPL_LOG_WIN_SHM_CLOSE;
+			spl_err("CloseHandle");
 		}
 #else
 #ifdef __MACH__
 		ret = munmap((void *)t->buf, (size_t)t->map_mem_size);
 		if (ret) {
 			ret = SPL_LOG_SHM_UNIX_UNMAP;
-			spl_console_log(
-			    "shm_unlink: err: %d, errno: %d, text: %s, name: %s.", ret, errno, strerror(errno), "__name__");
+			spl_err("munmap");
 		}
 		spl_shm_unlink(t->shared_key, ret);
 #else
 		ret = munmap((void *)t->buf, (size_t)t->map_mem_size);
 		if (ret) {
 			ret = SPL_LOG_SHM_UNIX_UNMAP;
-			spl_console_log(
-			    "shm_unlink: err: %d, errno: %d, text: %s, name: %s.", ret, errno, strerror(errno), "__name__");
+			spl_err("munmap");
 		}
 		spl_shm_unlink(t->shared_key, ret);
 #endif
@@ -1911,15 +1909,15 @@ spl_create_memory(void **output, char *shared_key, int size_shared, char isCreat
 			    shared_key); /*    // name of mapping object */
 
 			if (!hMapFile) {
-				spl_console_log("Cannot create SHM. error: %d\n", (int)GetLastError());
+				spl_err("CreateFileMappingA");
 				ret = SPL_LOG_WIN32_MAP_FILE;
 				break;
 			}
 		} else {
 			hMapFile = OpenFileMappingA(FILE_MAP_ALL_ACCESS, 0, shared_key);
 			if (!hMapFile) {
-				ret = 2;
-				spl_console_log("Cannot open SHM. error: %d\n", (int)GetLastError());
+				ret = SPL_LOG_WIN32_MAP_FILE;
+				spl_err("OpenFileMappingA");
 				break;
 			}
 		}
@@ -1928,8 +1926,8 @@ spl_create_memory(void **output, char *shared_key, int size_shared, char isCreat
 		}
 		p = (char *)MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, size_shared);
 		if (!p) {
-			ret = 3;
-			spl_console_log("Cannot MapViewOfFile. error: %d\n", (int)GetLastError());
+			ret = SPL_LOG_WIN32_MAP_FILE;
+			spl_err("MapViewOfFile");
 			break;
 		}
 #else
@@ -1941,20 +1939,20 @@ spl_create_memory(void **output, char *shared_key, int size_shared, char isCreat
 		}
 		hMapFile = shm_open(shared_key, SPL_LOG_UNIX_OPEN_MODE, SPL_LOG_UNIX__SHARED_MODE);
 		if (hMapFile < 1) {
-			spl_console_log("SPL_LOG_SHM_UNIX_OPEN option creating");
+			spl_err("shm_open");
 			ret = SPL_LOG_SHM_UNIX_OPEN;
 			break;
 		}
 		err = ftruncate(hMapFile, size_shared);
 		if (err) {
-			spl_console_log("SPL_LOG_SHM_UNIX_TRUNC");
+			spl_err("ftruncate");
 			ret = SPL_LOG_SHM_UNIX_TRUNC;
 			break;
 		}
 		p = (char *)mmap(0, size_shared, SPL_LOG_UNIX_PROT_FLAGS, MAP_SHARED, hMapFile, 0);
 		if (p == MAP_FAILED || p == 0) {
 			ret = SPL_LOG_SHM_UNIX_MAP_FAILED;
-			spl_console_log("SPL_LOG_SHM_UNIX_MAP_FAILED");
+			spl_err("mmap");
 			p = 0;
 			break;
 		}
@@ -2098,16 +2096,14 @@ spl_calculate_size()
 				err = pthread_spin_init(mtx, PTHREAD_PROCESS_SHARED);
 				if (err) {
 					ret = SPL_LOG_SPINLOCK_INIT_SHARED;
-					spl_console_log(
-					    "pthread_spin_init, errno: %d, errno_text: %s.", errno, strerror(errno));
+					spl_err("pthread_spin_init");
 				}
 			} else {
 				int err = 0;
 				err = pthread_spin_init(mtx, PTHREAD_PROCESS_PRIVATE);
 				if (err) {
 					ret = SPL_LOG_SPINLOCK_INIT_PRIVATE;
-					spl_console_log(
-					    "pthread_spin_init, errno: %d, errno_text: %s.", errno, strerror(errno));
+					spl_err("pthread_spin_init");
 				}
 			}
 		}
@@ -2157,13 +2153,13 @@ spl_calculate_size()
 			err = sem_init((sem_t *)t->sem_rwfile, (int)t->isProcessMode, 0);
 			if (err) {
 				ret = SPL_LOG_SEM_INIT_UNIX;
-				spl_console_log("sem_init, errno: %d, errno_text: %s.", errno, strerror(errno));
+				spl_err("sem_init, sem_rwfile");
 				break;
 			}
 			err = sem_init((sem_t *)t->sem_off, (int)t->isProcessMode, 0);
 			if (err) {
 				ret = SPL_LOG_SEM_INIT_UNIX;
-				spl_console_log("sem_init, errno: %d, errno_text: %s.", errno, strerror(errno));
+				spl_err("sem_init, sem_off");
 				break;
 			}
 		}
@@ -2201,7 +2197,7 @@ spl_win32_sync_create()
 			hd = CreateMutexA(0, 0, nameobj);
 			if (!hd) {
 				ret = SPL_LOG_MTX_WIN32_CREATED_ERROR;
-				spl_console_log("CreateMutexA, errno: %d.", (int)GetLastError());
+				spl_err("CreateMutexA");
 				break;
 			}
 			t->mtx_rw = hd;
@@ -2211,7 +2207,7 @@ spl_win32_sync_create()
 				hd = CreateMutexA(0, 0, nameobj);
 				if (!hd) {
 					ret = SPL_LOG_MTX_WIN32_CREATED_ERROR;
-					spl_console_log("CreateMutexA, errno: %d.", (int)GetLastError());
+					spl_err("CreateMutexA");
 					break;
 				}
 				t->arr_mtx[i] = hd;
@@ -2222,7 +2218,7 @@ spl_win32_sync_create()
 			hd = CreateMutexA(0, 0, 0);
 			if (!hd) {
 				ret = SPL_LOG_MTX_WIN32_CREATED_ERROR;
-				spl_console_log("CreateMutexA, errno: %d.", (int)GetLastError());
+				spl_err("CreateMutexA");
 				break;
 			}
 			t->mtx_rw = hd;
@@ -2231,7 +2227,7 @@ spl_win32_sync_create()
 				hd = CreateMutexA(0, 0, 0);
 				if (!hd) {
 					ret = SPL_LOG_MTX_WIN32_CREATED_ERROR;
-					spl_console_log("CreateMutexA, errno: %d.", (int)GetLastError());
+					spl_err("CreateMutexA");
 					break;
 				}
 				t->arr_mtx[i] = hd;
@@ -2246,7 +2242,7 @@ spl_win32_sync_create()
 			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_RW, t->shared_key);
 			hd = CreateSemaphoreA(0, 0, 1, nameobj);
 			if (!hd) {
-				spl_console_log("CreateSemaphoreA, errno: %d.", (int)GetLastError());
+				spl_err("CreateSemaphoreA");
 				ret = SPL_LOG_SEM_WIN32_CREATED_ERROR;
 				break;
 			}
@@ -2254,7 +2250,7 @@ spl_win32_sync_create()
 			snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s", SPL_SEM_NAME_OFF, t->shared_key);
 			hd = CreateSemaphoreA(0, 0, 1, nameobj);
 			if (!hd) {
-				spl_console_log("CreateSemaphoreA, errno: %d.", (int)GetLastError());
+				spl_err("CreateSemaphoreA");
 				ret = SPL_LOG_SEM_WIN32_CREATED_ERROR;
 				break;
 			}
@@ -2263,14 +2259,14 @@ spl_win32_sync_create()
 			HANDLE hd = 0;
 			hd = CreateSemaphoreA(0, 0, 1, 0);
 			if (!hd) {
-				spl_console_log("CreateSemaphoreA, errno: %d.", (int)GetLastError());
+				spl_err("CreateSemaphoreA");
 				ret = SPL_LOG_SEM_WIN32_CREATED_ERROR;
 				break;
 			}
 			t->sem_rwfile = hd;
 			hd = CreateSemaphoreA(0, 0, 1, 0);
 			if (!hd) {
-				spl_console_log("CreateSemaphoreA, errno: %d.", (int)GetLastError());
+				spl_err("CreateSemaphoreA");
 				ret = SPL_LOG_SEM_WIN32_CREATED_ERROR;
 				break;
 			}
