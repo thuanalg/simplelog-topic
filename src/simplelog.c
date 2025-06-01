@@ -1411,7 +1411,8 @@ spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month)
 		}
 
 		memset(&buf, 0, sizeof(buf));
-		snprintf(path, SPL_FULLPATH_LEN, "%s/%.4u", folder, lctime->year + YEAR_PADDING);
+		snprintf(path, SPL_FULLPATH_LEN, "%s/%.4u", folder, 
+			(lctime->year + YEAR_PADDING) % 10000);
 		err = stat(path, &buf);
 		if (!S_ISDIR(buf.st_mode)) {
 			err = mkdir(path, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
@@ -1422,7 +1423,8 @@ spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month)
 			}
 		}
 		memset(&buf, 0, sizeof(buf));
-		snprintf(path, SPL_FULLPATH_LEN, "%s/%.4d/%.2d", folder, (int)lctime->year + YEAR_PADDING,
+		snprintf(path, SPL_FULLPATH_LEN, "%s/%.4d/%.2d", folder, 
+		 	(int)lctime->year + YEAR_PADDING,
 		    (int)lctime->month + MONTH_PADDING);
 		err = stat(path, &buf);
 		if (!S_ISDIR(buf.st_mode)) {
@@ -1434,7 +1436,9 @@ spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month)
 			}
 		}
 #endif
-		snprintf(year_month, 10, "%.4d\\%.2d", (int)lctime->year + YEAR_PADDING, (int)lctime->month + MONTH_PADDING);
+		snprintf(year_month, 10, "%.4d\\%.2d", 
+			((int)lctime->year + YEAR_PADDING) % 10000, 
+			((int)lctime->month + MONTH_PADDING) % 100);
 	} while (0);
 	return ret;
 }
