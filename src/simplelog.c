@@ -440,12 +440,14 @@ spl_set_off(int isoff)
 #ifndef UNIX_LINUX
 		errCode = (int)WaitForSingleObject(t->sem_off, INFINITE);
 		if (errCode == WAIT_FAILED) {
-			spl_console_log("------- WaitForSingleObject errCode: %d\n", (int)GetLastError());
+			spl_err("WaitForSingleObject");
+			ret = SPL_LOG_WIN32_WAIT_OBJECT;
 		}
 #else
 		errCode = SPL_sem_wait(t->sem_off);
 		if (errCode) {
-			spl_console_log("------- SPL_sem_wait errCode: %d\n", (int)errCode);
+			spl_err("SPL_sem_wait");
+			ret = SPL_LOG_PX_SEM_WAIT_OBJECT;
 		}
 #endif
 #ifdef SPL_SHOW_CONSOLE
@@ -720,6 +722,7 @@ spl_mutex_lock(void *obj)
 #ifndef UNIX_LINUX
 	DWORD err = 0;
 #else
+	int err = 0;
 #endif
 	do {
 		if (!obj) {
@@ -732,6 +735,7 @@ spl_mutex_lock(void *obj)
 		err = WaitForSingleObject(obj, INFINITE);
 		if (err != WAIT_OBJECT_0) {
 			ret = SPL_LOG_WIN32_WAIT_OBJECT;
+			spl_err("WaitForSingleObject");
 			break;
 		}
 #else
@@ -739,9 +743,17 @@ spl_mutex_lock(void *obj)
 #endif
 #else
 #ifndef SPL_USING_SPIN_LOCK
-		SPL_pthread_mutex_lock((pthread_mutex_t *)obj, ret);
+		SPL_pthread_mutex_lock((pthread_mutex_t *)obj, err);
+		if (err) {
+			spl_err("SPL_pthread_mutex_lock");
+			ret = SPL_LOG_PX_MUTEX_LOCK;
+		}
 #else
-		pthread_spin_lock((pthread_spinlock_t *)obj);
+		err = pthread_spin_lock((pthread_spinlock_t *)obj);
+		if (err) {
+			ret = SPL_LOG_PX_SPIN_LOCK;
+			spl_err("pthread_spin_lock");
+		}
 #endif
 
 #endif
@@ -839,6 +851,7 @@ spl_written_thread_routine(void *lpParam)
 	int k = 0;
 	SIMPLE_LOG_ST *t = (SIMPLE_LOG_ST *)lpParam;
 	int ret = 0, sz = 0, err = 0;
+	int werr = 0;
 
 	register char is_off = 0;
 	register int i = 0, j = 0;
@@ -904,13 +917,24 @@ spl_written_thread_routine(void *lpParam)
 			exit(1);
 		}
 		while (1) {
+			
 			if (is_off) {
 				break;
 			}
 #ifndef UNIX_LINUX
-			WaitForSingleObject(t->sem_rwfile, INFINITE);
+			werr = WaitForSingleObject(t->sem_rwfile, INFINITE);
+			if (werr != WAIT_OBJECT_0) {
+				ret = SPL_LOG_WIN32_WAIT_OBJECT;
+				spl_err("WaitForSingleObject");
+				break;
+			}
 #else
-			SPL_sem_wait(t->sem_rwfile);
+			werr = SPL_sem_wait(t->sem_rwfile);
+			if (werr) {
+				spl_err("SPL_sem_wait");
+				ret = SPL_LOG_PX_SEM_WAIT_OBJECT;
+				break;
+			}
 #endif
 			do {
 				ret = spl_gen_file(t, &sz, t->file_limit_size, &(t->index));
@@ -2684,6 +2708,14 @@ spl_err_txt_init()
 	__spl_err_text__[SPL_LOG_WIN32_WAIT_OBJECT] = "SPL_LOG_WIN32_WAIT_OBJECT";
 	__spl_err_text__[SPL_LOG_WIN32_MUTEX_RELEASE] = "SPL_LOG_WIN32_MUTEX_RELEASE";
 	__spl_err_text__[SPL_LOG_WIN32_MAP_FILE] = "SPL_LOG_WIN32_MAP_FILE";
+	__spl_err_text__[SPL_LOG_PX_SEM_WAIT_OBJECT] = "SPL_LOG_PX_SEM_WAIT_OBJECT";
+
+
+
+	__spl_err_text__[SPL_LOG_PX_MUTEX_LOCK] = "SPL_LOG_PX_MUTEX_LOCK";
+	__spl_err_text__[SPL_LOG_PX_SPIN_LOCK] = "SPL_LOG_PX_SPIN_LOCK";
+
+
 
 	__spl_err_text__[SPL_END_ERROR] = "SPL_END_ERROR";
 }
