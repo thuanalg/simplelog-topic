@@ -2741,11 +2741,12 @@ spl_err_txt_init()
 	__spl_err_text__[SPL_LOG_WIN32_MUTEX_RELEASE] = "SPL_LOG_WIN32_MUTEX_RELEASE";
 	__spl_err_text__[SPL_LOG_WIN32_MAP_FILE] = "SPL_LOG_WIN32_MAP_FILE";
 	__spl_err_text__[SPL_LOG_PX_SEM_WAIT_OBJECT] = "SPL_LOG_PX_SEM_WAIT_OBJECT";
+	__spl_err_text__[SPL_LOG_PX_MUTEX_LOCK] = "SPL_LOG_PX_MUTEX_LOCK";
+	__spl_err_text__[SPL_LOG_PX_SPIN_LOCK] = "SPL_LOG_PX_SPIN_LOCK";
 	__spl_err_text__[SPL_LOG_PX_MUTEX_RELEASE] = "SPL_LOG_PX_MUTEX_RELEASE";
 	__spl_err_text__[SPL_LOG_PX_SPIN_RELEASE] = "SPL_LOG_PX_SPIN_RELEASE";
 	__spl_err_text__[SPL_LOG_WIN32_SEM_REL_OBJECT] = "SPL_LOG_WIN32_SEM_REL_OBJECT";
 	__spl_err_text__[SPL_LOG_PX_SEM_REL_OBJECT] = "SPL_LOG_PX_SEM_REL_OBJECT";
-
 
 
 	__spl_err_text__[SPL_END_ERROR] = "SPL_END_ERROR";
