@@ -768,6 +768,7 @@ spl_mutex_unlock(void *obj)
 #ifndef UNIX_LINUX
 	DWORD done = 0;
 #else
+	int err = 0;
 #endif
 	do {
 		if (!obj) {
@@ -780,6 +781,7 @@ spl_mutex_unlock(void *obj)
 		done = ReleaseMutex(obj);
 		if (!done) {
 			ret = SPL_LOG_WIN32_MUTEX_RELEASE;
+			spl_err("ReleaseMutex");
 			break;
 		}
 #else
@@ -787,9 +789,17 @@ spl_mutex_unlock(void *obj)
 #endif
 #else
 #ifndef SPL_USING_SPIN_LOCK
-		SPL_pthread_mutex_unlock((pthread_mutex_t *)obj, ret);
+		SPL_pthread_mutex_unlock((pthread_mutex_t *)obj, err);
+		if (err) {
+			spl_err("SPL_pthread_mutex_unlock");
+			ret = SPL_LOG_PX_MUTEX_RELEASE;
+		}
 #else
-		pthread_spin_unlock((pthread_spinlock_t *)obj);
+		err = pthread_spin_unlock((pthread_spinlock_t *)obj);
+		if (err) {
+			spl_err("SPL_pthread_mutex_unlock");
+			ret = SPL_LOG_PX_SPIN_RELEASE;
+		}
 #endif
 #endif
 	} while (0);
@@ -1335,7 +1345,9 @@ spl_rel_sem(void *sem)
 {
 	int ret = 0;
 #ifndef UNIX_LINUX
+	DWORD done = 0;
 #else
+	int err = 0;
 #endif
 	do {
 		if (!sem) {
@@ -1343,17 +1355,37 @@ spl_rel_sem(void *sem)
 			break;
 		}
 #ifndef UNIX_LINUX
-		ReleaseSemaphore(sem, 1, 0);
+		done = ReleaseSemaphore(sem, 1, 0);
+		if (!done) {
+			DWORD dwerr = 0;
+			dwerr = GetLastError();
+			if (dwerr == ERROR_TOO_MANY_POSTS) {
+				break;
+			}
+			ret = SPL_LOG_WIN32_SEM_REL_OBJECT;
+			spl_err("ReleaseSemaphore");
+		}
 #else
 #ifdef __MACH__
-		SPL_sem_post(sem);
+		err = SPL_sem_post(sem);
+		if (err) {
+			ret = SPL_LOG_PX_SEM_REL_OBJECT;
+			spl_err("SPL_sem_post");
+		}
 #else
+	#if 0
 		int val = 0;
 		int err = sem_getvalue((sem_t *)sem, &val);
 		if (!err) {
 			if (val < 1) {
 				SPL_sem_post(sem);
 			}
+		}
+	#endif
+		err = SPL_sem_post(sem);
+		if (err) {
+			ret = SPL_LOG_PX_SEM_REL_OBJECT;
+			spl_err("SPL_sem_post");
 		}
 #endif
 #endif
@@ -2709,12 +2741,12 @@ spl_err_txt_init()
 	__spl_err_text__[SPL_LOG_WIN32_MUTEX_RELEASE] = "SPL_LOG_WIN32_MUTEX_RELEASE";
 	__spl_err_text__[SPL_LOG_WIN32_MAP_FILE] = "SPL_LOG_WIN32_MAP_FILE";
 	__spl_err_text__[SPL_LOG_PX_SEM_WAIT_OBJECT] = "SPL_LOG_PX_SEM_WAIT_OBJECT";
-
-
-
 	__spl_err_text__[SPL_LOG_PX_MUTEX_LOCK] = "SPL_LOG_PX_MUTEX_LOCK";
 	__spl_err_text__[SPL_LOG_PX_SPIN_LOCK] = "SPL_LOG_PX_SPIN_LOCK";
-
+	__spl_err_text__[SPL_LOG_PX_MUTEX_RELEASE] = "SPL_LOG_PX_MUTEX_RELEASE";
+	__spl_err_text__[SPL_LOG_PX_SPIN_RELEASE] = "SPL_LOG_PX_SPIN_RELEASE";
+	__spl_err_text__[SPL_LOG_WIN32_SEM_REL_OBJECT] = "SPL_LOG_WIN32_SEM_REL_OBJECT";
+	__spl_err_text__[SPL_LOG_PX_SEM_REL_OBJECT] = "SPL_LOG_PX_SEM_REL_OBJECT";
 
 
 	__spl_err_text__[SPL_END_ERROR] = "SPL_END_ERROR";
