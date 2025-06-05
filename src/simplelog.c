@@ -250,8 +250,7 @@ static int
 spl_get_fname_now(char *name);
 static int
 spl_folder_sup(char *folder, spl_local_time_st *lctime, char *year_month);
-static int
-spl_local_time_now(spl_local_time_st *st_time);
+
 static int
 spl_stdz_topics(char *buff, int *inoutlen, int *, char **);
 

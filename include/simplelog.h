@@ -546,7 +546,11 @@ spl_finish_log();
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 DLL_API_SIMPLE_LOG char *
-spl_fmt_now_ext(char *fmtt, int len, int lv, const char *filename, const char *funcname, int line, unsigned short *r, int *);
+spl_fmt_now_ext(char *fmtt, 
+	int len, int lv, 
+	const char *filename, 
+	const char *funcname, 
+	int line, unsigned short *r, int *);
 
 DLL_API_SIMPLE_LOG int
 spl_mutex_lock(void *mtx);
@@ -580,6 +584,10 @@ spl_control_obj();
 
 DLL_API_SIMPLE_LOG const char *
 spl_err_txt(int i);
+
+DLL_API_SIMPLE_LOG int
+spl_local_time_now(spl_local_time_st *st_time);
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 #ifdef __cplusplus
