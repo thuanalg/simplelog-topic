@@ -22,6 +22,7 @@
  *		<2025-Apr-11>
  *		<2025-Apr-22>
  *		<2025-Jun-01>
+ *		<2025-Jun-11>
  * Decription:
  *		The (only) main file to implement simple log.
  */
@@ -422,20 +423,28 @@ spl_set_off(int isoff)
 {
 	int ret = 0;
 	SIMPLE_LOG_ST *t = &__simple_log_static__;
+	int shouldWait = 0;
+
 	spl_mutex_lock(t->mtx_rw);
 	do {
 		t->off = isoff;
 	} while (0);
 	spl_mutex_unlock(t->mtx_rw);
 
-	if (isoff) {
+	spl_rel_sem(t->sem_rwfile);
+	shouldWait = (!t->isProcessMode) ? 1 : (!!t->is_master);
+
+	if (isoff && shouldWait) {
 		int errCode = 0;
+#if 0		
 		spl_rel_sem(t->sem_rwfile);
 		if (t->isProcessMode) {
 			if (!t->is_master) {
 				spl_rel_sem(t->sem_off);
 			}
 		}
+#endif
+
 #ifndef UNIX_LINUX
 		errCode = (int)WaitForSingleObject(t->sem_off, INFINITE);
 		if (errCode == WAIT_FAILED) {

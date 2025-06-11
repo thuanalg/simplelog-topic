@@ -147,13 +147,7 @@ posix_thread_routine(void *lpParam)
 		}
 	} else {
 		while (count < loop_count) {
-			spllogtopic(SPL_LOG_INFO, (topicindex - 1) % 5, SPL_TEST_FMT, count);
-	#if 0
-			spllogtopic(SPL_LOG_INFO, topicindex % 5, SPL_TEST_FMT, count);
-			spllogtopic(SPL_LOG_INFO, (topicindex + 1) % 5, SPL_TEST_FMT, count);
-			spllogtopic(SPL_LOG_INFO, (topicindex + 2) % 5, SPL_TEST_FMT, count);
-			spllogtopic(SPL_LOG_INFO, (topicindex + 3) % 5, SPL_TEST_FMT, count);
-	#endif
+			spllogtopic(SPL_LOG_INFO, topicindex - 1, SPL_TEST_FMT, count);
 			++count;
 		}
 	}

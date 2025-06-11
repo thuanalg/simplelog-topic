@@ -22,6 +22,7 @@
  *		<2025-Apr-11>
  *		<2025-Apr-22>
  *		<2025-Jun-01>
+ *		<2025-Jun-11>
  * Decription:
  *		The (only) main header file to export 4 APIs: [spl_init_log_ext, spllog, spllogtopic, spl_finish_log].
  */
@@ -546,8 +547,7 @@ spl_finish_log();
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 DLL_API_SIMPLE_LOG char *
-spl_fmt_now_ext(char *fmtt, 
-	int len, int lv, 
+spl_fmt_now_ext(char *fmtt, int len, int lv, 
 	const char *filename, 
 	const char *funcname, 
 	int line, unsigned short *r, int *);
@@ -587,7 +587,6 @@ spl_err_txt(int i);
 
 DLL_API_SIMPLE_LOG int
 spl_local_time_now(spl_local_time_st *st_time);
-
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 #ifdef __cplusplus
