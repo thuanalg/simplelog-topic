@@ -173,6 +173,12 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 
 ---
 
-Reference & Dedication:
+### Reference & Dedication:
    - [UNIX Network Programming, Volume 2: Interprocess Communications, Second Edition](https://www.amazon.com/UNIX-Network-Programming-Interprocess-Communications/dp/0130810819)
    - [Unix Network Programming: The Sockets Networking API](https://www.amazon.com/Unix-Network-Programming-Sockets-Networking/dp/0131411551)
+  
+### Contact:
+- [Email](mailto:nguyenthaithuanalg@gmail.com)
+
+### Used by:
+- [meta-voltumna](https://layers.openembedded.org/layerindex/branch/master/layer/meta-voltumna/) from [Elettra-Sincrotrone Trieste](https://www.elettra.eu/)
