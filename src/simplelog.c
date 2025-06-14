@@ -1658,8 +1658,10 @@ spl_gen_topics(SIMPLE_LOG_ST *t)
 			}
 			do {
 				int err = 0;
-				snprintf(path, SPL_FULLPATH_LEN, "%s-%s-%.7d.log", t->path_template, t->arr_topic[i].topic,
-				    t->arr_topic[i].index);
+				snprintf(path, SPL_FULLPATH_LEN, "%s-%s-%.7d.log", 
+					t->path_template, 
+					t->arr_topic[i].topic, t->arr_topic[i].index);
+
 				FFOPEN(t->arr_topic[i].fp, path, "a+");
 				if (!t->arr_topic[i].fp) {
 					ret = SPL_LOG_TOPIC_FOPEN;
@@ -1699,7 +1701,8 @@ spl_gen_topics(SIMPLE_LOG_ST *t)
 					}
 					t->arr_topic[i].index = 0;
 					t->arr_topic[i].fizize = 0;
-					snprintf(path, SPL_FULLPATH_LEN, "%s-%s-%.7d.log", t->path_template,
+					snprintf(path, SPL_FULLPATH_LEN, 
+						"%s-%s-%.7d.log", t->path_template,
 					    t->arr_topic[i].topic, t->arr_topic[i].index);
 					/*
 					//t->arr_topic[i].fp = fopen(path, "a+");
@@ -1732,7 +1735,9 @@ spl_gen_topics(SIMPLE_LOG_ST *t)
 
 				t->arr_topic[i].fizize = 0;
 
-				snprintf(path, SPL_FULLPATH_LEN, "%s-%s-%.7d.log", t->path_template, t->arr_topic[i].topic,
+				snprintf(path, SPL_FULLPATH_LEN, 
+					"%s-%s-%.7d.log", 
+					t->path_template, t->arr_topic[i].topic,
 				    t->arr_topic[i].index);
 				/*
 				//t->arr_topic[i].fp = fopen(path, "a+");
