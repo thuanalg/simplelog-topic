@@ -1226,17 +1226,18 @@ spl_gen_file(SIMPLE_LOG_ST *t, int *sz, int limit, int *index)
 	int ferr = 0;
 	char yearmonth[16];
 
+	plt = &(t->lc_time_now);
+	t->renew = SPL_NO_CHANGE_NAME;
+
 	do {
-		t->renew = SPL_NO_CHANGE_NAME;
 		ret = spl_local_time_now(&lt);
 		if (ret) {
 			spl_console_log("spl_local_time_now: ret: %d.\n", ret);
 			break;
 		}
-
-		memcpy(&(t->lc_time_now), &lt, sizeof(spl_local_time_st));
-		plt = &(t->lc_time_now);
+		
 		if (!t->fp) {
+			memcpy(&(t->lc_time_now), &lt, sizeof(spl_local_time_st));
 			memset(path, 0, sizeof(path));
 			memset(fmt_file_name, 0, sizeof(fmt_file_name));
 			spl_get_fname_now(fmt_file_name);
@@ -1304,10 +1305,13 @@ spl_gen_file(SIMPLE_LOG_ST *t, int *sz, int limit, int *index)
 			}
 			t->renew = SPL_NO_CHANGE_NAME;
 		} while (0);
+
+		memcpy(&(t->lc_time_now), &lt, sizeof(spl_local_time_st));
+
 		if (!t->renew) {
 			break;
 		}
-		memcpy(&(t->lc_time_now), &lt, sizeof(spl_local_time_st));
+		
 		spl_get_fname_now(fmt_file_name);
 		ret = spl_folder_sup(t->folder, &(t->lc_time_now), yearmonth);
 		if (ret) {
