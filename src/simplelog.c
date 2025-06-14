@@ -23,6 +23,7 @@
  *		<2025-Apr-22>
  *		<2025-Jun-01>
  *		<2025-Jun-11>
+ *		<2025-Jun-14>
  * Decription:
  *		The (only) main file to implement simple log.
  */
@@ -1237,6 +1238,7 @@ spl_gen_file(SIMPLE_LOG_ST *t, int *sz, int limit, int *index)
 		}
 		
 		if (!t->fp) {
+			/*Fix at v1.0.8 - 2025-Jun-14*/
 			memcpy(&(t->lc_time_now), &lt, sizeof(spl_local_time_st));
 			memset(path, 0, sizeof(path));
 			memset(fmt_file_name, 0, sizeof(fmt_file_name));
@@ -1306,6 +1308,7 @@ spl_gen_file(SIMPLE_LOG_ST *t, int *sz, int limit, int *index)
 			t->renew = SPL_NO_CHANGE_NAME;
 		} while (0);
 
+		/*Fix at v1.0.8 - 2025-Jun-14*/
 		memcpy(&(t->lc_time_now), &lt, sizeof(spl_local_time_st));
 
 		if (!t->renew) {
