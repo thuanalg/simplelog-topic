@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.5)
+
 # Add main.cpp file of the project root directory as a source file
 project(simplelog_topic_project)
 set(SOURCE_LIB_FILES src/simplelog.c )
