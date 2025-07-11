@@ -33,11 +33,8 @@ At its core, SimpleLog-Topic follows the **Unix Philosophy** of **KISS (Keep It 
 8. **Message safety feature**  
    The **message safety feature** in your logger allows users to configure a size limit for each log message (e.g., 10,000 bytes). If a message exceeds this size, it, sometimes, **may be truncated**, but the first 10,000 bytes will still be logged. This ensures that large messages do not cause memory overflow or uncontrolled log writing, while still preserving the beginning of the message for logging. This feature is particularly useful in resource-constrained environments like embedded devices, providing both flexibility and safety in log management. [max_sz_msg=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg)
    
-### **Performance Highlights: Speed and Efficiency**
-
-One of the core objectives of SimpleLog-Topic is to provide exceptional **performance** while maintaining **simplicity**. Here’s a detailed look at its performance in different scenarios:
+### **[Performance Highlights: Speed and Efficiency](https://github.com/thuanalg/simplelog-topic/blob/main/PERFORMANCE.md)**
   
-#### **[Benchmarking Performance](https://github.com/thuanalg/simplelog-topic/blob/main/PERFORMANCE.md)**
   
 #### **Optimized for Low Latency and High Throughput**
 
