@@ -134,37 +134,14 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 
 ---
 
-**APIs - Focus on Simplicity and Ease of Use**:  
-  - **4 simple APIs** for usage:  
-    - **Initialization** (at the start of `main`):  
-	    		    - `spl_init_log_ext(SPL_INPUT_ARG *input)`  
-    - **Logging** (in any thread):  
-	    	    - `spllog(level, fmt, ...)`  
-	    	    - **Levels**: `SPL_LOG_DEBUG`, `SPL_LOG_INFO`, `SPL_LOG_WARNING`, `SPL_LOG_ERROR`, `SPL_LOG_FATAL`  
-    - **Topic-based Logging**:  
-	    	    - `spllogtopic(level, topic_index, fmt, ...)`  
-    - **Finalization** (at the end of `main`):  
-		   - `spl_finish_log()`  
-    - [Samples](https://github.com/thuanalg/simplelog-topic/tree/main/tests)
+**[APIs - Focus on Simplicity and Ease of Use](https://github.com/thuanalg/simplelog-topic/blob/main/PERFORMANCE.md#apis---focus-on-simplicity-and-ease-of-use:/)**  
+  
 ---
 
-**Build and install with cmake**:	  
-	- Install **cmake**.     
-	- Come to root folder, **mkdir build && cd build**.  
-	- For windows-32: **cmake .. -G "Visual Studio 17 2022" -A win32**.  
-	- For windows-64: **cmake .. -G "Visual Studio 17 2022"**.  
-	- For Linux: **cmake .. -DUNIX_LINUX=1**.  
-	- For MAC-OSX/Apple: **cmake .. -DUNIX_LINUX=1 -DMACOSX=1**.  
-	  
- 
-
-**Video Install/Demo(old way):**  
-	- For [Windows 10 64bit](https://drive.google.com/file/d/1Ls4aD8fd65qcc7qgRKns2SlWw6RAhH5l/view?usp=sharing)  
-	- For [VM Linux CentOs9 64bit](https://drive.google.com/file/d/1wxBjI6654wZqL7vTCZtvyiIRkJk-68HF/view?usp=sharing)  
-	- For MacOSX 64bit, come to **src/mach**, and do similar steps of Linux.
-
+**[INSTALL](https://github.com/thuanalg/simplelog-topic/blob/main/INSTALL.md#install)**
+  
 ---
-
+  
 **Thanks a lot to:**
 
 1. My family, friends.
