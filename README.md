@@ -169,7 +169,7 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 
 1. My family, friends.
 2. My colleagues: Lê Duy Cường, Bùi Khánh Duy, Nguyễn Công Đức , ... .
-2. Jan Flik from [Intel Corp.](https://www.intel.com)
+2. [Jan Flik](https://www.linkedin.com/in/jan-flik/) from [Intel Corp.](https://www.intel.com)
 
 ---
 
