@@ -36,7 +36,11 @@
 #define SPL_MIN_AB(a, b) ((a) < (b)) ? (a) : (b)
 #define SPL_MAX_AB(a, b) ((a) > (b)) ? (a) : (b)
 
-#if 0
+#if 1
+#define SPL_CPP20
+#endif
+
+#if 1
 #ifndef UNIX_LINUX
 #define UNIX_LINUX                      
 #endif
@@ -517,6 +521,18 @@ typedef struct __SPL_INPUT_ARG__ {
 			}                                                                                                   \
 		}                                                                                                           \
 	}
+
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+#ifdef SPL_CPP20
+#define __spl_log_buf_level_cpp20__(__lv__, ___str___, ...) \
+do {\
+	;SIMPLE_LOG_ST *__t__ = spl_control_obj();\
+	;\
+	;\
+} \
+while(0);
+#endif
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
