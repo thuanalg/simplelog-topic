@@ -140,6 +140,7 @@ posix_thread_routine(void *lpParam)
 	if (topicindex < 1) {
 		while (count < loop_count) {
 			spllog(SPL_LOG_INFO, SPL_TEST_FMT, count);
+			//spllog_cpp20(0, "{}: {}", "spllog_cpp20", count);
 			++count;
 		}
 	} else {

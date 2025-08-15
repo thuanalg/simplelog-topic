@@ -36,11 +36,11 @@
 #define SPL_MIN_AB(a, b) ((a) < (b)) ? (a) : (b)
 #define SPL_MAX_AB(a, b) ((a) > (b)) ? (a) : (b)
 
-#if 1
+#if 0
 #define SPL_CPP20
 #endif
 
-#if 1
+#if 0
 #ifndef UNIX_LINUX
 #define UNIX_LINUX                      
 #endif
@@ -524,13 +524,79 @@ typedef struct __SPL_INPUT_ARG__ {
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #ifdef SPL_CPP20
-#define __spl_log_buf_level_cpp20__(__lv__, ___str___, ...) \
-do {\
-	;SIMPLE_LOG_ST *__t__ = spl_control_obj();\
-	;\
-	;\
-} \
+#include <format>
+
+#define __spl_log_buf_level_cpp20__(__lv__, ___fmttt___, ...)                                                                     \
+	{                                                                                                                   \
+		;                                                                                                           \
+		SIMPLE_LOG_ST *__t__ = spl_control_obj();                                                                   \
+		if (__t__->llevel <= (__lv__) && ___fmttt___[0]) {                                                          \
+			int __outlen__ = 0;                                                                                 \
+			const char *__pfn__ = 0; /*char __isOof = 0;*/                                                      \
+			unsigned short __r__ = 0;                                                                           \
+			char __tnow__[SPL_RL_BUF];                                                                          \
+			char *__pprefmt__ = 0;                                                                              \
+			;auto __strcpp20__ = std::format(___fmttt___, ##__VA_ARGS__);\
+			;                                                                                                   \
+			int __lenpp20__ = __strcpp20__.length();                                                            \
+			if (__lenpp20__ <= 0) {  break; }                                                                                            \
+			__FILLE__(__pfn__);                                                                                 \
+			__pprefmt__ = spl_fmt_now_ext(                                                                      \
+			    __tnow__, SPL_RL_BUF, __lv__, __pfn__, __FUNCTION__, __LINE__, &__r__, &__outlen__);            \
+			;                                                                                                   \
+			{                                                                                                   \
+				do {                                                                                        \
+					;                                                                                   \
+					int __len__ = 0;                                                                    \
+					;                                                                                   \
+					spl_mutex_lock(__t__->arr_mtx[__r__]);                                              \
+					;                                                                                   \
+					if (__t__->range > SPL_KEYBUF(__t__, __r__)->pl) {                                  \
+						;                                                                           \
+						memcpy(SPL_KEYBUF(__t__, __r__)->data + SPL_KEYBUF(__t__, __r__)->pl,       \
+						    __pprefmt__, __outlen__);                                               \
+						;                                                                           \
+						SPL_KEYBUF(__t__, __r__)->pl += __outlen__;                                 \
+						;                                                                           \
+						memcpy(SPL_KEYBUF(__t__, __r__)->data + SPL_KEYBUF(__t__, __r__)->pl,       \
+						    __strcpp20__.c_str(), __lenpp20__);                                                                           \
+						__len__ = __lenpp20__;;                                                     \
+						;                                                                           \
+						if (__len__ > 0) {                                                          \
+							;                                                                   \
+							__outlen__ = SPL_MIN_AB(                                            \
+							    __len__, __t__->krange - SPL_KEYBUF(__t__, __r__)->pl);         \
+							;                                                                   \
+							SPL_KEYBUF(__t__, __r__)->pl += __outlen__;                         \
+							;                                                                   \
+						};                                                                          \
+					}                                                                                   \
+                                                                                                                            \
+					spl_mutex_unlock(__t__->arr_mtx[__r__]);                                            \
+                                                                                                                            \
+					if (__len__ > 0)                                                                    \
+						break;                                                                      \
+					; /*spl_console_log("--OVER ===                                                     \
+					     r: %d", (int)r);*/                                                             \
+					;                                                                                   \
+					__r__++;                                                                            \
+					__r__ %= __t__->ncpu;                                                               \
+					;                                                                                   \
+					;                                                                                   \
+					continue;                                                                           \
+				} while (1);                                                                                \
+				if (!__t__->trigger_thread)                                                                 \
+					spl_rel_sem(__t__->sem_rwfile);                                                     \
+				if (__pprefmt__ != __tnow__) {                                                              \
+					spl_free(__pprefmt__);                                                              \
+				}                                                                                           \
+			}                                                                                                   \
+		}                                                                                                           \
+	}\
 while(0);
+
+#define spllog_cpp20 __spl_log_buf_level_cpp20__
+
 #endif
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
