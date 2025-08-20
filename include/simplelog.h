@@ -608,7 +608,6 @@ typedef struct __SPL_INPUT_ARG__ {
 		if (__t__->llevel <= (__lv__) && ___fmttt___[0] && __t__->arr_topic) {                                      \
 			;                                                                                                   \
 			short __tpp__ = 0;                                                                                  \
-			int __len__ = strlen(___fmttt___);                                                                  \
 			unsigned short __r__ = 0;                                                                           \
 			;                                                                                                   \
 			const char *__pfn__ = 0;                                                                            \
@@ -623,6 +622,7 @@ typedef struct __SPL_INPUT_ARG__ {
 			__tpp__ = __tpic__ % __t__->n_topic;                                                                \
 			;                                                                                                   \
 			;                                                                                                   \
+			int __len__ = strlen(___fmttt___);                                                                  \
 			;                                                                                                   \
 			__FILLE__(__pfn__);                                                                                 \
 			;                                                                                                   \
