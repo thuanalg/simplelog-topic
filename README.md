@@ -96,5 +96,9 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 ### Contact:
 - [Email](mailto:nguyenthaithuanalg@gmail.com)
 
-### Used by:
-- [meta-voltumna](https://layers.openembedded.org/layerindex/branch/master/layer/meta-voltumna/) from [Elettra-Sincrotrone Trieste](https://www.elettra.eu/)
+### Contributed to/Used by:
+- [meta-voltumna](https://layers.openembedded.org/layerindex/branch/master/layer/meta-voltumna/) from [Elettra-Sincrotrone Trieste](https://www.elettra.eu/)  
+-  [Yoto/meta-openembedded](https://github.com/openembedded/meta-openembedded/tree/master/meta-oe/recipes-support/libsimplelog)  
+-  [openBMC/Linux Foundation](https://github.com/openbmc/openbmc/tree/master/meta-openembedded/meta-oe/recipes-support/libsimplelog)  
+-  [Google](https://gbmc.googlesource.com/openbmc/+/refs/heads/master/meta-openembedded/meta-oe/recipes-support/libsimplelog?autodive=0%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F/)   
+- [Enea](https://www.enea.com/)
