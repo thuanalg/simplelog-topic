@@ -96,7 +96,7 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 ### Contact:
 - [Email](mailto:nguyenthaithuanalg@gmail.com)
 
-### Contributed to/Used by:
+### Contributed to/ May be used by:
 - [meta-voltumna](https://layers.openembedded.org/layerindex/branch/master/layer/meta-voltumna/) from [Elettra-Sincrotrone Trieste](https://www.elettra.eu/)  
 -  [Yoto/meta-openembedded](https://github.com/openembedded/meta-openembedded/tree/master/meta-oe/recipes-support/libsimplelog)  
 -  [openBMC/Linux Foundation](https://github.com/openbmc/openbmc/tree/master/meta-openembedded/meta-oe/recipes-support/libsimplelog)  
