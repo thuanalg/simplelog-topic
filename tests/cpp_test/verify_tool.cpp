@@ -57,7 +57,8 @@ int main(int argc, char *argv[]) {
                     }
                 }
                 n = 0;
-                memset(buffline, 0, sizeof(buffline));                
+                memset(buffline, 0, sizeof(buffline)); 
+                continue;               
             }
             if( c == EOF) {
                 break;
