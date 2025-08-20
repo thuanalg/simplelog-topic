@@ -88,3 +88,5 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 //./verify_tool ./log_simple/2025/08/2025-08-20-simplelog_00000000.log 10 "My test log : "
+//./verify_tool ./log_simple/2025/08/2025-08-20-simplelog_00000000.log 10 "My test log : "
+//./verify_tool ./log_simple/2025/08/2025-08-20-simplelog_00000000.log 10 "My test log : "
