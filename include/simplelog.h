@@ -37,7 +37,7 @@
 #define SPL_MAX_AB(a, b) ((a) > (b)) ? (a) : (b)
 
 #if 0
-#define SPL_CPP20
+#define SPL_CPP20                       
 #endif
 
 #if 0
@@ -526,7 +526,7 @@ typedef struct __SPL_INPUT_ARG__ {
 #ifdef SPL_CPP20
 #include <format>
 
-#define __spl_log_buf_level_cpp20__(__lv__, ___fmttt___, ...)                                                                     \
+#define __spl_log_buf_level_raw__(__lv__, ___fmttt___)                                                                      \
 	{                                                                                                                   \
 		;                                                                                                           \
 		SIMPLE_LOG_ST *__t__ = spl_control_obj();                                                                   \
@@ -536,10 +536,10 @@ typedef struct __SPL_INPUT_ARG__ {
 			unsigned short __r__ = 0;                                                                           \
 			char __tnow__[SPL_RL_BUF];                                                                          \
 			char *__pprefmt__ = 0;                                                                              \
-			;auto __strcpp20__ = std::format(___fmttt___, ##__VA_ARGS__);\
 			;                                                                                                   \
-			int __lenpp20__ = __strcpp20__.length();                                                            \
-			if (__lenpp20__ <= 0) {  break; }                                                                                            \
+			;                                                                                                   \
+			int __lenpp20__ = strlen(___fmttt___);                                                              \
+			;                                                                                                   \
 			__FILLE__(__pfn__);                                                                                 \
 			__pprefmt__ = spl_fmt_now_ext(                                                                      \
 			    __tnow__, SPL_RL_BUF, __lv__, __pfn__, __FUNCTION__, __LINE__, &__r__, &__outlen__);            \
@@ -558,18 +558,15 @@ typedef struct __SPL_INPUT_ARG__ {
 						;                                                                           \
 						SPL_KEYBUF(__t__, __r__)->pl += __outlen__;                                 \
 						;                                                                           \
+						__lenpp20__ =                                                               \
+						    SPL_MIN_AB(__lenpp20__, __t__->krange - SPL_KEYBUF(__t__, __r__)->pl);  \
 						memcpy(SPL_KEYBUF(__t__, __r__)->data + SPL_KEYBUF(__t__, __r__)->pl,       \
-						    __strcpp20__.c_str(), __lenpp20__);                                                                           \
-						__len__ = __lenpp20__;;                                                     \
+						    ___fmttt___, __lenpp20__);                                              \
+						__len__ = __lenpp20__;                                                      \
 						;                                                                           \
-						if (__len__ > 0) {                                                          \
-							;                                                                   \
-							__outlen__ = SPL_MIN_AB(                                            \
-							    __len__, __t__->krange - SPL_KEYBUF(__t__, __r__)->pl);         \
-							;                                                                   \
-							SPL_KEYBUF(__t__, __r__)->pl += __outlen__;                         \
-							;                                                                   \
-						};                                                                          \
+						;                                                                           \
+						SPL_KEYBUF(__t__, __r__)->pl += __len__;                                    \
+						\                                                                           \
 					}                                                                                   \
                                                                                                                             \
 					spl_mutex_unlock(__t__->arr_mtx[__r__]);                                            \
@@ -592,10 +589,10 @@ typedef struct __SPL_INPUT_ARG__ {
 				}                                                                                           \
 			}                                                                                                   \
 		}                                                                                                           \
-	}\
-while(0);
-
-#define spllog_cpp20 __spl_log_buf_level_cpp20__
+	}                                                                                                                   \
+	while (0)                                                                                                           \
+		;
+#define spllog_raw                      __spl_log_buf_level_raw__
 
 #endif
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
@@ -629,10 +626,7 @@ spl_finish_log();
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 DLL_API_SIMPLE_LOG char *
-spl_fmt_now_ext(char *fmtt, int len, int lv, 
-	const char *filename, 
-	const char *funcname, 
-	int line, unsigned short *r, int *);
+spl_fmt_now_ext(char *fmtt, int len, int lv, const char *filename, const char *funcname, int line, unsigned short *r, int *);
 
 DLL_API_SIMPLE_LOG int
 spl_mutex_lock(void *mtx);
