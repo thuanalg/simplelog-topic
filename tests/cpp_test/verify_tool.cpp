@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     filename = argv[1];
-    sscanf(argv[2], "%d", range);
+    sscanf(argv[2], "%d", &range);
     keysearch = argv[3];
     lenkey = strlen(keysearch);
     do {
@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
         }
         while(1) {
             c  = getc(fp);
-            if ( c == '\n') {
+            if ( c == '\n' || c == EOF) {
                 if(n > 1) {
                     tmpstr = strstr(buffline, keysearch);
                     if(tmpstr) 
@@ -58,6 +58,9 @@ int main(int argc, char *argv[]) {
                 }
                 n = 0;
                 memset(buffline, 0, sizeof(buffline)); 
+                if( c == EOF) {
+                    break;
+                }                
                 continue;               
             }
             if( c == EOF) {
@@ -76,7 +79,8 @@ int main(int argc, char *argv[]) {
         sz = (int) m_map.size();
         for(i = 0; i < sz; ++i) {
             if(m_map[i] < range) {
-                fprintf(stderr, "\nerror: i: %d\n", i);
+                fprintf(stderr, "\nerror: i: %d, range %d != val: %d\n", 
+                    i, range, m_map[i]);
                 break;
             }
         }
