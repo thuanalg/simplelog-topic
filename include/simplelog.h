@@ -523,7 +523,7 @@ typedef struct __SPL_INPUT_ARG__ {
 	}
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-#if 0
+#if 1
 #define __spl_log_buf_level_raw__(__lv__, ___fmttt___)                                                                      \
 	{                                                                                                                   \
 		;                                                                                                           \
@@ -548,7 +548,8 @@ typedef struct __SPL_INPUT_ARG__ {
 			{                                                                                                   \
 				do {                                                                                        \
 					;                                                                                   \
-					int __len__ = strlen(___fmttt___);                                                  \
+					int __len__ = 0;                                                                    \
+					int __len_raw__ = strlen(___fmttt___);                                              \
 					;                                                                                   \
 					spl_mutex_lock(__t__->arr_mtx[__r__]);                                              \
 					;                                                                                   \
@@ -560,7 +561,7 @@ typedef struct __SPL_INPUT_ARG__ {
 						SPL_KEYBUF(__t__, __r__)->pl += __outlen__;                                 \
 						;                                                                           \
 						__len__ =                                                                   \
-						    SPL_MIN_AB(__len__, __t__->krange - SPL_KEYBUF(__t__, __r__)->pl);      \
+						    SPL_MIN_AB(__len_raw__, __t__->krange - SPL_KEYBUF(__t__, __r__)->pl);  \
 						/*__len__ =                                                                 \
 						    snprintf(SPL_KEYBUF(__t__, __r__)->data + SPL_KEYBUF(__t__, __r__)->pl, \
 							__t__->krange - SPL_KEYBUF(__t__, __r__)->pl, ___fmttt___,          \
@@ -580,8 +581,9 @@ typedef struct __SPL_INPUT_ARG__ {
 						}*/                                                                         \
 						;                                                                           \
 					}                                                                                   \
-					\ spl_mutex_unlock(__t__->arr_mtx[__r__]);                                          \
-					\ if (__len__ > 0) break;                                                           \
+					spl_mutex_unlock(__t__->arr_mtx[__r__]);                                            \
+					if (__len__ > 0)                                                                    \
+						break;                                                                      \
 					; /*spl_console_log("--OVER ===                                                     \
 					     r: %d", (int)r);*/                                                             \
 					;                                                                                   \
@@ -622,10 +624,12 @@ typedef struct __SPL_INPUT_ARG__ {
 			__tpp__ = __tpic__ % __t__->n_topic;                                                                \
 			;                                                                                                   \
 			;                                                                                                   \
-			int __len__ = strlen(___fmttt___);                                                                  \
+			;                                                                                                   \
+			int __len__ = 0;                                                                                    \
 			;                                                                                                   \
 			__FILLE__(__pfn__);                                                                                 \
 			;                                                                                                   \
+			int __len_raw__ = strlen(___fmttt___);                                                              \
 			;                                                                                                   \
 			__pprefmt__ = spl_fmt_now_ext(                                                                      \
 			    __tnow__, SPL_RL_BUF, __lv__, __pfn__, __FUNCTION__, __LINE__, &__r__, &__outlen__);            \
@@ -648,8 +652,8 @@ typedef struct __SPL_INPUT_ARG__ {
 					;                                                                                   \
 					SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->pl += __outlen__;                  \
 					;                                                                                   \
-					__len__ = SPL_MIN_AB(                                                               \
-					    __len__, __t__->krange - SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->pl);  \
+					__len__ = SPL_MIN_AB(__len_raw__,                                                   \
+					    __t__->krange - SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->pl);           \
 					;                                                                                   \
 					memcpy(SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->data +                      \
 						   SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->pl,                     \
