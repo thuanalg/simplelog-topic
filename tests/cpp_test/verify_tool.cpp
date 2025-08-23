@@ -76,14 +76,23 @@ int main(int argc, char *argv[]) {
     if(m_map.size()) {
         int i = 0;
         int sz = 0;
+	    fp = fopen(argv[4], "w+");
         sz = (int) m_map.size();
-        for(i = 0; i < sz; ++i) {
-            if(m_map[i] < range) {
-                fprintf(stderr, "\nerror: i: %d, range %d != val: %d\n", 
-                    i, range, m_map[i]);
-                //break;
+        for(i = 0; i < sz; ++i) 
+        {
+            if(m_map[i] < range) 
+            {
+                //fprintf(stderr, "error: i: %d, range %d != val: %d\n", 
+                //    i, range, m_map[i]);
+		        if (fp) {
+					fprintf(fp, "error at [i: %d], range %d != val: %d\n", 
+						i, range, m_map[i]);					
+		        }
             }
         }
+		if(fp) {
+			fclose(fp);
+		}
      }
     return 0;
 }
@@ -91,3 +100,8 @@ int main(int argc, char *argv[]) {
 //./verify_tool ./log_simple/2025/08/2025-08-20-simplelog_00000000.log 10 "My test log : "
 //./verify_tool ./log_simple/2025/08/2025-08-20-simplelog_00000000.log 10 "My test log : "
 //verify_tool "2025-08-23-testlog-sys-0000000.log" 20 "Log: "
+//start dumb_fmt.exe "2025-08-24-testlog-exe-0000000.log" 30 "Log: "   zzzz_24_exe.txt 
+//start dumb_fmt.exe "2025-08-24-testlog-lib-0000000.log" 30 "Log: "   zzzz_24_lib.txt 
+//start dumb_fmt.exe "2025-08-24-testlog-nayax-0000000.log" 30 "Log: "   zzzz_24_nayax.txt 
+//start dumb_fmt.exe "2025-08-24-testlog-sksgn-0000000.log" 30 "Log: "   zzzz_24_sksgn.txt 
+//start dumb_fmt.exe "2025-08-24-testlog-sys-0000000.log" 30 "Log: "   zzzz_24_sys.txt 
