@@ -12,4 +12,8 @@
 **Video Install/Demo(old way):**  
 	- For [Windows 10 64bit](https://drive.google.com/file/d/1Ls4aD8fd65qcc7qgRKns2SlWw6RAhH5l/view?usp=sharing)  
 	- For [VM Linux CentOs9 64bit](https://drive.google.com/file/d/1wxBjI6654wZqL7vTCZtvyiIRkJk-68HF/view?usp=sharing)  
-	- For MacOSX 64bit, come to **src/mach**, and do similar steps of Linux.
+	- For MacOSX 64bit, come to **src/mach**, and do similar steps of Linux.  
+
+**Run demo/performance test:**  
+	- Linux: [xrun.sh](https://github.com/thuanalg/simplelog-topic/blob/main/src/linux/xrun.sh), [z.cfg](https://github.com/thuanalg/simplelog-topic/blob/main/src/linux/z.cfg).
+	- Windows and MAC OSX are same or similar to Linux.
