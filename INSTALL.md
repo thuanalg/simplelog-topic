@@ -15,5 +15,5 @@
 	- For MacOSX 64bit, come to **src/mach**, and do similar steps of Linux.  
 
 **Run demo/performance test:**  
-	- Linux: [xrun.sh](https://github.com/thuanalg/simplelog-topic/blob/main/src/linux/xrun.sh), [z.cfg](https://github.com/thuanalg/simplelog-topic/blob/main/src/linux/z.cfg).
+	- Linux: [xrun.sh](https://github.com/thuanalg/simplelog-topic/blob/main/src/linux/xrun.sh), [z.cfg](https://github.com/thuanalg/simplelog-topic/blob/main/src/linux/z.cfg).  
 	- Windows and MAC OSX are same or similar to Linux.
