@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
             if(m_map[i] < range) {
                 fprintf(stderr, "\nerror: i: %d, range %d != val: %d\n", 
                     i, range, m_map[i]);
-                break;
+                //break;
             }
         }
      }
@@ -90,3 +90,4 @@ int main(int argc, char *argv[]) {
 //./verify_tool ./log_simple/2025/08/2025-08-20-simplelog_00000000.log 10 "My test log : "
 //./verify_tool ./log_simple/2025/08/2025-08-20-simplelog_00000000.log 10 "My test log : "
 //./verify_tool ./log_simple/2025/08/2025-08-20-simplelog_00000000.log 10 "My test log : "
+//verify_tool "2025-08-23-testlog-sys-0000000.log" 20 "Log: "
