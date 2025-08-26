@@ -1,7 +1,13 @@
 ### **Performance Highlights: Speed and Efficiency**
+      
+	  
+	  
+	  
+#### **How to test**  
+- Refer to [Linux-script](https://github.com/thuanalg/simplelog-topic/blob/main/src/linux/xrun.sh)  
+- Refer to [MacOSX-script](https://github.com/thuanalg/simplelog-topic/blob/main/src/mach/xrun.sh)  
+- Windows is same above.  
 
-One of the core objectives of SimpleLog-Topic is to provide exceptional **performance** while maintaining **simplicity**. Here’s a detailed look at its performance in different scenarios:  
-  
 #### **Benchmarking Performance**
 
 1. **Windows10/MSVC 2022 with 10 Threads and 10 Million Records:**
