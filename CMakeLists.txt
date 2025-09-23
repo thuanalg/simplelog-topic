@@ -94,6 +94,13 @@ if(DEFINED UNIX_LINUX)
 	install(FILES src/simplelog.cfg DESTINATION include)
 endif()
 
+if(DEFINED MSYS2_WIN)
+	install(TARGETS simplelog LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+	install(TARGETS simple_c_example RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+	install(FILES include/simplelog.h DESTINATION include)
+	install(FILES src/simplelog.cfg DESTINATION include)
+endif()
+
 
 target_link_libraries(simple_c_example 
 	simplelog
