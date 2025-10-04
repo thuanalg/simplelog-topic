@@ -258,6 +258,7 @@ typedef struct __SIMPLE_LOG_ST__ {
 	int ncpu; /*Number of CPU.*/
 	int trigger_thread; /*Use trigger thread or not.*/
 	void **arr_mtx; /*List of lock: Spinlock or Mutex. Must be freed.*/
+	char mode_straight; /* The order of records in same thread is arranged.*/
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #ifndef UNIX_LINUX
 	void *
