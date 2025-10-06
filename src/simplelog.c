@@ -24,6 +24,7 @@
  *		<2025-Jun-01>
  *		<2025-Jun-11>
  *		<2025-Jun-14>
+ *		<2025-Oct-06>
  * Decription:
  *		The (only) main file to implement simple log.
  */
@@ -176,6 +177,7 @@
 #define SPL_LOG_NCPU              "ncpu="
 #define SPL_LOG_TRIGGER           "trigger="
 #define SPL_LOG_SHARED_KEY        "shared_key="
+#define SPL_LOG_MODE_STRAIGHT     "mode_straight="
 #define SPL_LOG_END_CFG           "end_configuring="
 
 #define SPL_FILE_NAME_FMT         "%s\\%s\\%s_%.8d.log"
@@ -227,7 +229,8 @@ typedef enum __CHANGE_NAME_E__ {
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 static const char *__splog_pathfolder[] = {SPL_LOG_PATHFOLDR, SPL_LOG_LEVEL, SPL_LOG_BUFF_SIZE, SPL_MAX_SZ_MSG,
-    SPL_LOG_ROT_SIZE, SPL_LOG_TOPIC, SPL_LOG_NCPU, SPL_LOG_TRIGGER, SPL_LOG_SHARED_KEY, SPL_LOG_END_CFG, 0};
+    SPL_LOG_ROT_SIZE, SPL_LOG_TOPIC, SPL_LOG_NCPU, SPL_LOG_TRIGGER, SPL_LOG_SHARED_KEY, SPL_LOG_MODE_STRAIGHT,
+    SPL_LOG_END_CFG, 0};
 
 static SIMPLE_LOG_ST __simple_log_static__;
 ;
@@ -578,6 +581,14 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 #if SPL_SHOW_CONSOLE
 			spl_console_log("t->shared_key: %s.", t->shared_key);
 #endif
+			break;
+		}
+		if (strcmp(key, SPL_LOG_MODE_STRAIGHT) == 0) {
+			int n = 0, sz = 0;
+			sz = sscanf(buff, "%d", &n);
+			t->mode_straight = n ? 1 : 0;
+			spl_console_log("buff %s, t->mode_straight: %d, sz: %d.", 
+				buff, t->mode_straight, sz);
 			break;
 		}
 		if (strcmp(key, SPL_LOG_END_CFG) == 0) {
@@ -1145,7 +1156,7 @@ spl_fmt_now_ext(
 	if (ret) {
 		return p;
 	}
-#if 0	
+#if 1	
 	*r = (__simple_log_static__.mode_straight ? 
 		threadiid : stt.nn ) 
 		% __simple_log_static__.ncpu;
