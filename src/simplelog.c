@@ -1146,7 +1146,7 @@ spl_fmt_now_ext(
 {
 	char *p = fmtt;
 	int ret = 0;
-	spl_local_time_st stt;
+	spl_local_time_st stt = {0};
 	int n = 0;
 	LLU threadiid = 0;
 
