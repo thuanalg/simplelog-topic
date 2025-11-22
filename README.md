@@ -98,6 +98,6 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 
 ### Contributed to / Used by:  
 - [meta-openembedded](https://layers.openembedded.org/layerindex/recipe/448479/)  
-- [openBMC](https://gerrit.openbmc.org/plugins/gitiles/openbmc/openbmc/+/bda8fae3b5b5789ddeb9f9bb99de0cd48affd481/meta-openembedded/meta-oe/recipes-support/libsimplelog/libsimplelog_1.0.7.bb)
-- [Google](https://gbmc.googlesource.com/openbmc/+/refs/heads/master/meta-openembedded/meta-oe/recipes-support/libsimplelog/libsimplelog_1.0.7.bb)
+- [openBMC](https://github.com/openbmc/openbmc/tree/master/meta-openembedded/meta-oe/recipes-support/libsimplelog)
+- [Google](https://gbmc.googlesource.com/openbmc/+/refs/heads/master/meta-openembedded/meta-oe/recipes-support/libsimplelog)
 - [meta-voltumna](https://layers.openembedded.org/layerindex/branch/master/layer/meta-voltumna/) from [Elettra-Sincrotrone Trieste](https://www.elettra.eu/)
