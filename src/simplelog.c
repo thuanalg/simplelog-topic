@@ -1142,8 +1142,9 @@ spl_simple_log_thread(SIMPLE_LOG_ST *t)
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 char *
-spl_fmt_now_ext(
-    char *fmtt, int len, int lv, const char *filename, const char *funcname, int line, unsigned short *r, int *outlen)
+spl_fmt_now_ext( char * const fmtt, 
+	const int len, const int lv, const char *filename, 
+	const char *funcname, const int line, unsigned short *r, int *outlen)
 {
 	char *p = fmtt;
 	int ret = 0;
@@ -1180,7 +1181,11 @@ spl_fmt_now_ext(
 	*outlen += snprintf(fmtt + n, len - n, "[%s:%s:%d] [r: %d]\t",
 		filename, funcname, line, (int)*r); */
 	*outlen += snprintf(fmtt + n, SPL_RL_BUF - n, "[%s:%s:%d] ", filename, funcname, line);
+	*outlen = (*outlen < SPL_RL_BUF) ? (*outlen) : (SPL_RL_BUF -1);
+#if 0		
 	if (*outlen > len) {
+		*outlen = len;
+	
 		spl_malloc((*outlen + 1), p, char);
 		if (!p) {
 			exit(1);
@@ -1192,8 +1197,9 @@ spl_fmt_now_ext(
 			filename, funcname, line, (int)*r);
 		*/
 		*outlen += snprintf(fmtt + n, SPL_RL_BUF - n, "[%s:%s:%d] ", filename, funcname, line);
-	}
 
+	}
+#endif
 	return p;
 }
 

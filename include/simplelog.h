@@ -521,9 +521,9 @@ typedef struct __SPL_INPUT_ARG__ {
 			if (!SPL_CTRL_OBJ->trigger_thread)                                                                         \
 				spl_rel_sem(SPL_CTRL_OBJ->sem_rwfile);                                                             \
 			;                                                                                                   \
-			if (__pprefmt__ != __tnow__) {                                                                      \
+			/* if (__pprefmt__ != __tnow__) {                                                                      \
 				spl_free(__pprefmt__);                                                                      \
-			}                                                                                                   \
+			}  */                                                                                                 \
 		}                                                                                                           \
 	}
 
@@ -556,10 +556,11 @@ spl_finish_log();
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 DLL_API_SIMPLE_LOG char *
-spl_fmt_now_ext(char *fmtt, int len, int lv, 
+spl_fmt_now_ext(char * const fmtt, 
+	const int len, const int lv, 
 	const char *filename, 
 	const char *funcname, 
-	int line, unsigned short *r, int *);
+	const int line, unsigned short *r, int *);
 
 DLL_API_SIMPLE_LOG int
 spl_mutex_lock(void *mtx);
