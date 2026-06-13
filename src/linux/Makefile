@@ -1,6 +1,6 @@
 target=libsimplelog.so
 debugFlag=-g -fPIC -Wall -shared 
-releaseFlag=-fPIC -Wall -shared
+releaseFlag=-fPIC -Wall -shared -s
 LIBS+=-lpthread
 src=../simplelog.c
 INC=-I../ -I../../include

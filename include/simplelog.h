@@ -593,8 +593,10 @@ SIMPLE_LOG_ST *
 spl_control_obj();
 #endif
 
+#if 0
 DLL_API_SIMPLE_LOG const char *
 spl_err_txt(int i);
+#endif
 
 DLL_API_SIMPLE_LOG int
 spl_local_time_now(spl_local_time_st *st_time);

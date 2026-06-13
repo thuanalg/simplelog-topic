@@ -235,8 +235,10 @@ static const char *__splog_pathfolder[] = {SPL_LOG_PATHFOLDR, SPL_LOG_LEVEL, SPL
 
 static SIMPLE_LOG_ST __simple_log_static__;
 SIMPLE_LOG_ST * const __spl_ctr_obj__ = &__simple_log_static__;
+#if 0
 void
 spl_err_txt_init();
+#endif
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 static int
@@ -612,7 +614,9 @@ int
 spl_init_log_ext(SPL_INPUT_ARG *input)
 {
 	int ret = 0;
+#if 0	
 	spl_err_txt_init();
+#endif
 	do {
 		memcpy(__simple_log_static__.id_name, input->id_name, SPL_IDD_NAME);
 		ret = spl_init_log(input->folder);
@@ -2704,6 +2708,7 @@ spl_clean_sync_tool()
 	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+#if 0
 static const char *__spl_err_text__[SPL_END_ERROR + 1];
 
 void
@@ -2802,6 +2807,9 @@ spl_err_txt(int i)
 	}
 	return __spl_err_text__[i];
 }
+#endif
+
+
 #ifndef UNIX_LINUX
 #else
 #endif
