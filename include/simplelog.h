@@ -24,6 +24,7 @@
  *		<2025-Jun-01>
  *		<2025-Jun-11>
  *		<2025-Oct-04>
+ *		<2026-Jun-13>
  * Decription:
  *		The (only) main header file to export 4 APIs: [spl_init_log_ext, spllog, spllogtopic, spl_finish_log].
  */
@@ -256,7 +257,7 @@ typedef struct __SIMPLE_LOG_ST__ {
 	SIMPLE_LOG_TOPIC_ST *arr_topic; /*List od topics: SIMPLE_LOG_TOPIC_ST. Must be freed*/
 	int renew; /*In a thread of logger, NO NEED SYNC.*/
 	char path_template[SPL_TEMPLATE_LEN]; /*In a thread of logger, NO NEED SYNC.*/
-	const int ncpu; /*Number of CPU.*/
+	int ncpu; /*Number of CPU.*/
 	int trigger_thread; /*Use trigger thread or not.*/
 	void **arr_mtx; /*List of lock: Spinlock or Mutex. Must be freed.*/
 	char mode_straight; /* The order of records in same thread is arranged.*/

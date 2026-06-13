@@ -25,6 +25,7 @@
  *		<2025-Jun-11>
  *		<2025-Jun-14>
  *		<2025-Oct-06>
+ *		<2026-Jun-13>
  * Decription:
  *		The (only) main file to implement simple log.
  */
@@ -553,14 +554,13 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 		if (strcmp(key, SPL_LOG_NCPU) == 0) {
 			int sz = 0;
 			int n = 0;
-			int *tmp_cast = (int *)(&(t->ncpu));
 			sz = sscanf(buff, "%d", &n);
 			if (sz < 1) {
 				
-				*tmp_cast = 1;
+				n = 1;
 				break;
 			}
-			*tmp_cast = n;
+			t->ncpu = n;
 			break;
 		}
 		if (strcmp(key, SPL_LOG_TRIGGER) == 0) {
