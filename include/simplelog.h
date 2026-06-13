@@ -587,11 +587,6 @@ DLL_API_SIMPLE_LOG
 LLU
 spl_milli_now();
 
-#if 0
-DLL_API_SIMPLE_LOG
-SIMPLE_LOG_ST *
-spl_control_obj();
-#endif
 
 #if 0
 DLL_API_SIMPLE_LOG const char *

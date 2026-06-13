@@ -323,12 +323,7 @@ static int
 spl_set_off(int);
 static int
 spl_standardize_path(char *fname);
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-SIMPLE_LOG_ST *
-spl_control_obj()
-{
-	return (SIMPLE_LOG_ST *)&__simple_log_static__;
-}
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 static const char spl_text_gb_c[SPL_LOG_PEAK] = {
