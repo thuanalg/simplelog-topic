@@ -256,7 +256,7 @@ typedef struct __SIMPLE_LOG_ST__ {
 	SIMPLE_LOG_TOPIC_ST *arr_topic; /*List od topics: SIMPLE_LOG_TOPIC_ST. Must be freed*/
 	int renew; /*In a thread of logger, NO NEED SYNC.*/
 	char path_template[SPL_TEMPLATE_LEN]; /*In a thread of logger, NO NEED SYNC.*/
-	int ncpu; /*Number of CPU.*/
+	const int ncpu; /*Number of CPU.*/
 	int trigger_thread; /*Use trigger thread or not.*/
 	void **arr_mtx; /*List of lock: Spinlock or Mutex. Must be freed.*/
 	char mode_straight; /* The order of records in same thread is arranged.*/
@@ -349,13 +349,13 @@ typedef struct __SPL_INPUT_ARG__ {
 	}
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+#define SPL_CTRL_OBJ		__spl_ctr_obj__
 
 #define SPL_KEYBUF(__t__, __i__) ((spl_gen_data_st *)((char *)__t__->buf + (__t__->buff_size * __i__)))
 #define __spl_log_buf_level__(__lv__, ___fmttt___, ...)                                                                     \
 	{                                                                                                                   \
 		;                                                                                                           \
-		SIMPLE_LOG_ST *__t__ = spl_control_obj();                                                                   \
-		if (__t__->llevel <= (__lv__) && ___fmttt___[0]) {                                                          \
+		if (SPL_CTRL_OBJ->llevel <= (__lv__) && ___fmttt___[0]) {                                                          \
 			;                                                                                                   \
 			;                                                                                                   \
 			int __outlen__ = 0;                                                                                 \
@@ -383,31 +383,37 @@ typedef struct __SPL_INPUT_ARG__ {
 					;                                                                                   \
 					;                                                                                   \
 					;                                                                                   \
-					spl_mutex_lock(__t__->arr_mtx[__r__]);                                              \
+					spl_mutex_lock(SPL_CTRL_OBJ->arr_mtx[__r__]);                                              \
 					;                                                                                   \
-					if (__t__->range > SPL_KEYBUF(__t__, __r__)->pl) {                                  \
+					if (SPL_CTRL_OBJ->range > SPL_KEYBUF(SPL_CTRL_OBJ, __r__)->pl) {                                  \
 						;                                                                           \
-						memcpy(SPL_KEYBUF(__t__, __r__)->data + SPL_KEYBUF(__t__, __r__)->pl,       \
+						memcpy(                                                                     \
+						    SPL_KEYBUF(SPL_CTRL_OBJ, __r__)->data +                              \
+							   SPL_KEYBUF(SPL_CTRL_OBJ, __r__)->pl,       \
 						    __pprefmt__, __outlen__);                                               \
 						;                                                                           \
-						SPL_KEYBUF(__t__, __r__)->pl += __outlen__;                                 \
+						SPL_KEYBUF(SPL_CTRL_OBJ, __r__)->pl += __outlen__;                                 \
 						;                                                                           \
 						__len__ =                                                                   \
-						    snprintf(SPL_KEYBUF(__t__, __r__)->data + SPL_KEYBUF(__t__, __r__)->pl, \
-							__t__->krange - SPL_KEYBUF(__t__, __r__)->pl, ___fmttt___,          \
+						    snprintf(                                                         \
+						    SPL_KEYBUF(SPL_CTRL_OBJ, __r__)->data +                  \
+								       SPL_KEYBUF(SPL_CTRL_OBJ, __r__)->pl, \
+							SPL_CTRL_OBJ->krange - SPL_KEYBUF(SPL_CTRL_OBJ, __r__)->pl,             \
+						    ___fmttt___,          \
 							##__VA_ARGS__);                                                     \
 						;                                                                           \
 						if (__len__ > 0) {                                                          \
 							;                                                                   \
 							__outlen__ = SPL_MIN_AB(                                            \
-							    __len__, __t__->krange - SPL_KEYBUF(__t__, __r__)->pl);         \
+							    __len__,                                    \
+							    SPL_CTRL_OBJ->krange - SPL_KEYBUF(SPL_CTRL_OBJ, __r__)->pl);         \
 							;                                                                   \
-							SPL_KEYBUF(__t__, __r__)->pl += __outlen__;                         \
+							SPL_KEYBUF(SPL_CTRL_OBJ, __r__)->pl += __outlen__;                         \
 							;                                                                   \
 						};                                                                          \
 					}                                                                                   \
                                                                                                                             \
-					spl_mutex_unlock(__t__->arr_mtx[__r__]);                                            \
+					spl_mutex_unlock(SPL_CTRL_OBJ->arr_mtx[__r__]);                                            \
                                                                                                                             \
 					if (__len__ > 0)                                                                    \
 						break;                                                                      \
@@ -415,13 +421,13 @@ typedef struct __SPL_INPUT_ARG__ {
 					     r: %d", (int)r);*/                                                             \
 					;                                                                                   \
 					__r__++;                                                                            \
-					__r__ %= __t__->ncpu;                                                               \
+					__r__ %= SPL_CTRL_OBJ->ncpu;                                                               \
 					;                                                                                   \
 					;                                                                                   \
 					continue;                                                                           \
 				} while (1);                                                                                \
-				if (!__t__->trigger_thread)                                                                 \
-					spl_rel_sem(__t__->sem_rwfile);                                                     \
+				if (!SPL_CTRL_OBJ->trigger_thread)                                                                 \
+					spl_rel_sem(SPL_CTRL_OBJ->sem_rwfile);                                                     \
 				if (__pprefmt__ != __tnow__) {                                                              \
 					spl_free(__pprefmt__);                                                              \
 				}                                                                                           \
@@ -436,9 +442,7 @@ typedef struct __SPL_INPUT_ARG__ {
 #define __spl_log_buf_topic_level__(__lv__, __tpic__, ___fmttt___, ...)                                                     \
 	{                                                                                                                   \
 		;                                                                                                           \
-		SIMPLE_LOG_ST *__t__ = spl_control_obj();                                                                   \
-		;                                                                                                           \
-		if (__t__->llevel <= (__lv__) && ___fmttt___[0] && __t__->arr_topic) {                                      \
+		if (SPL_CTRL_OBJ->llevel <= (__lv__) && ___fmttt___[0] && SPL_CTRL_OBJ->arr_topic) {                                      \
 			;                                                                                                   \
 			short __tpp__ = 0;                                                                                  \
 			int __len__ = 0;                                                                                    \
@@ -453,7 +457,7 @@ typedef struct __SPL_INPUT_ARG__ {
 			;                                                                                                   \
 			char __tnow__[SPL_RL_BUF];                                                                          \
 			;                                                                                                   \
-			__tpp__ = __tpic__ % __t__->n_topic;                                                                \
+			__tpp__ = __tpic__ % SPL_CTRL_OBJ->n_topic;                                                                \
 			;                                                                                                   \
 			;                                                                                                   \
 			;                                                                                                   \
@@ -466,25 +470,26 @@ typedef struct __SPL_INPUT_ARG__ {
 			do {                                                                                                \
 				;                                                                                           \
 				;                                                                                           \
-				spl_mutex_lock(__t__->arr_mtx[__r__]);                                                      \
+				spl_mutex_lock(SPL_CTRL_OBJ->arr_mtx[__r__]);                                                      \
 				/*do                                                                                        \
 				{*/                                                                                         \
 				/*if(__t__->arr_topic){*/;                                                                  \
 				;                                                                                           \
 				;                                                                                           \
 				;                                                                                           \
-				if (__t__->range > SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->pl) {                   \
+				if (SPL_CTRL_OBJ->range > SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __r__)->pl) {                   \
 					;                                                                                   \
-					memcpy(SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->data +                      \
-						   SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->pl,                     \
+					memcpy(SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __r__)->data +                      \
+						   SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __r__)->pl,                     \
 					    __pprefmt__, __outlen__);                                                       \
 					;                                                                                   \
-					SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->pl += __outlen__;                  \
+					SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __r__)->pl += __outlen__;                  \
 					;                                                                                   \
 					;                                                                                   \
-					__len__ = snprintf(SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->data +          \
-							       SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->pl,         \
-					    __t__->krange - SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->pl,            \
+					__len__ = snprintf(SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __r__)->data +          \
+							       SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __r__)->pl,         \
+					    SPL_CTRL_OBJ->krange -                                                          \
+						SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __r__)->pl,            \
 					    ___fmttt___, ##__VA_ARGS__);                                                    \
 					; /*spl_console_log("--------------lllllllennnnnnnnnnnnnnnnn---r: %d, len: %d",     \
 					     (int)r, len);*/                                                                \
@@ -492,27 +497,28 @@ typedef struct __SPL_INPUT_ARG__ {
 					if (__len__ > 0) {                                                                  \
 						;                                                                           \
 						__outlen__ = SPL_MIN_AB(__len__,                                            \
-						    __t__->krange - SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->pl);   \
+						    SPL_CTRL_OBJ->krange -                                         \
+								 SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __r__)->pl);   \
 						;                                                                           \
 						;                                                                           \
-						SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->pl += __outlen__;          \
+						SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __r__)->pl += __outlen__;          \
 					}                                                                                   \
 				}                                                                                           \
 				/*}*/                                                                                       \
 				/*}                                                                                         \
 				while(0);*/                                                                                 \
-				spl_mutex_unlock(__t__->arr_mtx[__r__]);                                                    \
+				spl_mutex_unlock(SPL_CTRL_OBJ->arr_mtx[__r__]);                                                    \
 				if (__len__ > 0)                                                                            \
 					break;                                                                              \
 				;                                                                                           \
 				;                                                                                           \
 				__r__++;                                                                                    \
-				__r__ %= __t__->ncpu;                                                                       \
+				__r__ %= SPL_CTRL_OBJ->ncpu;                                                                       \
 				;                                                                                           \
 				continue;                                                                                   \
 			} while (1);                                                                                        \
-			if (!__t__->trigger_thread)                                                                         \
-				spl_rel_sem(__t__->sem_rwfile);                                                             \
+			if (!SPL_CTRL_OBJ->trigger_thread)                                                                         \
+				spl_rel_sem(SPL_CTRL_OBJ->sem_rwfile);                                                             \
 			;                                                                                                   \
 			if (__pprefmt__ != __tnow__) {                                                                      \
 				spl_free(__pprefmt__);                                                                      \
@@ -580,15 +586,19 @@ DLL_API_SIMPLE_LOG
 LLU
 spl_milli_now();
 
+#if 0
 DLL_API_SIMPLE_LOG
 SIMPLE_LOG_ST *
 spl_control_obj();
+#endif
 
 DLL_API_SIMPLE_LOG const char *
 spl_err_txt(int i);
 
 DLL_API_SIMPLE_LOG int
 spl_local_time_now(spl_local_time_st *st_time);
+
+extern DLL_API_SIMPLE_LOG SIMPLE_LOG_ST * const __spl_ctr_obj__;
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 #ifdef __cplusplus

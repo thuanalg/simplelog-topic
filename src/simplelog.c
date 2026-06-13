@@ -233,7 +233,7 @@ static const char *__splog_pathfolder[] = {SPL_LOG_PATHFOLDR, SPL_LOG_LEVEL, SPL
     SPL_LOG_END_CFG, 0};
 
 static SIMPLE_LOG_ST __simple_log_static__;
-;
+SIMPLE_LOG_ST * const __spl_ctr_obj__ = &__simple_log_static__;
 void
 spl_err_txt_init();
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
@@ -474,7 +474,7 @@ int
 spl_init_log_parse(char *buff, char *key, char *isEnd)
 {
 	int ret = SPL_NO_ERROR;
-	SIMPLE_LOG_ST *t = (SIMPLE_LOG_ST *)&__simple_log_static__;
+	SIMPLE_LOG_ST * const t = (SIMPLE_LOG_ST *)&__simple_log_static__;
 	do {
 		if (strcmp(key, SPL_LOG_PATHFOLDR) == 0) {
 			if (!buff[0]) {
@@ -553,12 +553,14 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 		if (strcmp(key, SPL_LOG_NCPU) == 0) {
 			int sz = 0;
 			int n = 0;
+			int *tmp_cast = (int *)(&(t->ncpu));
 			sz = sscanf(buff, "%d", &n);
 			if (sz < 1) {
-				t->ncpu = 1;
+				
+				*tmp_cast = 1;
 				break;
 			}
-			t->ncpu = n;
+			*tmp_cast = n;
 			break;
 		}
 		if (strcmp(key, SPL_LOG_TRIGGER) == 0) {
@@ -635,7 +637,7 @@ spl_init_log(char *pathcfg)
 	char buf[1024];
 	/*void* obj = 0;*/
 	char isEnd = 0;
-	__simple_log_static__.ncpu = 1;
+	//__simple_log_static__.ncpu = 1;
 	do {
 		memset(buf, 0, sizeof(buf));
 		/*
@@ -883,8 +885,8 @@ spl_written_thread_routine(void *lpParam)
 	int ret = 0, sz = 0, err = 0;
 	int werr = 0;
 
-	register char is_off = 0;
-	register int i = 0, j = 0;
+	char is_off = 0;
+	int i = 0, j = 0;
 
 	char **main_src_thrd_buf = 0;
 	char ***src_topic_thrd_buf = 0;
