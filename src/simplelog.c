@@ -880,7 +880,7 @@ spl_written_thread_routine(void *lpParam)
 #endif
 {
 	int k = 0;
-	SIMPLE_LOG_ST *t = (SIMPLE_LOG_ST *)lpParam;
+	SIMPLE_LOG_ST * const t = (SIMPLE_LOG_ST *)lpParam;
 	int ret = 0, sz = 0, err = 0;
 	int werr = 0;
 
@@ -1202,7 +1202,47 @@ spl_fmt_now_ext( char * const fmtt,
 #endif
 	return p;
 }
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+void
+spl_fmt_now_ext1(SPL_FMT_PARAM * const p)
+{
+	//char *p = fmtt;
+	int ret = 0;
+	spl_local_time_st stt = {0};
+	int n = 0;
+	LLU threadiid = 0;
 
+	threadiid = (LLU)spl_get_threadid();
+	p->outlen = 0;
+	ret = spl_local_time_now(&stt);
+	if (ret) {
+		return;
+	}
+#if 1	
+	p->r = (SPL_CTRL_OBJ->mode_straight ? 
+		threadiid : stt.nn ) 
+		% SPL_CTRL_OBJ->ncpu;
+#else
+	#ifndef __MODE_STRAIGHT__
+		*r = (stt.nn % __simple_log_static__.ncpu);
+	#else
+		*r = (threadiid % __simple_log_static__.ncpu);
+	#endif
+#endif
+	n = sprintf(p->fmtt, SPL_FMT_DATE_ADDING_X "[%c] [tid\t%llu]\t", stt.year + YEAR_PADDING, stt.month + MONTH_PADDING,
+	    stt.day, stt.hour, stt.minute, stt.sec, (int)stt.nn, spl_text_gb_c[p->lv % SPL_LOG_PEAK], threadiid);
+	if (n < 1) {
+		ret = SPL_LOG_PRINTF_ERROR;
+		return;
+	}
+	p->outlen = n;
+
+	p->outlen += snprintf(p->fmtt + n, SPL_RL_BUF - n, "[%s:%s:%d] ", 
+		p->filename, p->funcname, p->line);
+	p->outlen = (p->outlen < SPL_RL_BUF) ? (p->outlen) : (SPL_RL_BUF -1);
+
+	return;
+}
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_fmmt_now(char *fmtt, int len)

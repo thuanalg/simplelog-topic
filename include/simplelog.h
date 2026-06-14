@@ -285,6 +285,16 @@ typedef struct __SPL_INPUT_ARG__ {
 	SPL_CALLBACL_FUNCTION fn; /* Callback function pointer (fn(obj)). */
 	SPL_CALLBACL_DATA *obj; /* Data pointer passed to the callback function (fn(obj)). */
 } SPL_INPUT_ARG;
+
+typedef struct __SPL_FMT_PARAM__ {
+	char fmtt[SPL_RL_BUF]; /* In/Output format. */
+	const char *filename; 
+	const char *funcname;
+	const int line;
+	const int lv; /* Log level. */
+	unsigned short r; /* Random slot. */
+	int outlen; /* Real length of fmtt. */
+} SPL_FMT_PARAM;
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 #define __FILLE__(__p__)                                                                                                    \
@@ -561,6 +571,9 @@ spl_fmt_now_ext(char * const fmtt,
 	const char *filename, 
 	const char *funcname, 
 	const int line, unsigned short *r, int *);
+
+DLL_API_SIMPLE_LOG void
+spl_fmt_now_ext1(SPL_FMT_PARAM * const p);
 
 DLL_API_SIMPLE_LOG int
 spl_mutex_lock(void *mtx);
