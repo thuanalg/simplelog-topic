@@ -559,6 +559,9 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 				n = 1;
 				break;
 			}
+			#if defined(_GNU_SOURCE) && defined(__LINUX__)
+			n = SPL_MAX_AB(sysconf(_SC_NPROCESSORS_ONLN), n);
+			#endif
 			t->ncpu = n;
 			break;
 		}
