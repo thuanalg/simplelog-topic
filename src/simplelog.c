@@ -38,8 +38,8 @@
 #include <time.h>
 #ifndef UNIX_LINUX
 #include <Windows.h>
-#define YEAR_PADDING              0
-#define MONTH_PADDING             0
+#define YEAR_PADDING 0
+#define MONTH_PADDING 0
 #else
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -61,13 +61,13 @@
 #include <mach/clock.h>
 #include <mach/clock_types.h>
 #endif
-#define YEAR_PADDING              1900
-#define MONTH_PADDING             1
+#define YEAR_PADDING 1900
+#define MONTH_PADDING 1
 
 #define SPL_LOG_UNIX__SHARED_MODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
-#define SPL_LOG_UNIX_CREATE_MODE  (O_CREAT | O_RDWR | O_EXCL)
-#define SPL_LOG_UNIX_OPEN_MODE    (O_RDWR | O_EXCL)
-#define SPL_LOG_UNIX_PROT_FLAGS   (PROT_READ | PROT_WRITE | PROT_EXEC)
+#define SPL_LOG_UNIX_CREATE_MODE (O_CREAT | O_RDWR | O_EXCL)
+#define SPL_LOG_UNIX_OPEN_MODE (O_RDWR | O_EXCL)
+#define SPL_LOG_UNIX_PROT_FLAGS (PROT_READ | PROT_WRITE | PROT_EXEC)
 #endif
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
@@ -162,40 +162,40 @@
 	}
 #endif
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-#define SPL_SEM_NAME_RW           "_SEM_RW"
-#define SPL_SEM_NAME_OFF          "_SEM_OFF"
+#define SPL_SEM_NAME_RW "_SEM_RW"
+#define SPL_SEM_NAME_OFF "_SEM_OFF"
 
-#define SPL_MTX_NAME_RW           "_MTX_RW"
-#define SPL_MTX_NAME_OFF          "_MTX_OFF"
+#define SPL_MTX_NAME_RW "_MTX_RW"
+#define SPL_MTX_NAME_OFF "_MTX_OFF"
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
-#define SPL_LOG_PATHFOLDR         "pathfoder="
-#define SPL_LOG_LEVEL             "level="
-#define SPL_LOG_BUFF_SIZE         "buffsize="
-#define SPL_MAX_SZ_MSG            "max_sz_msg="
-#define SPL_LOG_ROT_SIZE          "rotation_size="
-#define SPL_LOG_TOPIC             "topic="
-#define SPL_LOG_NCPU              "ncpu="
-#define SPL_LOG_TRIGGER           "trigger="
-#define SPL_LOG_SHARED_KEY        "shared_key="
-#define SPL_LOG_MODE_STRAIGHT     "mode_straight="
-#define SPL_LOG_END_CFG           "end_configuring="
+#define SPL_LOG_PATHFOLDR "pathfoder="
+#define SPL_LOG_LEVEL "level="
+#define SPL_LOG_BUFF_SIZE "buffsize="
+#define SPL_MAX_SZ_MSG "max_sz_msg="
+#define SPL_LOG_ROT_SIZE "rotation_size="
+#define SPL_LOG_TOPIC "topic="
+#define SPL_LOG_NCPU "ncpu="
+#define SPL_LOG_TRIGGER "trigger="
+#define SPL_LOG_SHARED_KEY "shared_key="
+#define SPL_LOG_MODE_STRAIGHT "mode_straight="
+#define SPL_LOG_END_CFG "end_configuring="
 
-#define SPL_FILE_NAME_FMT         "%s\\%s\\%s_%.8d.log"
-#define SPL_FILE_NAME_FMT_TOPIC   "%s\\%s\\%s"
-#define SPL_FMT_DATE_ADDING       "%.4d-%.2d-%.2d"
-#define SPL_FMT_HOUR_ADDING       "%.2d:%.2d:%.2d"
-#define SPL_FMT_DELT_ADDING       "%s %s.%.9u"
-#define SPL_FMT_MILL_ADDING       "%s %s.%.9d"
-#define SPL_FMT_DATE_ADDING_X     "\n[%.4d-%.2d-%.2d %.2d:%.2d:%.2d.%.9d] "
-#define HHHHHHHHHHH               "%llu]\t"
+#define SPL_FILE_NAME_FMT "%s\\%s\\%s_%.8d.log"
+#define SPL_FILE_NAME_FMT_TOPIC "%s\\%s\\%s"
+#define SPL_FMT_DATE_ADDING "%.4d-%.2d-%.2d"
+#define SPL_FMT_HOUR_ADDING "%.2d:%.2d:%.2d"
+#define SPL_FMT_DELT_ADDING "%s %s.%.9u"
+#define SPL_FMT_MILL_ADDING "%s %s.%.9d"
+#define SPL_FMT_DATE_ADDING_X "\n[%.4d-%.2d-%.2d %.2d:%.2d:%.2d.%.9d] "
+#define HHHHHHHHHHH "%llu]\t"
 
-#define SPL_TEXT_UNKNOWN          "U"
-#define SPL_TEXT_DEBUG            "D"
-#define SPL_TEXT_INFO             "I"
-#define SPL_TEXT_WARN             "W"
-#define SPL_TEXT_ERROR            "E"
-#define SPL_TEXT_FATAL            "F"
+#define SPL_TEXT_UNKNOWN "U"
+#define SPL_TEXT_DEBUG "D"
+#define SPL_TEXT_INFO "I"
+#define SPL_TEXT_WARN "W"
+#define SPL_TEXT_ERROR "E"
+#define SPL_TEXT_FATAL "F"
 
 #define SPL_CASTGEN(__t__) ((spl_gen_data_st *)__t__)
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
@@ -211,7 +211,7 @@ splUnlockSpinlock(volatile long *p);
 
 /*static
 	volatile long spl_rw_spin = 0;*/
-#define THREAD_ROUTINE            LPTHREAD_START_ROUTINE
+#define THREAD_ROUTINE LPTHREAD_START_ROUTINE
 #else
 /*pthread_spinlock_t	spl_rw_spin; */
 typedef void *(*THREAD_ROUTINE)(void *);
@@ -234,7 +234,7 @@ static const char *__splog_pathfolder[] = {SPL_LOG_PATHFOLDR, SPL_LOG_LEVEL, SPL
     SPL_LOG_END_CFG, 0};
 
 static SIMPLE_LOG_ST __simple_log_static__;
-SIMPLE_LOG_ST * const __spl_ctr_obj__ = &__simple_log_static__;
+SIMPLE_LOG_ST *const __spl_ctr_obj__ = &__simple_log_static__;
 #if 0
 void
 spl_err_txt_init();
@@ -472,7 +472,7 @@ int
 spl_init_log_parse(char *buff, char *key, char *isEnd)
 {
 	int ret = SPL_NO_ERROR;
-	SIMPLE_LOG_ST * const t = (SIMPLE_LOG_ST *)&__simple_log_static__;
+	SIMPLE_LOG_ST *const t = (SIMPLE_LOG_ST *)&__simple_log_static__;
 	do {
 		if (strcmp(key, SPL_LOG_PATHFOLDR) == 0) {
 			if (!buff[0]) {
@@ -553,7 +553,6 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 			int n = 0;
 			sz = sscanf(buff, "%d", &n);
 			if (sz < 1) {
-				
 				n = 1;
 				break;
 			}
@@ -586,8 +585,7 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 			int n = 0, sz = 0;
 			sz = sscanf(buff, "%d", &n);
 			t->mode_straight = n ? 1 : 0;
-			spl_console_log("buff %s, t->mode_straight: %d, sz: %d.", 
-				buff, t->mode_straight, sz);
+			spl_console_log("buff %s, t->mode_straight: %d, sz: %d.", buff, t->mode_straight, sz);
 			break;
 		}
 		if (strcmp(key, SPL_LOG_END_CFG) == 0) {
@@ -880,7 +878,7 @@ spl_written_thread_routine(void *lpParam)
 #endif
 {
 	int k = 0;
-	SIMPLE_LOG_ST * const t = (SIMPLE_LOG_ST *)lpParam;
+	SIMPLE_LOG_ST *const t = (SIMPLE_LOG_ST *)lpParam;
 	int ret = 0, sz = 0, err = 0;
 	int werr = 0;
 
@@ -948,7 +946,6 @@ spl_written_thread_routine(void *lpParam)
 			exit(1);
 		}
 		while (1) {
-			
 			if (is_off) {
 				break;
 			}
@@ -1140,73 +1137,13 @@ spl_simple_log_thread(SIMPLE_LOG_ST *t)
 	} while (0);
 	return ret;
 }
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-char *
-spl_fmt_now_ext( char * const fmtt, 
-	const int len, const int lv, const char *filename, 
-	const char *funcname, const int line, unsigned short *r, int *outlen)
-{
-	char *p = fmtt;
-	int ret = 0;
-	spl_local_time_st stt = {0};
-	int n = 0;
-	LLU threadiid = 0;
 
-	threadiid = (LLU)spl_get_threadid();
-	*outlen = 0;
-	ret = spl_local_time_now(&stt);
-	if (ret) {
-		return p;
-	}
-#if 1	
-	*r = (__simple_log_static__.mode_straight ? 
-		threadiid : stt.nn ) 
-		% __simple_log_static__.ncpu;
-#else
-	#ifndef __MODE_STRAIGHT__
-		*r = (stt.nn % __simple_log_static__.ncpu);
-	#else
-		*r = (threadiid % __simple_log_static__.ncpu);
-	#endif
-#endif
-	n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X "[%c] [tid\t%llu]\t", stt.year + YEAR_PADDING, stt.month + MONTH_PADDING,
-	    stt.day, stt.hour, stt.minute, stt.sec, (int)stt.nn, spl_text_gb_c[lv % SPL_LOG_PEAK], threadiid);
-	if (n < 1) {
-		ret = SPL_LOG_PRINTF_ERROR;
-		return p;
-	}
-	*outlen = n;
-
-	/*
-	*outlen += snprintf(fmtt + n, len - n, "[%s:%s:%d] [r: %d]\t",
-		filename, funcname, line, (int)*r); */
-	*outlen += snprintf(fmtt + n, SPL_RL_BUF - n, "[%s:%s:%d] ", filename, funcname, line);
-	*outlen = (*outlen < SPL_RL_BUF) ? (*outlen) : (SPL_RL_BUF -1);
-#if 0		
-	if (*outlen > len) {
-		*outlen = len;
-	
-		spl_malloc((*outlen + 1), p, char);
-		if (!p) {
-			exit(1);
-		}
-		memcpy(p, fmtt, n);
-		*outlen = n;
-		/*
-			*outlen += sprintf(p + n, "[%s:%s:%d] [r: %d]\t",
-			filename, funcname, line, (int)*r);
-		*/
-		*outlen += snprintf(fmtt + n, SPL_RL_BUF - n, "[%s:%s:%d] ", filename, funcname, line);
-
-	}
-#endif
-	return p;
-}
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 void
-spl_fmt_now_ext1(SPL_FMT_PARAM * const p)
+spl_fmt_now_ext(SPL_FMT_PARAM *const p)
 {
-	//char *p = fmtt;
+	// char *p = fmtt;
 	int ret = 0;
 	spl_local_time_st stt = {0};
 	int n = 0;
@@ -1218,16 +1155,14 @@ spl_fmt_now_ext1(SPL_FMT_PARAM * const p)
 	if (ret) {
 		return;
 	}
-#if 1	
-	p->r = (SPL_CTRL_OBJ->mode_straight ? 
-		threadiid : stt.nn ) 
-		% SPL_CTRL_OBJ->ncpu;
+#if 1
+	p->r = (SPL_CTRL_OBJ->mode_straight ? threadiid : stt.nn) % SPL_CTRL_OBJ->ncpu;
 #else
-	#ifndef __MODE_STRAIGHT__
-		*r = (stt.nn % SPL_CTRL_OBJ->ncpu);
-	#else
-		*r = (threadiid % SPL_CTRL_OBJ->ncpu);
-	#endif
+#ifndef __MODE_STRAIGHT__
+	*r = (stt.nn % SPL_CTRL_OBJ->ncpu);
+#else
+	*r = (threadiid % SPL_CTRL_OBJ->ncpu);
+#endif
 #endif
 	n = sprintf(p->fmtt, SPL_FMT_DATE_ADDING_X "[%c] [tid\t%llu]\t", stt.year + YEAR_PADDING, stt.month + MONTH_PADDING,
 	    stt.day, stt.hour, stt.minute, stt.sec, (int)stt.nn, spl_text_gb_c[p->lv % SPL_LOG_PEAK], threadiid);
@@ -1237,9 +1172,8 @@ spl_fmt_now_ext1(SPL_FMT_PARAM * const p)
 	}
 	p->outlen = n;
 
-	p->outlen += snprintf(p->fmtt + n, SPL_RL_BUF - n, "[%s:%s:%d] ", 
-		p->filename, p->funcname, p->line);
-	p->outlen = (p->outlen < SPL_RL_BUF) ? (p->outlen) : (SPL_RL_BUF -1);
+	p->outlen += snprintf(p->fmtt + n, SPL_RL_BUF - n, "[%s:%s:%d] ", p->filename, p->funcname, p->line);
+	p->outlen = (p->outlen < SPL_RL_BUF) ? (p->outlen) : (SPL_RL_BUF - 1);
 
 	return;
 }
@@ -1300,7 +1234,7 @@ spl_gen_file(SIMPLE_LOG_ST *t, int *sz, int limit, int *index)
 			spl_console_log("spl_local_time_now: ret: %d.\n", ret);
 			break;
 		}
-		
+
 		if (!t->fp) {
 			/*Fix at v1.0.8 - 2025-Jun-14*/
 			memcpy(&(t->lc_time_now), &lt, sizeof(spl_local_time_st));
@@ -1378,7 +1312,7 @@ spl_gen_file(SIMPLE_LOG_ST *t, int *sz, int limit, int *index)
 		if (!t->renew) {
 			break;
 		}
-		
+
 		spl_get_fname_now(fmt_file_name);
 		ret = spl_folder_sup(t->folder, &(t->lc_time_now), yearmonth);
 		if (ret) {
@@ -1452,7 +1386,7 @@ spl_rel_sem(void *sem)
 			spl_err("SPL_sem_post");
 		}
 #else
-	#if 0
+#if 0
 		int val = 0;
 		int err = sem_getvalue((sem_t *)sem, &val);
 		if (!err) {
@@ -1460,7 +1394,7 @@ spl_rel_sem(void *sem)
 				SPL_sem_post(sem);
 			}
 		}
-	#endif
+#endif
 		err = SPL_sem_post(sem);
 		if (err) {
 			ret = SPL_LOG_PX_SEM_REL_OBJECT;
@@ -1725,9 +1659,8 @@ spl_gen_topics(SIMPLE_LOG_ST *t)
 			}
 			do {
 				int err = 0;
-				snprintf(path, SPL_FULLPATH_LEN, "%s-%s-%.7d.log", 
-					t->path_template, 
-					t->arr_topic[i].topic, t->arr_topic[i].index);
+				snprintf(path, SPL_FULLPATH_LEN, "%s-%s-%.7d.log", t->path_template, t->arr_topic[i].topic,
+				    t->arr_topic[i].index);
 
 				FFOPEN(t->arr_topic[i].fp, path, "a+");
 				if (!t->arr_topic[i].fp) {
@@ -1768,8 +1701,7 @@ spl_gen_topics(SIMPLE_LOG_ST *t)
 					}
 					t->arr_topic[i].index = 0;
 					t->arr_topic[i].fizize = 0;
-					snprintf(path, SPL_FULLPATH_LEN, 
-						"%s-%s-%.7d.log", t->path_template,
+					snprintf(path, SPL_FULLPATH_LEN, "%s-%s-%.7d.log", t->path_template,
 					    t->arr_topic[i].topic, t->arr_topic[i].index);
 					/*
 					//t->arr_topic[i].fp = fopen(path, "a+");
@@ -1802,9 +1734,7 @@ spl_gen_topics(SIMPLE_LOG_ST *t)
 
 				t->arr_topic[i].fizize = 0;
 
-				snprintf(path, SPL_FULLPATH_LEN, 
-					"%s-%s-%.7d.log", 
-					t->path_template, t->arr_topic[i].topic,
+				snprintf(path, SPL_FULLPATH_LEN, "%s-%s-%.7d.log", t->path_template, t->arr_topic[i].topic,
 				    t->arr_topic[i].index);
 				/*
 				//t->arr_topic[i].fp = fopen(path, "a+");
@@ -2849,7 +2779,6 @@ spl_err_txt(int i)
 	return __spl_err_text__[i];
 }
 #endif
-
 
 #ifndef UNIX_LINUX
 #else

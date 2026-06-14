@@ -371,9 +371,9 @@ typedef struct __SPL_FMT_PARAM__ {
 			int __outlen__ = 0;                                                                                 \
 			;                                                                                                   \
 			const char *__pfn__ = 0; /*char __isOof = 0;*/                                                      \
-			;                                                                                                  \
+			;                                                                                                   \
 			__FILLE__(__pfn__);                                                                                 \
-			;                                                                                                 \
+			;                                                                                                   \
 			{                                                                                                   \
 				;                                                                                           \
 				SPL_FMT_PARAM __pr__ = {.fmtt = {0},                                                        \
@@ -384,8 +384,7 @@ typedef struct __SPL_FMT_PARAM__ {
 				    .r = 0,                                                                                 \
 				    .outlen = 0};                                                                           \
 				;                                                                                           \
-				spl_fmt_now_ext1(&__pr__);                                                                  \
-				;                                                                                           \
+				spl_fmt_now_ext(&__pr__);                                                                   \
 				;                                                                                           \
 				do {                                                                                        \
 					;                                                                                   \
@@ -428,7 +427,6 @@ typedef struct __SPL_FMT_PARAM__ {
 					(__pr__.r)++;                                                                       \
 					(__pr__.r) %= SPL_CTRL_OBJ->ncpu;                                                   \
 					;                                                                                   \
-					;                                                                                   \
 					continue;                                                                           \
 				} while (1);                                                                                \
 				if (!SPL_CTRL_OBJ->trigger_thread)                                                          \
@@ -450,7 +448,8 @@ typedef struct __SPL_FMT_PARAM__ {
 		if (SPL_CTRL_OBJ->llevel <= (__lv__) && ___fmttt___[0] && SPL_CTRL_OBJ->arr_topic) {                        \
 			;                                                                                                   \
 			short __tpp__ = 0;                                                                                  \
-			int __len__ = 0;;                                                                                                   \
+			int __len__ = 0;                                                                                    \
+			;                                                                                                   \
 			const char *__pfn__ = 0;                                                                            \
 			;                                                                                                   \
 			int __outlen__ = 0;                                                                                 \
@@ -468,33 +467,33 @@ typedef struct __SPL_FMT_PARAM__ {
 				    .lv = (__lv__),                                                                         \
 				    .r = 0,                                                                                 \
 				    .outlen = 0};                                                                           \
-				;spl_fmt_now_ext1(&__pr__);    \
+				;                                                                                           \
+				spl_fmt_now_ext(&__pr__);                                                                   \
 				;                                                                                           \
 				do {                                                                                        \
-					;__outlen__ =  __pr__.outlen;                                                                                  \
 					;                                                                                   \
-					spl_mutex_lock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                       \
+					__outlen__ = __pr__.outlen;                                                         \
+					;                                                                                   \
+					spl_mutex_lock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                    \
 					/*do                                                                                \
 					{*/                                                                                 \
 					/*if(__t__->arr_topic){*/;                                                          \
 					;                                                                                   \
-					;                                                                                   \
-					;                                                                                   \
 					if (SPL_CTRL_OBJ->range >                                                           \
-					    SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl) {                   \
+					    SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl) {                \
 						;                                                                           \
-						memcpy(SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->data +       \
-							   SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl,      \
-							   __pr__.fmtt, __outlen__);                                               \
+						memcpy(SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->data +    \
+							   SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl,   \
+						    __pr__.fmtt, __outlen__);                                               \
 						;                                                                           \
-						SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl += __outlen__;   \
-						;                                                                           \
+						SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl +=            \
+						    __outlen__;                                                             \
 						;                                                                           \
 						__len__ = snprintf(                                                         \
-						    SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->data +          \
-							SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl,         \
+						    SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->data +       \
+							SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl,      \
 						    SPL_CTRL_OBJ->krange -                                                  \
-							SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl,         \
+							SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl,      \
 						    ___fmttt___, ##__VA_ARGS__);                                            \
 						; /*spl_console_log("--------------lllllllennnnnnnnnnnnnnnnn---r: %d, len:  \
 						     %d", (int)r, len);*/                                                   \
@@ -503,24 +502,23 @@ typedef struct __SPL_FMT_PARAM__ {
 							;                                                                   \
 							__outlen__ = SPL_MIN_AB(__len__,                                    \
 							    SPL_CTRL_OBJ->krange -                                          \
-								SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)      \
+								SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)   \
 								    ->pl);                                                  \
 							;                                                                   \
-							;                                                                   \
-							SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl +=       \
+							SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl +=    \
 							    __outlen__;                                                     \
 						}                                                                           \
 					}                                                                                   \
 					/*}*/                                                                               \
 					/*}                                                                                 \
 					while(0);*/                                                                         \
-					spl_mutex_unlock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                     \
+					spl_mutex_unlock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                  \
 					if (__len__ > 0)                                                                    \
 						break;                                                                      \
 					;                                                                                   \
 					;                                                                                   \
-					(__pr__.r)++;                                                                            \
-					(__pr__.r) %= SPL_CTRL_OBJ->ncpu;                                                        \
+					(__pr__.r)++;                                                                       \
+					(__pr__.r) %= SPL_CTRL_OBJ->ncpu;                                                   \
 					;                                                                                   \
 					continue;                                                                           \
 				} while (1);                                                                                \
@@ -528,7 +526,6 @@ typedef struct __SPL_FMT_PARAM__ {
 					spl_rel_sem(SPL_CTRL_OBJ->sem_rwfile);                                              \
 				;                                                                                           \
 			}                                                                                                   \
-			                                                                                               \
 		}                                                                                                           \
 	}
 
@@ -560,12 +557,8 @@ spl_finish_log();
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
-DLL_API_SIMPLE_LOG char *
-spl_fmt_now_ext(char *const fmtt, const int len, const int lv, const char *filename, const char *funcname, const int line,
-    unsigned short *r, int *);
-
 DLL_API_SIMPLE_LOG void
-spl_fmt_now_ext1(SPL_FMT_PARAM *const p);
+spl_fmt_now_ext(SPL_FMT_PARAM *const p);
 
 DLL_API_SIMPLE_LOG int
 spl_mutex_lock(void *mtx);
