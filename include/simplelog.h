@@ -290,7 +290,7 @@ typedef struct __SPL_FMT_PARAM__ {
 	char fmtt[SPL_RL_BUF]; /* In/Output format. */
 	const char *filename; 
 	const char *funcname;
-	const int line;
+	const int line; /* Current line. */
 	const int lv; /* Log level. */
 	unsigned short r; /* Random slot. */
 	int outlen; /* Real length of fmtt. */
@@ -367,23 +367,17 @@ typedef struct __SPL_FMT_PARAM__ {
 	{                                                                                                                   \
 		;                                                                                                           \
 		if (SPL_CTRL_OBJ->llevel <= (__lv__) && ___fmttt___[0]) {                                                          \
-			;                                                                                                   \
-			;                                                                                                   \
+			;;                                                                                                   \
 			int __outlen__ = 0;                                                                                 \
 			;                                                                                                   \
 			const char *__pfn__ = 0; /*char __isOof = 0;*/                                                      \
 			;                                                                                                   \
-			;                                                                                                   \
-			/*unsigned short __r__ = 0*/;                                                                           \
-			;                                                                                                   \
-			/*char __tnow__[SPL_RL_BUF]*/;                                                                          \
-			/*char *__pprefmt__ = 0; */                                                                              \
 			;__FILLE__(__pfn__);                                                                                                   \
-			;SPL_FMT_PARAM __pr__ = { .fmtt = {0}, .filename = __pfn__, .funcname =__FUNCTION__, .line = __LINE__, .lv = (__lv__), .r = 0, .outlen = 0};                                                                                                    \
+			;SPL_FMT_PARAM __pr__ = { .fmtt = {0}, .filename = __pfn__, \
+				.funcname =__FUNCTION__, .line = __LINE__, \
+				.lv = (__lv__), .r = 0, .outlen = 0};                                                                                                    \
 			;                                                                                                   \
-			;spl_fmt_now_ext1(&__pr__);                                                                                 \
-			/*__pprefmt__ = spl_fmt_now_ext(                                                                      \
-			    __tnow__, SPL_RL_BUF, __lv__, __pfn__, __FUNCTION__, __LINE__, &__r__, &__outlen__);  */          \
+			;spl_fmt_now_ext1(&__pr__);         \
 			;                                                                                                   \
 			{                                                                                                   \
 				do {                                                                                        \
@@ -391,8 +385,7 @@ typedef struct __SPL_FMT_PARAM__ {
 					int __len__ = 0;                                                                    \
 					;                                                                                   \
                     ;__outlen__ =   __pr__.outlen;                                                                                                      \
-					;                                                                                   \
-					;                                                                                   \
+					;;                                                                                   \
 					;                                                                                   \
 					spl_mutex_lock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                              \
 					;                                                                                   \
@@ -433,8 +426,7 @@ typedef struct __SPL_FMT_PARAM__ {
 					;                                                                                   \
 					(__pr__.r)++;                                                                            \
 					(__pr__.r) %= SPL_CTRL_OBJ->ncpu;                                                               \
-					;                                                                                   \
-					;                                                                                   \
+					;;                                                                                   \
 					continue;                                                                           \
 				} while (1);                                                                                \
 				if (!SPL_CTRL_OBJ->trigger_thread)                                                                 \
