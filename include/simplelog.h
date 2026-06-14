@@ -374,42 +374,42 @@ typedef struct __SPL_FMT_PARAM__ {
 			const char *__pfn__ = 0; /*char __isOof = 0;*/                                                      \
 			;                                                                                                   \
 			;                                                                                                   \
-			unsigned short __r__ = 0;                                                                           \
+			/*unsigned short __r__ = 0*/;                                                                           \
 			;                                                                                                   \
-			char __tnow__[SPL_RL_BUF];                                                                          \
-			char *__pprefmt__ = 0;                                                                              \
+			/*char __tnow__[SPL_RL_BUF]*/;                                                                          \
+			/*char *__pprefmt__ = 0; */                                                                              \
+			;__FILLE__(__pfn__);                                                                                                   \
+			;SPL_FMT_PARAM __pr__ = { .fmtt = {0}, .filename = __pfn__, .funcname =__FUNCTION__, .line = __LINE__, .lv = (__lv__), .r = 0, .outlen = 0};                                                                                                    \
 			;                                                                                                   \
-			;                                                                                                   \
-			;                                                                                                   \
-			__FILLE__(__pfn__);                                                                                 \
-			__pprefmt__ = spl_fmt_now_ext(                                                                      \
-			    __tnow__, SPL_RL_BUF, __lv__, __pfn__, __FUNCTION__, __LINE__, &__r__, &__outlen__);            \
+			;spl_fmt_now_ext1(&__pr__);                                                                                 \
+			/*__pprefmt__ = spl_fmt_now_ext(                                                                      \
+			    __tnow__, SPL_RL_BUF, __lv__, __pfn__, __FUNCTION__, __LINE__, &__r__, &__outlen__);  */          \
 			;                                                                                                   \
 			{                                                                                                   \
 				do {                                                                                        \
 					;                                                                                   \
 					int __len__ = 0;                                                                    \
 					;                                                                                   \
-                                                                                                                            \
+                    ;__outlen__ =   __pr__.outlen;                                                                                                      \
 					;                                                                                   \
 					;                                                                                   \
 					;                                                                                   \
-					spl_mutex_lock(SPL_CTRL_OBJ->arr_mtx[__r__]);                                              \
+					spl_mutex_lock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                              \
 					;                                                                                   \
-					if (SPL_CTRL_OBJ->range > SPL_KEYBUF(SPL_CTRL_OBJ, __r__)->pl) {                                  \
+					if (SPL_CTRL_OBJ->range > SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->pl) {                                  \
 						;                                                                           \
 						memcpy(                                                                     \
-						    SPL_KEYBUF(SPL_CTRL_OBJ, __r__)->data +                              \
-							   SPL_KEYBUF(SPL_CTRL_OBJ, __r__)->pl,       \
-						    __pprefmt__, __outlen__);                                               \
+						    SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->data +                              \
+							   SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->pl,       \
+							   __pr__.fmtt, __outlen__);                                               \
 						;                                                                           \
-						SPL_KEYBUF(SPL_CTRL_OBJ, __r__)->pl += __outlen__;                                 \
+						SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->pl += __outlen__;                                 \
 						;                                                                           \
 						__len__ =                                                                   \
 						    snprintf(                                                         \
-						    SPL_KEYBUF(SPL_CTRL_OBJ, __r__)->data +                  \
-								       SPL_KEYBUF(SPL_CTRL_OBJ, __r__)->pl, \
-							SPL_CTRL_OBJ->krange - SPL_KEYBUF(SPL_CTRL_OBJ, __r__)->pl,             \
+						    SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->data +                  \
+								       SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->pl, \
+							SPL_CTRL_OBJ->krange - SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->pl,             \
 						    ___fmttt___,          \
 							##__VA_ARGS__);                                                     \
 						;                                                                           \
@@ -417,31 +417,31 @@ typedef struct __SPL_FMT_PARAM__ {
 							;                                                                   \
 							__outlen__ = SPL_MIN_AB(                                            \
 							    __len__,                                    \
-							    SPL_CTRL_OBJ->krange - SPL_KEYBUF(SPL_CTRL_OBJ, __r__)->pl);         \
+							    SPL_CTRL_OBJ->krange - SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->pl);         \
 							;                                                                   \
-							SPL_KEYBUF(SPL_CTRL_OBJ, __r__)->pl += __outlen__;                         \
+							SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->pl += __outlen__;                         \
 							;                                                                   \
 						};                                                                          \
 					}                                                                                   \
                                                                                                                             \
-					spl_mutex_unlock(SPL_CTRL_OBJ->arr_mtx[__r__]);                                            \
+					spl_mutex_unlock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                            \
                                                                                                                             \
 					if (__len__ > 0)                                                                    \
 						break;                                                                      \
 					; /*spl_console_log("--OVER ===                                                     \
 					     r: %d", (int)r);*/                                                             \
 					;                                                                                   \
-					__r__++;                                                                            \
-					__r__ %= SPL_CTRL_OBJ->ncpu;                                                               \
+					(__pr__.r)++;                                                                            \
+					(__pr__.r) %= SPL_CTRL_OBJ->ncpu;                                                               \
 					;                                                                                   \
 					;                                                                                   \
 					continue;                                                                           \
 				} while (1);                                                                                \
 				if (!SPL_CTRL_OBJ->trigger_thread)                                                                 \
 					spl_rel_sem(SPL_CTRL_OBJ->sem_rwfile);                                                     \
-				if (__pprefmt__ != __tnow__) {                                                              \
+				/*if (__pprefmt__ != __tnow__) {                                                              \
 					spl_free(__pprefmt__);                                                              \
-				}                                                                                           \
+				}*/                                                                                           \
 			}                                                                                                   \
 		}                                                                                                           \
 	}
