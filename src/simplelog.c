@@ -1162,9 +1162,11 @@ spl_fmt_now_ext(SPL_FMT_PARAM *const p)
 		return;
 	}
 #if 1
+	
 #if defined(_GNU_SOURCE) && defined(__LINUX__)
 	p->r = sched_getcpu();
 #else
+	/* https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentprocessornumberex */
 	p->r = (SPL_CTRL_OBJ->mode_straight ? threadiid : stt.nn) % SPL_CTRL_OBJ->ncpu;
 #endif	
 #else
