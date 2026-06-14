@@ -1224,9 +1224,9 @@ spl_fmt_now_ext1(SPL_FMT_PARAM * const p)
 		% SPL_CTRL_OBJ->ncpu;
 #else
 	#ifndef __MODE_STRAIGHT__
-		*r = (stt.nn % __simple_log_static__.ncpu);
+		*r = (stt.nn % SPL_CTRL_OBJ->ncpu);
 	#else
-		*r = (threadiid % __simple_log_static__.ncpu);
+		*r = (threadiid % SPL_CTRL_OBJ->ncpu);
 	#endif
 #endif
 	n = sprintf(p->fmtt, SPL_FMT_DATE_ADDING_X "[%c] [tid\t%llu]\t", stt.year + YEAR_PADDING, stt.month + MONTH_PADDING,
