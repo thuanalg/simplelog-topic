@@ -70,7 +70,9 @@
 #define SPL_LOG_UNIX_OPEN_MODE (O_RDWR | O_EXCL)
 #define SPL_LOG_UNIX_PROT_FLAGS (PROT_READ | PROT_WRITE | PROT_EXEC)
 #endif
-
+#if defined(_GNU_SOURCE) && defined(__LINUX__)
+#include <sched.h>
+#endif
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 #ifndef UNIX_LINUX
@@ -1157,7 +1159,11 @@ spl_fmt_now_ext(SPL_FMT_PARAM *const p)
 		return;
 	}
 #if 1
+#if defined(_GNU_SOURCE) && defined(__LINUX__)
+	p->r = sched_getcpu();
+#else
 	p->r = (SPL_CTRL_OBJ->mode_straight ? threadiid : stt.nn) % SPL_CTRL_OBJ->ncpu;
+#endif	
 #else
 #ifndef __MODE_STRAIGHT__
 	*r = (stt.nn % SPL_CTRL_OBJ->ncpu);
