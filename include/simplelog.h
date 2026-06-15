@@ -290,8 +290,8 @@ typedef struct __SPL_FMT_PARAM__ {
 	char fmtt[SPL_RL_BUF]; /* In/Output format. */
 	const char *filename;
 	const char *funcname;
-	const int line; /* Current line. */
-	const int lv; /* Log level. */
+	int line; /* Current line. */
+	int lv; /* Log level. */
 	unsigned short r; /* Random slot. */
 	int outlen; /* Real length of fmtt. */
 } SPL_FMT_PARAM;
@@ -376,13 +376,11 @@ typedef struct __SPL_FMT_PARAM__ {
 			;                                                                                                   \
 			{                                                                                                   \
 				;                                                                                           \
-				SPL_FMT_PARAM __pr__ = {.fmtt = {0},                                                        \
-				    .filename = __pfn__,                                                                    \
-				    .funcname = __FUNCTION__,                                                               \
-				    .line = __LINE__,                                                                       \
-				    .lv = (__lv__),                                                                         \
-				    .r = 0,                                                                                 \
-				    .outlen = 0};                                                                           \
+				SPL_FMT_PARAM __pr__ = {0};              \
+				__pr__.filename = __pfn__;                                                                  \
+				__pr__.funcname = __FUNCTION__;                                                             \
+				__pr__.line = __LINE__;                                                                     \
+				__pr__.lv = (__lv__);                                                                       \
 				;                                                                                           \
 				spl_fmt_now_ext(&__pr__);                                                                   \
 				;                                                                                           \
@@ -460,14 +458,13 @@ typedef struct __SPL_FMT_PARAM__ {
 			;                                                                                                   \
 			{                                                                                                   \
 				;                                                                                           \
-				SPL_FMT_PARAM __pr__ = {.fmtt = {0},                                                        \
-				    .filename = __pfn__,                                                                    \
-				    .funcname = __FUNCTION__,                                                               \
-				    .line = __LINE__,                                                                       \
-				    .lv = (__lv__),                                                                         \
-				    .r = 0,                                                                                 \
-				    .outlen = 0};                                                                           \
-				;                                                                                           \
+				SPL_FMT_PARAM __pr__ = {0};                                                                 \
+				__pr__.filename = __pfn__;                                                                  \
+				__pr__.funcname = __FUNCTION__;                                                             \
+				__pr__.line = __LINE__;                                                                     \
+				__pr__.lv = (__lv__);                                                                       \
+				;                                                                           \
+				                                                                                          \
 				spl_fmt_now_ext(&__pr__);                                                                   \
 				;                                                                                           \
 				do {                                                                                        \
