@@ -638,9 +638,7 @@ spl_init_log(char *pathcfg)
 	char c = 0;
 	int count = 0;
 	char buf[1024];
-	/*void* obj = 0;*/
 	char isEnd = 0;
-	//__simple_log_static__.ncpu = 1;
 	do {
 		memset(buf, 0, sizeof(buf));
 		/*
@@ -1149,7 +1147,6 @@ spl_simple_log_thread(SIMPLE_LOG_ST *t)
 void
 spl_fmt_now_ext(SPL_FMT_PARAM *const p)
 {
-	// char *p = fmtt;
 	int ret = 0;
 	spl_local_time_st stt = {0};
 	int n = 0;
