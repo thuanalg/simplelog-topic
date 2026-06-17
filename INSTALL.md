@@ -5,7 +5,7 @@
 	- For windows-32: **cmake .. -G "Visual Studio 17 2022" -A win32**.  
 	- For windows-64: **cmake .. -G "Visual Studio 17 2022"**.  
 	- For Linux: **cmake .. -DUNIX_LINUX=1**.  If don't support _GNU_SOURCE.  
-	- For Linux: **cmake .. -DUNIX_LINUX=1 -D__LINUX__=1 -D_GNU_SOURCE=1**.  If support _GNU_SOURCE.  
+	- For Linux: \cmake .. -DUNIX_LINUX=1 -D__LINUX__=1 -D_GNU_SOURCE=1` (If support _GNU_SOURCE)`.  
 	- For MAC-OSX/Apple: **cmake .. -DUNIX_LINUX=1 -DMACOSX=1**.  
 	  
  
