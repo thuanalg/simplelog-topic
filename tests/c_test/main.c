@@ -13,7 +13,7 @@ win32_thread_routine(LPVOID lpParam);
 #include <pthread.h>
 void *
 posix_thread_routine(void *lpParam);
-#endif // !UNIX_LINUX
+#endif 
 
 void
 dotest();
@@ -92,8 +92,10 @@ dotest()
 	for (i = 0; i < num_threads; ++i) {
 		hpThread[i] = CreateThread(NULL, 0, win32_thread_routine, 0, 0, (dwpThreadId + i));
 	}
+#if 0	
 	// https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitformultipleobjects
 	// https://learn.microsoft.com/en-us/windows/win32/sync/waiting-for-multiple-objects
+#endif	
 	dwEvent = WaitForMultipleObjects(num_threads, // number of objects in array
 	    hpThread, // array of objects
 	    TRUE, // wait for any object
@@ -101,7 +103,9 @@ dotest()
 	free(dwpThreadId);
 	free(hpThread);
 #else
+#if 0
 	// https://man7.org/linux/man-pages/man3/pthread_create.3.html
+#endif	
 	pthread_t *pidds = 0;
 	pidds = (pthread_t *)malloc(num_threads * sizeof(pthread_t));
 	if (!pidds) {
@@ -120,14 +124,16 @@ dotest()
 
 #endif
 }
-
+#if 0
 // topic=sys,lib,exe,nayax,sksgn
+#endif
+
 #define spllogsys(__level__, __fmt__, ...) spllogtopic(__level__, 0, __fmt__, ##__VA_ARGS__);
 #define splloglib(__level__, __fmt__, ...) spllogtopic(__level__, 1, __fmt__, ##__VA_ARGS__);
 #define spllogexe(__level__, __fmt__, ...) spllogtopic(__level__, 2, __fmt__, ##__VA_ARGS__);
 #define spllognaxyax(__level__, __fmt__, ...) spllogtopic(__level__, 3, __fmt__, ##__VA_ARGS__);
 #define spllogsksgn(__level__, __fmt__, ...) spllogtopic(__level__, 4, __fmt__, ##__VA_ARGS__);
-// https://github.com/gabime/spdlog, 10 thread
+
 #ifndef UNIX_LINUX
 DWORD WINAPI
 win32_thread_routine(LPVOID lpParam)
@@ -136,7 +142,7 @@ win32_thread_routine(LPVOID lpParam)
 void *
 posix_thread_routine(void *lpParam)
 {
-#endif // !UNIX_LINUX
+#endif 
 	int count = 0;
 	/*#define SPL_TEST_FMT			"test log test log test log: %d"*/
 #define SPL_TEST_FMT "My test log : %d"
