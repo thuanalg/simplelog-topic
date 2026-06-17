@@ -4,8 +4,8 @@
 	- Come to root folder, **mkdir build && cd build**.  
 	- For windows-32: **cmake .. -G "Visual Studio 17 2022" -A win32**.  
 	- For windows-64: **cmake .. -G "Visual Studio 17 2022"**.  
-	- For Linux: **cmake .. -DUNIX_LINUX=1**.  If don't support _GNU_SOURCE.  
-	- For Linux: **cmake .. -DUNIX_LINUX=1 -D__LINUX__=1 -D_GNU_SOURCE=1**.  If support _GNU_SOURCE.  
+	- For Linux (Standard): **cmake .. -DUNIX_LINUX=1**.  If not support _GNU_SOURCE.  
+	- For Linux (With GNU Extensions): `cmake .. -DUNIX_LINUX=1 -D_GNU_SOURCE=1 -D__LINUX__=1`.  
 	- For MAC-OSX/Apple: **cmake .. -DUNIX_LINUX=1 -DMACOSX=1**.  
 	  
  
