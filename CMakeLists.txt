@@ -20,6 +20,12 @@ if(DEFINED UNIX_LINUX)
 	if(DEFINED MACOSX)
 		target_compile_definitions(simplelog PUBLIC __MACH__=1)
 	endif()
+	if(DEFINED _GNU_SOURCE)
+		target_compile_definitions(simplelog PUBLIC _GNU_SOURCE=1)
+	endif()
+	if(DEFINED __LINUX__)
+		target_compile_definitions(simplelog PUBLIC __LINUX__=1)
+	endif()		
 	set_target_properties(simplelog PROPERTIES  
 		VERSION 1.0.8 
 		SOVERSION 1 
