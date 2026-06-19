@@ -30,7 +30,7 @@
  */
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #ifndef ___SIMPLE_LOG__
-#define ___SIMPLE_LOG__
+#define ___SIMPLE_LOG__                 
 #include <stdio.h>
 #include <string.h>
 /*strrchr*/
@@ -40,25 +40,25 @@
 
 #if 0
 #ifndef UNIX_LINUX
-#define UNIX_LINUX
+#define UNIX_LINUX                      
 #endif
 #endif
 
 #if 0
 #ifndef __MACH__
-#define __MACH__
+#define __MACH__                        
 #endif
 #endif
 
 #if 0
 #ifndef SPL_USING_SPIN_LOCK
-#define SPL_USING_SPIN_LOCK
+#define SPL_USING_SPIN_LOCK             
 #endif // !SPL_USING_SPIN_LOCK
 #endif
 
 #if 0
 #ifndef __UNIX_LINUX_CPP11_AND_NEWERS__
-#define __UNIX_LINUX_CPP11_AND_NEWERS__
+#define __UNIX_LINUX_CPP11_AND_NEWERS__ 
 #endif
 #endif
 
@@ -70,49 +70,49 @@
 extern "C" {
 #endif
 
-#define LLU unsigned long long
+#define LLU                             unsigned long long
 
-#define SPL_LOG_BASE 0
-#define SPL_LOG_DEBUG 1
-#define SPL_LOG_INFO 2
-#define SPL_LOG_WARNING 3
-#define SPL_LOG_ERROR 4
-#define SPL_LOG_FATAL 5
-#define SPL_LOG_PEAK 6
+#define SPL_LOG_BASE                    0
+#define SPL_LOG_DEBUG                   1
+#define SPL_LOG_INFO                    2
+#define SPL_LOG_WARNING                 3
+#define SPL_LOG_ERROR                   4
+#define SPL_LOG_FATAL                   5
+#define SPL_LOG_PEAK                    6
 
 #if 0
 #ifndef SPL_RL_BUF
-#define SPL_RL_BUF 50
+#define SPL_RL_BUF                      50
 #endif
 #endif
 
-#define SPL_RL_BUF 256
-#define SPL_PATH_FOLDER (256 + 16)
-#define SPL_IDD_NAME 32
-#define SPL_TOPIC_SIZE 32
-#define SPL_MEMO_PADDING 2048
-#define SPL_SHARED_KEY_LEN 32
-#define SPL_SHARED_NAME_LEN 64
-#define SPL_FNAME_LEN (SPL_IDD_NAME + 32)
-#define SPL_TEMPLATE_LEN (SPL_PATH_FOLDER + SPL_FNAME_LEN + 32)
-#define SPL_FULLPATH_LEN (SPL_TEMPLATE_LEN + 32 + 16)
-#define SPL_MILLION 1000000
-#define SPL_RANGE_YEAR 10000
-#define SPL_RANGE_MONTH 13
-#define SPL_RANGE_DAY 32
+#define SPL_RL_BUF                      256
+#define SPL_PATH_FOLDER                 (256 + 16)
+#define SPL_IDD_NAME                    32
+#define SPL_TOPIC_SIZE                  32
+#define SPL_MEMO_PADDING                2048
+#define SPL_SHARED_KEY_LEN              32
+#define SPL_SHARED_NAME_LEN             64
+#define SPL_FNAME_LEN                   (SPL_IDD_NAME + 32)
+#define SPL_TEMPLATE_LEN                (SPL_PATH_FOLDER + SPL_FNAME_LEN + 32)
+#define SPL_FULLPATH_LEN                (SPL_TEMPLATE_LEN + 32 + 16)
+#define SPL_MILLION                     1000000
+#define SPL_RANGE_YEAR                  10000
+#define SPL_RANGE_MONTH                 13
+#define SPL_RANGE_DAY                   32
 
 #ifndef UNIX_LINUX
 #ifndef __SIMPLE_STATIC_LOG__
 #ifdef EXPORT_DLL_API_SIMPLE_LOG
-#define DLL_API_SIMPLE_LOG __declspec(dllexport)
+#define DLL_API_SIMPLE_LOG              __declspec(dllexport)
 #else
-#define DLL_API_SIMPLE_LOG __declspec(dllimport)
+#define DLL_API_SIMPLE_LOG              __declspec(dllimport)
 #endif
 #else
-#define DLL_API_SIMPLE_LOG
+#define DLL_API_SIMPLE_LOG              
 #endif
 #else
-#define DLL_API_SIMPLE_LOG
+#define DLL_API_SIMPLE_LOG              
 #endif /*! UNIX_LINUX */
 
 typedef enum __SPL_LOG_ERR_CODE__ {
@@ -214,8 +214,8 @@ typedef struct __SPL_GENERIC_DATA__ {
 	char data[0]; /*Generic data */
 } spl_gen_data_st;
 
-#define spl_uchar unsigned char
-#define spl_uint unsigned int
+#define spl_uchar                       unsigned char
+#define spl_uint                        unsigned int
 
 typedef struct __spl_local_time_st__ {
 	spl_uint year;
@@ -360,7 +360,7 @@ typedef struct __SPL_FMT_PARAM__ {
 	}
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-#define SPL_CTRL_OBJ __spl_ctr_obj__
+#define SPL_CTRL_OBJ                    __spl_ctr_obj__
 
 #define SPL_KEYBUF(__t__, __i__) ((spl_gen_data_st *)((char *)__t__->buf + (__t__->buff_size * __i__)))
 #define __spl_log_buf_level__(__lv__, ___fmttt___, ...)                                                                     \
@@ -376,7 +376,7 @@ typedef struct __SPL_FMT_PARAM__ {
 			;                                                                                                   \
 			{                                                                                                   \
 				;                                                                                           \
-				SPL_FMT_PARAM __pr__ = {0};              \
+				SPL_FMT_PARAM __pr__ = {0};                                                                 \
 				__pr__.filename = __pfn__;                                                                  \
 				__pr__.funcname = __FUNCTION__;                                                             \
 				__pr__.line = __LINE__;                                                                     \
@@ -463,8 +463,8 @@ typedef struct __SPL_FMT_PARAM__ {
 				__pr__.funcname = __FUNCTION__;                                                             \
 				__pr__.line = __LINE__;                                                                     \
 				__pr__.lv = (__lv__);                                                                       \
-				;                                                                           \
-				                                                                                          \
+				;                                                                                           \
+                                                                                                                            \
 				spl_fmt_now_ext(&__pr__);                                                                   \
 				;                                                                                           \
 				do {                                                                                        \
@@ -540,13 +540,13 @@ spl_init_log_ext(SPL_INPUT_ARG *input);
  * Export name:	spllog
  * Sample:		spllog(SPL_LOG_INFO, "Hello spllog: %llu", time(0));
  */
-#define spllog __spl_log_buf_level__
+#define spllog                          __spl_log_buf_level__
 
 /*
  * Export name:	spllogtopic
  * Sample:		spllogtopic(SPL_LOG_INFO, 0, "Hello spllog: %llu", time(0));
  */
-#define spllogtopic __spl_log_buf_topic_level__
+#define spllogtopic                     __spl_log_buf_topic_level__
 
 /* Please demo with spl_finish_log */
 DLL_API_SIMPLE_LOG int
@@ -582,11 +582,6 @@ spl_milli_sleep(unsigned int);
 DLL_API_SIMPLE_LOG
 LLU
 spl_milli_now();
-
-#if 0
-DLL_API_SIMPLE_LOG const char *
-spl_err_txt(int i);
-#endif
 
 DLL_API_SIMPLE_LOG int
 spl_local_time_now(spl_local_time_st *st_time);

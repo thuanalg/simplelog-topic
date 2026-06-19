@@ -39,8 +39,8 @@
 #include <time.h>
 #ifndef UNIX_LINUX
 #include <Windows.h>
-#define YEAR_PADDING 0
-#define MONTH_PADDING 0
+#define YEAR_PADDING              0
+#define MONTH_PADDING             0
 #else
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -62,13 +62,13 @@
 #include <mach/clock.h>
 #include <mach/clock_types.h>
 #endif
-#define YEAR_PADDING 1900
-#define MONTH_PADDING 1
+#define YEAR_PADDING              1900
+#define MONTH_PADDING             1
 
 #define SPL_LOG_UNIX__SHARED_MODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
-#define SPL_LOG_UNIX_CREATE_MODE (O_CREAT | O_RDWR | O_EXCL)
-#define SPL_LOG_UNIX_OPEN_MODE (O_RDWR | O_EXCL)
-#define SPL_LOG_UNIX_PROT_FLAGS (PROT_READ | PROT_WRITE | PROT_EXEC)
+#define SPL_LOG_UNIX_CREATE_MODE  (O_CREAT | O_RDWR | O_EXCL)
+#define SPL_LOG_UNIX_OPEN_MODE    (O_RDWR | O_EXCL)
+#define SPL_LOG_UNIX_PROT_FLAGS   (PROT_READ | PROT_WRITE | PROT_EXEC)
 #endif
 #if defined(_GNU_SOURCE) && defined(__LINUX__)
 #include <sched.h>
@@ -165,40 +165,40 @@
 	}
 #endif
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-#define SPL_SEM_NAME_RW "_SEM_RW"
-#define SPL_SEM_NAME_OFF "_SEM_OFF"
+#define SPL_SEM_NAME_RW           "_SEM_RW"
+#define SPL_SEM_NAME_OFF          "_SEM_OFF"
 
-#define SPL_MTX_NAME_RW "_MTX_RW"
-#define SPL_MTX_NAME_OFF "_MTX_OFF"
+#define SPL_MTX_NAME_RW           "_MTX_RW"
+#define SPL_MTX_NAME_OFF          "_MTX_OFF"
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
-#define SPL_LOG_PATHFOLDR "pathfoder="
-#define SPL_LOG_LEVEL "level="
-#define SPL_LOG_BUFF_SIZE "buffsize="
-#define SPL_MAX_SZ_MSG "max_sz_msg="
-#define SPL_LOG_ROT_SIZE "rotation_size="
-#define SPL_LOG_TOPIC "topic="
-#define SPL_LOG_NCPU "ncpu="
-#define SPL_LOG_TRIGGER "trigger="
-#define SPL_LOG_SHARED_KEY "shared_key="
-#define SPL_LOG_MODE_STRAIGHT "mode_straight="
-#define SPL_LOG_END_CFG "end_configuring="
+#define SPL_LOG_PATHFOLDR         "pathfoder="
+#define SPL_LOG_LEVEL             "level="
+#define SPL_LOG_BUFF_SIZE         "buffsize="
+#define SPL_MAX_SZ_MSG            "max_sz_msg="
+#define SPL_LOG_ROT_SIZE          "rotation_size="
+#define SPL_LOG_TOPIC             "topic="
+#define SPL_LOG_NCPU              "ncpu="
+#define SPL_LOG_TRIGGER           "trigger="
+#define SPL_LOG_SHARED_KEY        "shared_key="
+#define SPL_LOG_MODE_STRAIGHT     "mode_straight="
+#define SPL_LOG_END_CFG           "end_configuring="
 
-#define SPL_FILE_NAME_FMT "%s\\%s\\%s_%.8d.log"
-#define SPL_FILE_NAME_FMT_TOPIC "%s\\%s\\%s"
-#define SPL_FMT_DATE_ADDING "%.4d-%.2d-%.2d"
-#define SPL_FMT_HOUR_ADDING "%.2d:%.2d:%.2d"
-#define SPL_FMT_DELT_ADDING "%s %s.%.9u"
-#define SPL_FMT_MILL_ADDING "%s %s.%.9d"
-#define SPL_FMT_DATE_ADDING_X "\n[%.4d-%.2d-%.2d %.2d:%.2d:%.2d.%.9d] "
-#define HHHHHHHHHHH "%llu]\t"
+#define SPL_FILE_NAME_FMT         "%s\\%s\\%s_%.8d.log"
+#define SPL_FILE_NAME_FMT_TOPIC   "%s\\%s\\%s"
+#define SPL_FMT_DATE_ADDING       "%.4d-%.2d-%.2d"
+#define SPL_FMT_HOUR_ADDING       "%.2d:%.2d:%.2d"
+#define SPL_FMT_DELT_ADDING       "%s %s.%.9u"
+#define SPL_FMT_MILL_ADDING       "%s %s.%.9d"
+#define SPL_FMT_DATE_ADDING_X     "\n[%.4d-%.2d-%.2d %.2d:%.2d:%.2d.%.9d] "
+#define HHHHHHHHHHH               "%llu]\t"
 
-#define SPL_TEXT_UNKNOWN "U"
-#define SPL_TEXT_DEBUG "D"
-#define SPL_TEXT_INFO "I"
-#define SPL_TEXT_WARN "W"
-#define SPL_TEXT_ERROR "E"
-#define SPL_TEXT_FATAL "F"
+#define SPL_TEXT_UNKNOWN          "U"
+#define SPL_TEXT_DEBUG            "D"
+#define SPL_TEXT_INFO             "I"
+#define SPL_TEXT_WARN             "W"
+#define SPL_TEXT_ERROR            "E"
+#define SPL_TEXT_FATAL            "F"
 
 #define SPL_CASTGEN(__t__) ((spl_gen_data_st *)__t__)
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
@@ -214,7 +214,7 @@ splUnlockSpinlock(volatile long *p);
 
 /*static
 	volatile long spl_rw_spin = 0;*/
-#define THREAD_ROUTINE LPTHREAD_START_ROUTINE
+#define THREAD_ROUTINE            LPTHREAD_START_ROUTINE
 #else
 /*pthread_spinlock_t	spl_rw_spin; */
 typedef void *(*THREAD_ROUTINE)(void *);
@@ -559,9 +559,9 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 				n = 1;
 				break;
 			}
-			#if defined(_GNU_SOURCE) && defined(__LINUX__)
+#if defined(_GNU_SOURCE) && defined(__LINUX__)
 			n = SPL_MAX_AB(sysconf(_SC_NPROCESSORS_ONLN), n);
-			#endif
+#endif
 			t->ncpu = n;
 			break;
 		}
@@ -1159,13 +1159,14 @@ spl_fmt_now_ext(SPL_FMT_PARAM *const p)
 		return;
 	}
 #if 1
-	
+
 #if defined(_GNU_SOURCE) && defined(__LINUX__)
 	p->r = sched_getcpu();
 #else
-	/* https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentprocessornumberex */
+	/* https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentprocessornumberex
+	 */
 	p->r = (SPL_CTRL_OBJ->mode_straight ? threadiid : stt.nn) % SPL_CTRL_OBJ->ncpu;
-#endif	
+#endif
 #else
 #ifndef __MODE_STRAIGHT__
 	*r = (stt.nn % SPL_CTRL_OBJ->ncpu);
@@ -2689,106 +2690,6 @@ spl_clean_sync_tool()
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #if 0
-static const char *__spl_err_text__[SPL_END_ERROR + 1];
-
-void
-spl_err_txt_init()
-{
-	__spl_err_text__[SPL_NO_ERROR] = "SPL_NO_ERROR";
-	__spl_err_text__[SPL_INIT_PATH_FOLDER_EMPTY_ERROR] = "SPL_INIT_PATH_FOLDER_EMPTY_ERROR";
-	__spl_err_text__[SPL_LOG_LEVEL_ERROR] = "SPL_LOG_LEVEL_ERROR";
-	__spl_err_text__[SPL_ERROR_CREATE_MUTEX] = "SPL_ERROR_CREATE_MUTEX";
-	__spl_err_text__[SPL_ERROR_CREATE_SEM] = "SPL_ERROR_CREATE_SEM";
-	__spl_err_text__[SPL_LOG_BUFF_SIZE_ERROR] = "SPL_LOG_BUFF_SIZE_ERROR";
-	__spl_err_text__[SPL_LOG_BUFF_MALLOC_ERROR] = "SPL_LOG_BUFF_MALLOC_ERROR";
-	__spl_err_text__[SPL_LOG_MAX_SZ_MSG_ERROR] = "SPL_LOG_MAX_SZ_MSG_ERROR";
-	__spl_err_text__[SPL_LOG_FOLDER_ERROR] = "SPL_LOG_FOLDER_ERROR";
-	__spl_err_text__[SPL_LOG_CREATE_THREAD_ERROR] = "SPL_LOG_CREATE_THREAD_ERROR";
-	__spl_err_text__[SPL_LOG_FMT_NULL_ERROR] = "SPL_LOG_FMT_NULL_ERROR";
-	__spl_err_text__[SPL_LOG_MEM_GEN_FILE_ERROR] = "SPL_LOG_MEM_GEN_FILE_ERROR";
-	__spl_err_text__[SPL_LOG_MEM_MALLOC_ERROR] = "SPL_LOG_MEM_MALLOC_ERROR";
-	__spl_err_text__[SPL_LOG_OPEN_FILE_ERROR] = "SPL_LOG_OPEN_FILE_ERROR";
-	__spl_err_text__[SPL_LOG_OPEN1_FILE_ERROR] = "SPL_LOG_OPEN1_FILE_ERROR";
-	__spl_err_text__[SPL_LOG_CLOSE_FILE_ERROR] = "SPL_LOG_CLOSE_FILE_ERROR";
-	__spl_err_text__[SPL_LOG_SEM_NULL_ERROR] = "SPL_LOG_SEM_NULL_ERROR";
-	__spl_err_text__[SPL_LOG_SEM_WIN32_CREATED_ERROR] = "SPL_LOG_SEM_WIN32_CREATED_ERROR";
-	__spl_err_text__[SPL_LOG_MTX_WIN32_CREATED_ERROR] = "SPL_LOG_MTX_WIN32_CREATED_ERROR";
-	__spl_err_text__[SPL_LOG_ROT_SIZE_ERROR] = "SPL_LOG_ROT_SIZE_ERROR";
-	__spl_err_text__[SPL_LOG_TOPIC_EMPTY] = "SPL_LOG_TOPIC_EMPTY";
-	__spl_err_text__[SPL_LOG_TOPIC_NULL] = "SPL_LOG_TOPIC_NULL";
-	__spl_err_text__[SPL_LOG_MEM_FILE_MALLOC_ERROR] = "SPL_LOG_MEM_FILE_MALLOC_ERROR";
-	__spl_err_text__[SPL_LOG_CHECK_FOLDER_ERROR] = "SPL_LOG_CHECK_FOLDER_ERROR";
-	__spl_err_text__[SPL_LOG_CHECK_FOLDER_YEAR_ERROR] = "SPL_LOG_CHECK_FOLDER_YEAR_ERROR";
-	__spl_err_text__[SPL_LOG_CHECK_FILE_YEAR_ERROR] = "SPL_LOG_CHECK_FILE_YEAR_ERROR";
-	__spl_err_text__[SPL_LOG_CHECK_FOLDER_NULL_ERROR] = "SPL_LOG_CHECK_FOLDER_NULL_ERROR";
-	__spl_err_text__[SPL_LOG_MUTEX_NULL_ERROR] = "SPL_LOG_MUTEX_NULL_ERROR";
-	__spl_err_text__[SPL_LOG_ST_NAME_NULL_ERROR] = "SPL_LOG_ST_NAME_NULL_ERROR";
-	__spl_err_text__[SPL_LOG_TIME_NULL_ERROR] = "SPL_LOG_TIME_NULL_ERROR";
-	__spl_err_text__[SPL_LOG_TIME_NANO_NULL_ERROR] = "SPL_LOG_TIME_NANO_NULL_ERROR";
-	__spl_err_text__[SPL_LOG_STAT_FOLDER_ERROR] = "SPL_LOG_STAT_FOLDER_ERROR";
-	__spl_err_text__[SPL_LOG_PRINTF_ERROR] = "SPL_LOG_PRINTF_ERROR";
-	__spl_err_text__[SPL_LOG_TOPIC_ZERO] = "SPL_LOG_TOPIC_ZERO";
-	__spl_err_text__[SPL_LOG_TOPIC_MEMORY] = "SPL_LOG_TOPIC_MEMORY";
-	__spl_err_text__[SPL_LOG_TOPIC_FOPEN] = "SPL_LOG_TOPIC_FOPEN";
-	__spl_err_text__[SPL_LOG_TOPIC_FLUSH] = "SPL_LOG_TOPIC_FLUSH";
-	__spl_err_text__[SPL_LOG_TOPIC_BUFF_MEM] = "SPL_LOG_TOPIC_BUFF_MEM";
-	__spl_err_text__[SPL_LOG_ALOCK_NUM] = "SPL_LOG_ALOCK_NUM";
-	__spl_err_text__[SPL_LOG_ALOCK_NULL] = "SPL_LOG_ALOCK_NULL";
-	__spl_err_text__[SPL_LOG_SHM_CREATE_NULL] = "SPL_LOG_SHM_CREATE_NULL";
-	__spl_err_text__[SPL_LOG_SHM_WIN_UNMAP] = "SPL_LOG_SHM_WIN_UNMAP";
-	__spl_err_text__[SPL_LOG_SHM_UNIX_OPEN] = "SPL_LOG_SHM_UNIX_OPEN";
-	__spl_err_text__[SPL_LOG_SHM_UNIX_TRUNC] = "SPL_LOG_SHM_UNIX_TRUNC";
-	__spl_err_text__[SPL_LOG_SHM_UNIX_MAP_FAILED] = "SPL_LOG_SHM_UNIX_MAP_FAILED";
-	__spl_err_text__[SPL_LOG_WIN_SHM_CLOSE] = "SPL_LOG_WIN_SHM_CLOSE";
-	__spl_err_text__[SPL_LOG_SHM_UNIX_UNMAP] = "SPL_LOG_SHM_UNIX_UNMAP";
-	__spl_err_text__[SPL_LOG_VAR_NULL] = "SPL_LOG_VAR_NULL";
-	__spl_err_text__[SPL_LOG_ARR_MTX_NULL] = "SPL_LOG_ARR_MTX_NULL";
-	__spl_err_text__[SPL_LOG_ARR_BUFF_NULL] = "SPL_LOG_ARR_BUFF_NULL";
-	__spl_err_text__[SPL_LOG_MTX_ATT_SHARED_MODE] = "SPL_LOG_MTX_ATT_SHARED_MODE";
-	__spl_err_text__[SPL_LOG_MTX_ATT_SHARED_MODE_SET] = "SPL_LOG_MTX_ATT_SHARED_MODE_SET";
-	__spl_err_text__[SPL_LOG_MTX_INIT_ERR] = "SPL_LOG_MTX_INIT_ERR";
-	__spl_err_text__[SPL_LOG_SHM_UNIX_INIT_MUTEX] = "SPL_LOG_SHM_UNIX_INIT_MUTEX";
-	__spl_err_text__[SPL_LOG_SPINLOCK_INIT_SHARED] = "SPL_LOG_SPINLOCK_INIT_SHARED";
-	__spl_err_text__[SPL_LOG_SPINLOCK_INIT_PRIVATE] = "SPL_LOG_SPINLOCK_INIT_PRIVATE";
-	__spl_err_text__[SPL_LOG_SEM_INIT_UNIX] = "SPL_LOG_SEM_INIT_UNIX";
-	__spl_err_text__[SPL_LOG_THREAD_W32_CREATE] = "SPL_LOG_THREAD_W32_CREATE";
-	__spl_err_text__[SPL_LOG_THREAD_PX_CREATE] = "SPL_LOG_THREAD_PX_CREATE";
-	__spl_err_text__[SPL_LOG_MACH_GETTIME_ERROR] = "SPL_LOG_MACH_GETTIME_ERROR";
-	__spl_err_text__[SPL_LOG_MACH_CLOCK_SERVICE_ERROR] = "SPL_LOG_MACH_CLOCK_SERVICE_ERROR";
-	__spl_err_text__[SPL_LOG_OSX_SEM_CLOSE] = "SPL_LOG_OSX_SEM_CLOSE";
-	__spl_err_text__[SPL_LOG_OSX_SEM_UNLINK] = "SPL_LOG_OSX_SEM_UNLINK";
-	__spl_err_text__[SPL_LOG_SEM_OSX_CREATED_ERROR] = "SPL_LOG_SEM_OSX_CREATED_ERROR";
-	__spl_err_text__[SPL_LOG_SEM_INIT_OSX] = "SPL_LOG_SEM_INIT_OSX";
-	__spl_err_text__[SPL_LOG_SEM_OSX_UNLINK_ERROR] = "SPL_LOG_SEM_OSX_UNLINK_ERROR";
-	__spl_err_text__[SPL_LOG_OPEN_CFG] = "SPL_LOG_OPEN_CFG";
-	__spl_err_text__[SPL_LOG_WIN32_WAIT_OBJECT] = "SPL_LOG_WIN32_WAIT_OBJECT";
-	__spl_err_text__[SPL_LOG_WIN32_MUTEX_RELEASE] = "SPL_LOG_WIN32_MUTEX_RELEASE";
-	__spl_err_text__[SPL_LOG_WIN32_MAP_FILE] = "SPL_LOG_WIN32_MAP_FILE";
-	__spl_err_text__[SPL_LOG_PX_SEM_WAIT_OBJECT] = "SPL_LOG_PX_SEM_WAIT_OBJECT";
-	__spl_err_text__[SPL_LOG_PX_MUTEX_LOCK] = "SPL_LOG_PX_MUTEX_LOCK";
-	__spl_err_text__[SPL_LOG_PX_SPIN_LOCK] = "SPL_LOG_PX_SPIN_LOCK";
-	__spl_err_text__[SPL_LOG_PX_MUTEX_RELEASE] = "SPL_LOG_PX_MUTEX_RELEASE";
-	__spl_err_text__[SPL_LOG_PX_SPIN_RELEASE] = "SPL_LOG_PX_SPIN_RELEASE";
-	__spl_err_text__[SPL_LOG_WIN32_SEM_REL_OBJECT] = "SPL_LOG_WIN32_SEM_REL_OBJECT";
-	__spl_err_text__[SPL_LOG_PX_SEM_REL_OBJECT] = "SPL_LOG_PX_SEM_REL_OBJECT";
-
-
-	__spl_err_text__[SPL_END_ERROR] = "SPL_END_ERROR";
-}
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-const char *
-spl_err_txt(int i)
-{
-	if (i < 0) {
-		return "UNKNOW - less than 0.";
-	}
-	if (i > SPL_END_ERROR) {
-		return "UNKNOW - greater than SPL_END_ERROR.";
-	}
-	return __spl_err_text__[i];
-}
-#endif
-
 #ifndef UNIX_LINUX
 #else
 #endif
@@ -2800,6 +2701,7 @@ spl_err_txt(int i)
 #else
 #ifdef SPL_USING_SPIN_LOCK
 #else
+#endif
 #endif
 #endif
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
