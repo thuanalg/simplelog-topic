@@ -2620,8 +2620,8 @@ spl_allocate_topics(char isbin)
 	char *p1 = 0;
 	int n = 0;
 	int szitopics = 0;
-	SIMPLE_LOG_ST *t = &__simple_log_static__;
-	SIMPLE_LOG_TOPIC_ST ** pp = 0;
+	SIMPLE_LOG_ST * const t = &__simple_log_static__;
+	SIMPLE_LOG_TOPIC_ST **pp = 0;
 	int n_tp = 0;
 	char * ltopics = 0;
 	do {
@@ -2665,6 +2665,10 @@ spl_gen_sync_tool()
 		if (ret) {
 			break;
 		}
+		ret = spl_allocate_topics(1);
+		if (ret) {
+			break;
+		}		
 		ret = spl_calculate_size();
 		if (ret) {
 			break;
