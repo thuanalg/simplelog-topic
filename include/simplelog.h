@@ -253,11 +253,15 @@ typedef struct __SIMPLE_LOG_ST__ {
 	spl_local_time_st lc_time_now; /*Current time.*/
 	FILE *fp; /*fp: Need to close*/
 	spl_gen_data_st *buf; /*buf: Must be synchoronized. Must be freed.*/
+	
 	char *topics; /*topics: topics string. Must be freed */
 	int n_topic; /*Number of topics, SIMPLE_LOG_TOPIC_ST.*/
+	SIMPLE_LOG_TOPIC_ST *arr_topic; /*List of topics: SIMPLE_LOG_TOPIC_ST. Must be freed*/
+
 	char *btopics; /*btopics: binary topics string. Must be freed */	
 	int n_btopic; /*Number of binary topics, SIMPLE_LOG_TOPIC_ST.*/
-	SIMPLE_LOG_TOPIC_ST *arr_topic; /*List od topics: SIMPLE_LOG_TOPIC_ST. Must be freed*/
+	SIMPLE_LOG_TOPIC_ST *arr_btopic; /*List of binary topics: SIMPLE_LOG_TOPIC_ST. Must be freed*/
+
 	int renew; /*In a thread of logger, NO NEED SYNC.*/
 	char path_template[SPL_TEMPLATE_LEN]; /*In a thread of logger, NO NEED SYNC.*/
 	int ncpu; /*Number of CPU.*/
