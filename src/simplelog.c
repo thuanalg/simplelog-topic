@@ -27,6 +27,7 @@
  *		<2025-Oct-06>
  *		<2026-Jun-13>
  *		<2026-Jun-14>
+ *		<2026-Jun-20>
  * Decription:
  *		The (only) main file to implement simple log.
  */
@@ -178,6 +179,7 @@
 #define SPL_MAX_SZ_MSG            "max_sz_msg="
 #define SPL_LOG_ROT_SIZE          "rotation_size="
 #define SPL_LOG_TOPIC             "topic="
+#define SPL_LOG_BIN_TOPIC             "bin_topic="
 #define SPL_LOG_NCPU              "ncpu="
 #define SPL_LOG_TRIGGER           "trigger="
 #define SPL_LOG_SHARED_KEY        "shared_key="
@@ -233,7 +235,7 @@ typedef enum __CHANGE_NAME_E__ {
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 static const char *__splog_pathfolder[] = {SPL_LOG_PATHFOLDR, SPL_LOG_LEVEL, SPL_LOG_BUFF_SIZE, SPL_MAX_SZ_MSG,
-    SPL_LOG_ROT_SIZE, SPL_LOG_TOPIC, SPL_LOG_NCPU, SPL_LOG_TRIGGER, SPL_LOG_SHARED_KEY, SPL_LOG_MODE_STRAIGHT,
+    SPL_LOG_ROT_SIZE, SPL_LOG_TOPIC, SPL_LOG_BIN_TOPIC, SPL_LOG_NCPU, SPL_LOG_TRIGGER, SPL_LOG_SHARED_KEY, SPL_LOG_MODE_STRAIGHT,
     SPL_LOG_END_CFG, 0};
 
 static SIMPLE_LOG_ST __simple_log_static__;
@@ -551,6 +553,23 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 			t->topics = p;
 			break;
 		}
+		if (strcmp(key, SPL_LOG_BIN_TOPIC) == 0) {
+#if 0			
+			int n = 0, count = 0;
+			char *p = 0;
+			n = (int)strlen(buff);
+			if (n < 1) {
+				break;
+			}
+			ret = spl_stdz_topics(buff, &n, &count, &p);
+			if (ret) {
+				break;
+			}
+			t->n_topic = count;
+			t->topics = p;
+			break;
+#endif
+		}		
 		if (strcmp(key, SPL_LOG_NCPU) == 0) {
 			int sz = 0;
 			int n = 0;
