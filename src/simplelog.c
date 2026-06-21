@@ -28,7 +28,7 @@
  *		<2026-Jun-13>
  *		<2026-Jun-14>
  *		<2026-Jun-20>
-  *		<2026-Jun-21>
+ *		<2026-Jun-21>
  * Decription:
  *		The (only) main file to implement simple log.
  */
@@ -236,8 +236,8 @@ typedef enum __CHANGE_NAME_E__ {
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 static const char *__splog_pathfolder[] = {SPL_LOG_PATHFOLDR, SPL_LOG_LEVEL, SPL_LOG_BUFF_SIZE, SPL_MAX_SZ_MSG,
-    SPL_LOG_ROT_SIZE, SPL_LOG_TOPIC, SPL_LOG_BIN_TOPIC, SPL_LOG_NCPU, SPL_LOG_TRIGGER, SPL_LOG_SHARED_KEY, SPL_LOG_MODE_STRAIGHT,
-    SPL_LOG_END_CFG, 0};
+    SPL_LOG_ROT_SIZE, SPL_LOG_TOPIC, SPL_LOG_BIN_TOPIC, SPL_LOG_NCPU, SPL_LOG_TRIGGER, SPL_LOG_SHARED_KEY,
+    SPL_LOG_MODE_STRAIGHT, SPL_LOG_END_CFG, 0};
 
 static SIMPLE_LOG_ST __simple_log_static__;
 SIMPLE_LOG_ST *const __spl_ctr_obj__ = &__simple_log_static__;
@@ -547,7 +547,7 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 			break;
 		}
 		if (strcmp(key, SPL_LOG_BIN_TOPIC) == 0) {
-#if 1			
+#if 1
 			int n = 0, count = 0;
 			char *p = 0;
 			n = (int)strlen(buff);
@@ -562,7 +562,7 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 			t->btopics = p;
 			break;
 #endif
-		}		
+		}
 		if (strcmp(key, SPL_LOG_NCPU) == 0) {
 			int sz = 0;
 			int n = 0;
@@ -1201,18 +1201,13 @@ spl_fmt_now_ext(SPL_FMT_PARAM *const p)
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 void
-spl_bfmt_now_ext(SPL_BFMT_HD *const p){
-
-}
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-void
-spl_bfmt_now(SPL_BFMT_PARAM *const p)
+spl_bfmt_now_ext(SPL_BFMT_HD *const p)
 {
 	int ret = 0;
 #ifndef UNIX_LINUX
 	SYSTEMTIME lt;
 #else
-	
+
 #ifdef __MACH__
 	clock_serv_t cclock;
 	mach_timespec_t mts;
@@ -1225,18 +1220,23 @@ spl_bfmt_now(SPL_BFMT_PARAM *const p)
 		if (!p) {
 			return;
 		}
-		
+
 #ifndef UNIX_LINUX
 		LARGE_INTEGER counter;
 		GetLocalTime(&lt);
 		QueryPerformanceCounter(&counter);
-		p->tv_sec= (LLU)time(0);
-		p->tv_nsec = counter.QuadPart % SPL_MILLION;
+		LLU threadiid = 0;
+		threadiid = (LLU)spl_get_threadid();
+		p->hd.tv_sec = (LLU)time(0);
+		p->hd.tv_nsec = counter.QuadPart % SPL_MILLION;
+		p->r = (SPL_CTRL_OBJ->mode_straight ? threadiid : p->hd.tv_nsec) % SPL_CTRL_OBJ->ncpu;
 #else
 		/* No need freeing,
 		 * https://stackoverflow.com/questions/35031647/do-i-need-to-free-the-returned-pointer-from-localtime-function
 		 */
 #ifdef __MACH__
+		LLU threadiid = 0;
+		threadiid = (LLU)spl_get_threadid();
 		result = host_get_clock_service(mach_host_self(), REALTIME_CLOCK, &cclock);
 		if (result != KERN_SUCCESS) {
 			ret = SPL_LOG_MACH_CLOCK_SERVICE_ERROR;
@@ -1250,27 +1250,48 @@ spl_bfmt_now(SPL_BFMT_PARAM *const p)
 			break;
 		}
 		mach_port_deallocate(mach_task_self(), cclock);
-		p->tv_sec = mts.tv_sec;
-		p->tv_nsec = mts.tv_nsec;
+		p->hd.tv_sec = mts.tv_sec;
+		p->hd.tv_nsec = mts.tv_nsec;
+		p->r = (SPL_CTRL_OBJ->mode_straight ? threadiid : p->hd.tv_nsec) % SPL_CTRL_OBJ->ncpu;
 #else
 		/* https://linux.die.net/man/3/localtime */
 		/* https://linux.die.net/man/3/clock_gettime */
+
+#if defined(_GNU_SOURCE) && defined(__LINUX__)
 		ret = clock_gettime(CLOCK_REALTIME, &nanosec);
 		if (ret) {
 			ret = SPL_LOG_TIME_NANO_NULL_ERROR;
 			break;
 		}
-		p->tv_sec = nanosec.tv_sec;
-		p->tv_nsec = (spl_uint)nanosec.tv_nsec;
+		p->hd.tv_sec = nanosec.tv_sec;
+		p->hd.tv_nsec = (spl_uint)nanosec.tv_nsec;
+		p->r = sched_getcpu();
+#else
+		LLU threadiid = 0;
+		threadiid = (LLU)spl_get_threadid();
+		ret = clock_gettime(CLOCK_REALTIME, &nanosec);
+		if (ret) {
+			ret = SPL_LOG_TIME_NANO_NULL_ERROR;
+			break;
+		}
+		p->hd.tv_sec = nanosec.tv_sec;
+		p->hd.tv_nsec = (spl_uint)nanosec.tv_nsec;
+
+		p->r = (SPL_CTRL_OBJ->mode_straight ? threadiid : p->hd.tv_nsec) % SPL_CTRL_OBJ->ncpu;
+#endif
+
 #endif
 #endif
+
 	} while (0);
 
-	if(ret) {
+	if (ret) {
 		spl_console_log("ret: %d.\n", ret);
 	}
 }
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+
 int
 spl_fmmt_now(char *fmtt, int len)
 {
@@ -2155,7 +2176,7 @@ spl_calculate_size()
 	char *p = 0;
 	int step_size = 0;
 #endif
-	SIMPLE_LOG_ST * const t = &__simple_log_static__;
+	SIMPLE_LOG_ST *const t = &__simple_log_static__;
 	size_arr_mtx = t->ncpu * sizeof(void *);
 	/*k: For buffer.*/
 	k = t->buff_size * t->ncpu * (t->n_topic + t->n_btopic + 1);
@@ -2684,16 +2705,16 @@ spl_allocate_topics(char isbin)
 	char *p1 = 0;
 	int n = 0;
 	int szitopics = 0;
-	SIMPLE_LOG_ST * const t = &__simple_log_static__;
+	SIMPLE_LOG_ST *const t = &__simple_log_static__;
 	SIMPLE_LOG_TOPIC_ST **pp = 0;
 	int n_tp = 0;
-	char * ltopics = 0;
+	char *ltopics = 0;
 	do {
 		n_tp = isbin ? t->n_btopic : t->n_topic;
 		if (!n_tp) {
 			break;
 		}
-		pp = isbin ? ( &(t->arr_btopic)) : ( &(t->arr_topic));
+		pp = isbin ? (&(t->arr_btopic)) : (&(t->arr_topic));
 		ltopics = isbin ? t->btopics : t->topics;
 
 		szitopics = sizeof(SIMPLE_LOG_TOPIC_ST) * n_tp;
@@ -2706,12 +2727,12 @@ spl_allocate_topics(char isbin)
 		for (i = 0; i < n_tp; ++i) {
 			p1 = strstr(p0, ",");
 			if (!p1) {
-				snprintf( (*pp)[i].topic, SPL_TOPIC_SIZE, "%s", p0);
+				snprintf((*pp)[i].topic, SPL_TOPIC_SIZE, "%s", p0);
 				continue;
 			}
 			n = (int)(p1 - p0);
 			if (n > 0) {
-				snprintf( (*pp)[i].topic, SPL_MIN_AB(SPL_TOPIC_SIZE, n + 1), "%s", p0);
+				snprintf((*pp)[i].topic, SPL_MIN_AB(SPL_TOPIC_SIZE, n + 1), "%s", p0);
 			}
 			p1++;
 			p0 = p1;
@@ -2732,7 +2753,7 @@ spl_gen_sync_tool()
 		ret = spl_allocate_topics(1);
 		if (ret) {
 			break;
-		}		
+		}
 		ret = spl_calculate_size();
 		if (ret) {
 			break;
