@@ -28,6 +28,7 @@
  *		<2026-Jun-13>
  *		<2026-Jun-14>
  *		<2026-Jun-20>
+  *		<2026-Jun-22>
  * Decription:
  *		The (only) main file to implement simple log.
  */
@@ -179,7 +180,7 @@
 #define SPL_MAX_SZ_MSG            "max_sz_msg="
 #define SPL_LOG_ROT_SIZE          "rotation_size="
 #define SPL_LOG_TOPIC             "topic="
-#define SPL_LOG_BIN_TOPIC             "bin_topic="
+#define SPL_LOG_BIN_TOPIC         "topic_bin="
 #define SPL_LOG_NCPU              "ncpu="
 #define SPL_LOG_TRIGGER           "trigger="
 #define SPL_LOG_SHARED_KEY        "shared_key="
@@ -443,14 +444,6 @@ spl_set_off(int isoff)
 
 	if (isoff && shouldWait) {
 		int errCode = 0;
-#if 0		
-		spl_rel_sem(t->sem_rwfile);
-		if (t->isProcessMode) {
-			if (!t->is_master) {
-				spl_rel_sem(t->sem_off);
-			}
-		}
-#endif
 
 #ifndef UNIX_LINUX
 		errCode = (int)WaitForSingleObject(t->sem_off, INFINITE);
@@ -554,7 +547,7 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 			break;
 		}
 		if (strcmp(key, SPL_LOG_BIN_TOPIC) == 0) {
-#if 0			
+#if 1			
 			int n = 0, count = 0;
 			char *p = 0;
 			n = (int)strlen(buff);
@@ -565,8 +558,8 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 			if (ret) {
 				break;
 			}
-			t->n_topic = count;
-			t->topics = p;
+			t->n_btopic = count;
+			t->btopics = p;
 			break;
 #endif
 		}		
@@ -2091,10 +2084,10 @@ spl_calculate_size()
 	char *p = 0;
 	int step_size = 0;
 #endif
-	SIMPLE_LOG_ST *t = &__simple_log_static__;
+	SIMPLE_LOG_ST * const t = &__simple_log_static__;
 	size_arr_mtx = t->ncpu * sizeof(void *);
 	/*k: For buffer.*/
-	k = t->buff_size * t->ncpu * (t->n_topic + 1);
+	k = t->buff_size * t->ncpu * (t->n_topic + t->n_btopic + 1);
 	/*k = t->buff_size * t->ncpu + t->buff_size * t->ncpu * t->n_topic;*/
 	do {
 		if (!t->arr_mtx) {
