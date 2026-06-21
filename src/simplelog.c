@@ -33,7 +33,13 @@
  *		The (only) main file to implement simple log.
  */
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-
+#if 1
+#ifndef UNIX_LINUX
+#define UNIX_LINUX 
+#define __LINUX__
+#define _GNU_SOURCE                     
+#endif
+#endif
 #include "simplelog.h"
 #include <stdio.h>
 #include <string.h>

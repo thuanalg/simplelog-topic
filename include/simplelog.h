@@ -39,9 +39,11 @@
 #define SPL_MIN_AB(a, b) ((a) < (b)) ? (a) : (b)
 #define SPL_MAX_AB(a, b) ((a) > (b)) ? (a) : (b)
 
-#if 0
+#if 1
 #ifndef UNIX_LINUX
-#define UNIX_LINUX                      
+#define UNIX_LINUX 
+#define __LINUX__
+#define _GNU_SOURCE                     
 #endif
 #endif
 
