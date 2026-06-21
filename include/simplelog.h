@@ -538,9 +538,9 @@ typedef struct __SPL_BFMT_HD__ {
 		;                                                                                                           \
 		if (SPL_CTRL_OBJ->arr_btopic) {                                                                             \
 			;                                                                                                   \
-			short __tpp__ = 0;                                                                                  \
+			unsigned short __tpp__ = 0;                                                                         \
 			;                                                                                                   \
-			int __len__ = 0;                                                                                    \
+			unsigned char __done__ = 0;                                                                         \
 			{                                                                                                   \
 				;                                                                                           \
 				__tpp__ = __tpic__ % SPL_CTRL_OBJ->n_btopic;                                                \
@@ -565,11 +565,11 @@ typedef struct __SPL_BFMT_HD__ {
 						__lane__->pl += __SPL_HD_SZ__;                                              \
 						memcpy(__lane__->data + __lane__->pl, __data__, __sz__);                    \
 						__lane__->pl += __sz__;                                                     \
-						__len__ = __pr__.hd.total;                                                  \
+						__done__ = 1;                                                               \
 					};                                                                                  \
 					;                                                                                   \
 					spl_mutex_unlock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                  \
-					if (__len__ > 0)                                                                    \
+					if (__done__)                                                                       \
 						break;                                                                      \
 					(__pr__.r)++;                                                                       \
 					(__pr__.r) %= SPL_CTRL_OBJ->ncpu;                                                   \
