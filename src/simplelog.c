@@ -28,7 +28,7 @@
  *		<2026-Jun-13>
  *		<2026-Jun-14>
  *		<2026-Jun-20>
-  *		<2026-Jun-22>
+  *		<2026-Jun-21>
  * Decription:
  *		The (only) main file to implement simple log.
  */
@@ -1198,6 +1198,77 @@ spl_fmt_now_ext(SPL_FMT_PARAM *const p)
 	p->outlen = (p->outlen < SPL_RL_BUF) ? (p->outlen) : (SPL_RL_BUF - 1);
 
 	return;
+}
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+void
+spl_bfmt_now_ext(SPL_BFMT_HD *const p){
+
+}
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+void
+spl_bfmt_now(SPL_BFMT_PARAM *const p)
+{
+	int ret = 0;
+#ifndef UNIX_LINUX
+	SYSTEMTIME lt;
+#else
+	
+#ifdef __MACH__
+	clock_serv_t cclock;
+	mach_timespec_t mts;
+	kern_return_t result;
+#else
+	struct timespec nanosec = {0};
+#endif
+#endif
+	do {
+		if (!p) {
+			return;
+		}
+		
+#ifndef UNIX_LINUX
+		LARGE_INTEGER counter;
+		GetLocalTime(&lt);
+		QueryPerformanceCounter(&counter);
+		p->tv_sec= (LLU)time(0);
+		p->tv_nsec = counter.QuadPart % SPL_MILLION;
+#else
+		/* No need freeing,
+		 * https://stackoverflow.com/questions/35031647/do-i-need-to-free-the-returned-pointer-from-localtime-function
+		 */
+#ifdef __MACH__
+		result = host_get_clock_service(mach_host_self(), REALTIME_CLOCK, &cclock);
+		if (result != KERN_SUCCESS) {
+			ret = SPL_LOG_MACH_CLOCK_SERVICE_ERROR;
+			spl_console_log("SPL_LOG_MACH_CLOCK_SERVICE_ERROR.");
+			break;
+		}
+		result = clock_get_time(cclock, &mts);
+		if (result != KERN_SUCCESS) {
+			ret = SPL_LOG_MACH_GETTIME_ERROR;
+			spl_console_log("SPL_LOG_MACH_GETTIME_ERROR.");
+			break;
+		}
+		mach_port_deallocate(mach_task_self(), cclock);
+		p->tv_sec = mts.tv_sec;
+		p->tv_nsec = mts.tv_nsec;
+#else
+		/* https://linux.die.net/man/3/localtime */
+		/* https://linux.die.net/man/3/clock_gettime */
+		ret = clock_gettime(CLOCK_REALTIME, &nanosec);
+		if (ret) {
+			ret = SPL_LOG_TIME_NANO_NULL_ERROR;
+			break;
+		}
+		p->tv_sec = nanosec.tv_sec;
+		p->tv_nsec = (spl_uint)nanosec.tv_nsec;
+#endif
+#endif
+	} while (0);
+
+	if(ret) {
+		spl_console_log("ret: %d.\n", ret);
+	}
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
