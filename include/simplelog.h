@@ -531,6 +531,7 @@ typedef struct __SPL_BFMT_HD__ {
 	((spl_gen_data_st *)((char *)SPL_ST_LOGBUF_BTOPIC(__t__, __i__) + __t__->buff_size * __r__))
 
 #define __SPL_HD_SZ__                   sizeof(SPL_BFMT_PARAM)
+#define __SPL_CHK_HD__(__lane__, __pr__) (SPL_CTRL_OBJ->range > (__lane__->pl + __pr__.hd.total))
 
 #define __spl_log_buf_btopic__(__tpic__, __id__, __data__, ___sz___)                                                        \
 	{                                                                                                                   \
@@ -558,20 +559,15 @@ typedef struct __SPL_BFMT_HD__ {
 					    SPL_ST_LOGBUF_BTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r);                    \
 					__len__ = 0;                                                                        \
 					spl_mutex_lock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                    \
-					/*do                                                                                \
-					{*/                                                                                 \
-					/*if(__t__->arr_topic){*/;                                                          \
 					;                                                                                   \
-					if (SPL_CTRL_OBJ->range > __lane__->pl) {                                           \
+					if (__SPL_CHK_HD__(__lane__, __pr__)) {                                             \
 						memcpy(__lane__->data + __lane__->pl, &(__pr__.hd), __SPL_HD_SZ__);         \
 						__lane__->pl += __SPL_HD_SZ__;                                              \
 						memcpy(__lane__->data + __lane__->pl, __data__, __sz__);                    \
 						__lane__->pl += __sz__;                                                     \
 						__len__ = __pr__.hd.total;                                                  \
-					}                                                                                   \
-					/*}*/                                                                               \
-					/*}                                                                                 \
-					while(0);*/                                                                         \
+					};                                                                                  \
+					;                                                                                   \
 					spl_mutex_unlock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                  \
 					if (__len__ > 0)                                                                    \
 						break;                                                                      \
