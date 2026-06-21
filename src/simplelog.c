@@ -1000,12 +1000,15 @@ spl_written_thread_routine(void *lpParam)
 
 				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				if (!is_off) {
+					spl_console_log("is off: %d=============", (int)is_off);
 					spl_mutex_lock(t->mtx_rw);
 					is_off = t->off;
 					spl_mutex_unlock(t->mtx_rw);
+					spl_console_log("================is off: %d", (int)is_off);
 				}
 				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				for (i = 0; i < t->ncpu; ++i) {
+					spl_console_log("================t->ncpu: %d, i: %d", (int)t->ncpu, i);
 					spl_mutex_lock(t->arr_mtx[i]);
 					/* //do { */
 					if (SPL_CASTGEN(main_src_thrd_buf[i])->pl > 0) {
@@ -1018,6 +1021,7 @@ spl_written_thread_routine(void *lpParam)
 					/* //} while (0); */
 					spl_mutex_unlock(t->arr_mtx[i]);
 				}
+				spl_console_log("================is off: %d", (int)is_off);
 				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				if (only_cast->pl > 0) {
 					k = (int)fwrite(only_cast->data, 1, only_cast->pl, t->fp);
@@ -2316,6 +2320,7 @@ spl_calculate_size()
 		if (t->mtx_rw) {
 			pthread_mutex_t *mtx = (pthread_mutex_t *)t->mtx_rw;
 			ret = spl_mtx_init(mtx, t->isProcessMode);
+			spl_console_log("ret : %d", ret);
 		}
 		step_size = sizeof(pthread_mutex_t);
 		p = buff + k + step_size;
