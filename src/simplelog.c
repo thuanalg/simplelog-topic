@@ -1020,6 +1020,7 @@ spl_written_thread_routine(void *lpParam)
 					}
 					/* //} while (0); */
 					spl_mutex_unlock(t->arr_mtx[i]);
+					spl_console_log("================unlockt->ncpu: %d, i: %d", (int)t->ncpu, i);
 				}
 				spl_console_log("================is off: %d", (int)is_off);
 				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
