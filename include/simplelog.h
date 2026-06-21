@@ -409,39 +409,31 @@ typedef struct __SPL_BFMT_HD__ {
 					;                                                                                   \
 					int __len__ = 0;                                                                    \
 					;                                                                                   \
+					spl_gen_data_st *const __lane__ = SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r);               \
 					__outlen__ = __pr__.outlen;                                                         \
 					;                                                                                   \
 					spl_mutex_lock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                    \
 					;                                                                                   \
-					if (SPL_CTRL_OBJ->range > SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->pl) {                 \
+					if (SPL_CTRL_OBJ->range > __lane__->pl) {                                           \
 						;                                                                           \
-						memcpy(SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->data +                           \
-							   SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->pl,                          \
-						    __pr__.fmtt, __outlen__);                                               \
+						memcpy(__lane__->data + __lane__->pl, __pr__.fmtt, __outlen__);             \
+						__lane__->pl += __outlen__;                                                 \
 						;                                                                           \
-						SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->pl += __outlen__;                       \
-						;                                                                           \
-						__len__ = snprintf(SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->data +               \
-								       SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->pl,              \
-						    SPL_CTRL_OBJ->krange - SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->pl,          \
-						    ___fmttt___, ##__VA_ARGS__);                                            \
+						__len__ = snprintf(__lane__->data + __lane__->pl,                           \
+						    SPL_CTRL_OBJ->krange - __lane__->pl, ___fmttt___, ##__VA_ARGS__);       \
 						;                                                                           \
 						if (__len__ > 0) {                                                          \
-							;                                                                   \
-							__outlen__ = SPL_MIN_AB(__len__,                                    \
-							    SPL_CTRL_OBJ->krange - SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->pl); \
-							;                                                                   \
-							SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->pl += __outlen__;               \
-							;                                                                   \
+							__outlen__ =                                                        \
+							    SPL_MIN_AB(__len__, SPL_CTRL_OBJ->krange - __lane__->pl);       \
+							__lane__->pl += __outlen__;                                         \
 						};                                                                          \
-					}                                                                                   \
-                                                                                                                            \
+					};                                                                                  \
+					;                                                                                   \
 					spl_mutex_unlock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                  \
-                                                                                                                            \
+					;                                                                                   \
+					;                                                                                   \
 					if (__len__ > 0)                                                                    \
 						break;                                                                      \
-					; /*spl_console_log("--OVER ===                                                     \
-					     r: %d", (int)r);*/                                                             \
 					;                                                                                   \
 					(__pr__.r)++;                                                                       \
 					(__pr__.r) %= SPL_CTRL_OBJ->ncpu;                                                   \
@@ -485,11 +477,12 @@ typedef struct __SPL_BFMT_HD__ {
 				__pr__.line = __LINE__;                                                                     \
 				__pr__.lv = (__lv__);                                                                       \
 				;                                                                                           \
-                                                                                                                            \
 				spl_fmt_now_ext(&__pr__);                                                                   \
 				;                                                                                           \
 				do {                                                                                        \
 					;                                                                                   \
+					spl_gen_data_st *const __lane__ =                                                   \
+					    SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r);                      \
 					__outlen__ = __pr__.outlen;                                                         \
 					;                                                                                   \
 					spl_mutex_lock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                    \
@@ -497,34 +490,23 @@ typedef struct __SPL_BFMT_HD__ {
 					{*/                                                                                 \
 					/*if(__t__->arr_topic){*/;                                                          \
 					;                                                                                   \
-					if (SPL_CTRL_OBJ->range >                                                           \
-					    SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl) {                \
+					if (SPL_CTRL_OBJ->range > __lane__->pl) {                                           \
 						;                                                                           \
-						memcpy(SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->data +    \
-							   SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl,   \
-						    __pr__.fmtt, __outlen__);                                               \
+						memcpy(__lane__->data + __lane__->pl, __pr__.fmtt, __outlen__);             \
 						;                                                                           \
-						SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl +=            \
-						    __outlen__;                                                             \
+						__lane__->pl += __outlen__;                                                 \
 						;                                                                           \
-						__len__ = snprintf(                                                         \
-						    SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->data +       \
-							SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl,      \
-						    SPL_CTRL_OBJ->krange -                                                  \
-							SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl,      \
-						    ___fmttt___, ##__VA_ARGS__);                                            \
+						__len__ = snprintf(__lane__->data + __lane__->pl,                           \
+						    SPL_CTRL_OBJ->krange - __lane__->pl, ___fmttt___, ##__VA_ARGS__);       \
 						; /*spl_console_log("--------------lllllllennnnnnnnnnnnnnnnn---r: %d, len:  \
 						     %d", (int)r, len);*/                                                   \
 						;                                                                           \
 						if (__len__ > 0) {                                                          \
 							;                                                                   \
-							__outlen__ = SPL_MIN_AB(__len__,                                    \
-							    SPL_CTRL_OBJ->krange -                                          \
-								SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)   \
-								    ->pl);                                                  \
+							__outlen__ =                                                        \
+							    SPL_MIN_AB(__len__, SPL_CTRL_OBJ->krange - __lane__->pl);       \
 							;                                                                   \
-							SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl +=    \
-							    __outlen__;                                                     \
+							__lane__->pl += __outlen__;                                         \
 						}                                                                           \
 					}                                                                                   \
 					/*}*/                                                                               \
@@ -533,11 +515,8 @@ typedef struct __SPL_BFMT_HD__ {
 					spl_mutex_unlock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                  \
 					if (__len__ > 0)                                                                    \
 						break;                                                                      \
-					;                                                                                   \
-					;                                                                                   \
 					(__pr__.r)++;                                                                       \
 					(__pr__.r) %= SPL_CTRL_OBJ->ncpu;                                                   \
-					;                                                                                   \
 					continue;                                                                           \
 				} while (1);                                                                                \
 				if (!SPL_CTRL_OBJ->trigger_thread)                                                          \
@@ -575,7 +554,7 @@ typedef struct __SPL_BFMT_HD__ {
 				;                                                                                           \
 				do {                                                                                        \
 					;                                                                                   \
-					spl_gen_data_st *const __slot__ =                                                   \
+					spl_gen_data_st *const __lane__ =                                                   \
 					    SPL_ST_LOGBUF_BTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r);                    \
 					__len__ = 0;                                                                        \
 					spl_mutex_lock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                    \
@@ -583,11 +562,11 @@ typedef struct __SPL_BFMT_HD__ {
 					{*/                                                                                 \
 					/*if(__t__->arr_topic){*/;                                                          \
 					;                                                                                   \
-					if (SPL_CTRL_OBJ->range > __slot__->pl) {                                           \
-						memcpy(__slot__->data + __slot__->pl, &(__pr__.hd), __SPL_HD_SZ__);         \
-						__slot__->pl += __SPL_HD_SZ__;                                              \
-						memcpy(__slot__->data + __slot__->pl, __data__, __sz__);                    \
-						__slot__->pl += __sz__;                                                     \
+					if (SPL_CTRL_OBJ->range > __lane__->pl) {                                           \
+						memcpy(__lane__->data + __lane__->pl, &(__pr__.hd), __SPL_HD_SZ__);         \
+						__lane__->pl += __SPL_HD_SZ__;                                              \
+						memcpy(__lane__->data + __lane__->pl, __data__, __sz__);                    \
+						__lane__->pl += __sz__;                                                     \
 						__len__ = __pr__.hd.total;                                                  \
 					}                                                                                   \
 					/*}*/                                                                               \
