@@ -573,27 +573,26 @@ typedef struct __SPL_BFMT_HD__ {
 				;                                                                                           \
 				do {                                                                                        \
 					;                                                                                   \
+					spl_gen_data_st *const __slot__ =                                                   \
+					    SPL_ST_LOGBUF_BTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r);                    \
 					__len__ = 0;                                                                        \
 					spl_mutex_lock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                    \
 					/*do                                                                                \
 					{*/                                                                                 \
 					/*if(__t__->arr_topic){*/;                                                          \
 					;                                                                                   \
-					if (SPL_CTRL_OBJ->range >                                                           \
-					    SPL_ST_LOGBUF_BTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl) {              \
+					if (SPL_CTRL_OBJ->range > __slot__->pl) {                                           \
 						;                                                                           \
-						memcpy(SPL_ST_LOGBUF_BTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->data +  \
-							   SPL_ST_LOGBUF_BTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl, \
-						    &(__pr__.hd), sizeof(SPL_BFMT_PARAM));                                  \
+						memcpy(                                                                     \
+						    __slot__->data + __slot__->pl, &(__pr__.hd), sizeof(SPL_BFMT_PARAM));   \
 						;                                                                           \
-						SPL_ST_LOGBUF_BTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl +=          \
-						    sizeof(SPL_BFMT_PARAM);                                                 \
+						__slot__->pl += sizeof(SPL_BFMT_PARAM);                                     \
 						;                                                                           \
-						;memcpy(SPL_ST_LOGBUF_BTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->data +    \
-						SPL_ST_LOGBUF_BTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl,   \
+						;memcpy(__slot__->data +    \
+							__slot__->pl,   \
 							__data__, __sz__;                                               \
 			 		;\
-					;SPL_ST_LOGBUF_BTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl +=            \
+					;__slot__->pl +=            \
 			 			__sz__;                                                             \
 			 		;                                                                           \
 					__len__ = __pr__.hd.total;                                            \
