@@ -2669,7 +2669,7 @@ spl_init_segments()
 	int k = 0;
 	int step = 0;
 	spl_gen_data_st *sgment = 0;
-	SIMPLE_LOG_ST *t = &__simple_log_static__;
+	SIMPLE_LOG_ST * const t = &__simple_log_static__;
 	p = (char *)t->buf;
 	if (!t->range) {
 		t->range = t->buff_size - (sizeof(spl_gen_data_st) + t->max_sz_msg + SPL_RL_BUF);
@@ -2691,6 +2691,15 @@ spl_init_segments()
 				spl_fmt_segment(sgment);
 			}
 		}
+		for (k = t->n_topic; k < (t->n_topic + t->n_btopic); ++k) {
+			p += step;
+			t->arr_btopic[k].buf = (spl_gen_data_st *)p;
+			for (i = 0; i < t->ncpu; ++i) {
+				seg = p + i * t->buff_size;
+				sgment = (spl_gen_data_st *)seg;
+				spl_fmt_segment(sgment);
+			}
+		}		
 	} while (0);
 	return ret;
 }
