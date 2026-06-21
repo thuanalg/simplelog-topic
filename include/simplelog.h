@@ -531,7 +531,7 @@ typedef struct __SPL_BFMT_HD__ {
 	((spl_gen_data_st *)((char *)SPL_ST_LOGBUF_BTOPIC(__t__, __i__) + __t__->buff_size * __r__))
 
 #define __SPL_HD_SZ__                   sizeof(SPL_BFMT_PARAM)
-#define __SPL_CHK_HD__(__lane__, __pr__) (SPL_CTRL_OBJ->range > (__lane__->pl + __pr__.hd.total))
+#define __SPL_CHK_HD__(__lane__, __pr__) (SPL_CTRL_OBJ->krange > (__lane__->pl + __pr__.hd.total))
 
 #define __spl_log_buf_btopic__(__tpic__, __id__, __data__, ___sz___)                                                        \
 	{                                                                                                                   \
