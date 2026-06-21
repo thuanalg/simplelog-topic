@@ -551,6 +551,8 @@ typedef struct __SPL_BFMT_HD__ {
 #define SPL_ST_LOGBUF_BTOPIC_RANGE(__t__, __i__, __r__)                                                                     \
 	((spl_gen_data_st *)((char *)SPL_ST_LOGBUF_BTOPIC(__t__, __i__) + __t__->buff_size * __r__))
 
+#define __SPL_HD_SZ__                   sizeof(SPL_BFMT_PARAM)
+
 #define __spl_log_buf_btopic__(__tpic__, __id__, __data__, ___sz___)                                                        \
 	{                                                                                                                   \
 		;                                                                                                           \
@@ -565,7 +567,7 @@ typedef struct __SPL_BFMT_HD__ {
 				;                                                                                           \
 				SPL_BFMT_HD __pr__ = {0};                                                                   \
 				;                                                                                           \
-				__pr__.hd.total = sizeof(SPL_BFMT_PARAM) + ___sz___;                                        \
+				__pr__.hd.total = __SPL_HD_SZ__ + ___sz___;                                                 \
 				;                                                                                           \
 				__pr__.hd.type_id = __id__;                                                                 \
 				;                                                                                           \
@@ -582,23 +584,11 @@ typedef struct __SPL_BFMT_HD__ {
 					/*if(__t__->arr_topic){*/;                                                          \
 					;                                                                                   \
 					if (SPL_CTRL_OBJ->range > __slot__->pl) {                                           \
-						;                                                                           \
-						memcpy(                                                                     \
-						    __slot__->data + __slot__->pl, &(__pr__.hd), sizeof(SPL_BFMT_PARAM));   \
-						;                                                                           \
-						__slot__->pl += sizeof(SPL_BFMT_PARAM);                                     \
-						;                                                                           \
-						;memcpy(__slot__->data +    \
-							__slot__->pl,   \
-							__data__, __sz__;                                               \
-			 		;\
-					;__slot__->pl +=            \
-			 			__sz__;                                                             \
-			 		;                                                                           \
-					__len__ = __pr__.hd.total;                                            \
-					; /*spl_console_log("--------------lllllllennnnnnnnnnnnnnnnn---r: %d, len:  \
-					     %d", (int)r, len);*/                                                   \
-					;                                                                                   \
+						memcpy(__slot__->data + __slot__->pl, &(__pr__.hd), __SPL_HD_SZ__);         \
+						__slot__->pl += __SPL_HD_SZ__;                                              \
+						memcpy(__slot__->data + __slot__->pl, __data__, __sz__);                    \
+						__slot__->pl += __sz__;                                                     \
+						__len__ = __pr__.hd.total;                                                  \
 					}                                                                                   \
 					/*}*/                                                                               \
 					/*}                                                                                 \
@@ -606,13 +596,8 @@ typedef struct __SPL_BFMT_HD__ {
 					spl_mutex_unlock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                  \
 					if (__len__ > 0)                                                                    \
 						break;                                                                      \
-					;                                                                                   \
-					;                                                                                   \
-					;                                                                                   \
 					(__pr__.r)++;                                                                       \
-					;                                                                                   \
 					(__pr__.r) %= SPL_CTRL_OBJ->ncpu;                                                   \
-					;                                                                                   \
 					continue;                                                                           \
 				} while (1);                                                                                \
 				if (!SPL_CTRL_OBJ->trigger_thread)                                                          \
