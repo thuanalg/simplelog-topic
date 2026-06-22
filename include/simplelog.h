@@ -388,29 +388,26 @@ typedef struct __SPL_FMT_PARAM__ {
 					;                                                                                   \
 					int __len__ = 0;                                                                    \
 					;                                                                                   \
+					spl_gen_data_st *const __lane__ = SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r);               \
 					__outlen__ = __pr__.outlen;                                                         \
 					;                                                                                   \
 					spl_mutex_lock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                    \
 					;                                                                                   \
-					if (SPL_CTRL_OBJ->range > SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->pl) {                 \
+					if (SPL_CTRL_OBJ->range > __lane__->pl) {                                           \
 						;                                                                           \
-						memcpy(SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->data +                           \
-							   SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->pl,                          \
-						    __pr__.fmtt, __outlen__);                                               \
+						memcpy(__lane__->data + __lane__->pl, __pr__.fmtt, __outlen__);             \
 						;                                                                           \
-						SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->pl += __outlen__;                       \
+						__lane__->pl += __outlen__;                                                 \
 						;                                                                           \
-						__len__ = snprintf(SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->data +               \
-								       SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->pl,              \
-						    SPL_CTRL_OBJ->krange - SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->pl,          \
-						    ___fmttt___, ##__VA_ARGS__);                                            \
+						__len__ = snprintf(__lane__->data + __lane__->pl,                           \
+						    SPL_CTRL_OBJ->krange - __lane__->pl, ___fmttt___, ##__VA_ARGS__);       \
 						;                                                                           \
 						if (__len__ > 0) {                                                          \
 							;                                                                   \
-							__outlen__ = SPL_MIN_AB(__len__,                                    \
-							    SPL_CTRL_OBJ->krange - SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->pl); \
+							__outlen__ =                                                        \
+							    SPL_MIN_AB(__len__, SPL_CTRL_OBJ->krange - __lane__->pl);       \
 							;                                                                   \
-							SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r)->pl += __outlen__;               \
+							__lane__->pl += __outlen__;                                         \
 							;                                                                   \
 						};                                                                          \
 					}                                                                                   \
@@ -445,14 +442,14 @@ typedef struct __SPL_FMT_PARAM__ {
 		;                                                                                                           \
 		if (SPL_CTRL_OBJ->llevel <= (__lv__) && ___fmttt___[0] && SPL_CTRL_OBJ->arr_topic) {                        \
 			;                                                                                                   \
-			short __tpp__ = 0;                                                                                  \
+			unsigned short const __tpp__ = (__tpic__ > SPL_CTRL_OBJ->n_topic) ? 0 : __tpic__;                   \
 			int __len__ = 0;                                                                                    \
 			;                                                                                                   \
 			const char *__pfn__ = 0;                                                                            \
 			;                                                                                                   \
 			int __outlen__ = 0;                                                                                 \
 			;                                                                                                   \
-			__tpp__ = __tpic__ % SPL_CTRL_OBJ->n_topic;                                                         \
+			/*__tpp__ = __tpic__ % SPL_CTRL_OBJ->n_topic;*/                                                     \
 			;                                                                                                   \
 			__FILLE__(__pfn__);                                                                                 \
 			;                                                                                                   \
@@ -469,6 +466,8 @@ typedef struct __SPL_FMT_PARAM__ {
 				;                                                                                           \
 				do {                                                                                        \
 					;                                                                                   \
+					spl_gen_data_st *const __lane__ =                                                   \
+					    SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r);                      \
 					__outlen__ = __pr__.outlen;                                                         \
 					;                                                                                   \
 					spl_mutex_lock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                    \
@@ -476,34 +475,23 @@ typedef struct __SPL_FMT_PARAM__ {
 					{*/                                                                                 \
 					/*if(__t__->arr_topic){*/;                                                          \
 					;                                                                                   \
-					if (SPL_CTRL_OBJ->range >                                                           \
-					    SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl) {                \
+					if (SPL_CTRL_OBJ->range > __lane__->pl) {                                           \
 						;                                                                           \
-						memcpy(SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->data +    \
-							   SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl,   \
-						    __pr__.fmtt, __outlen__);                                               \
+						memcpy(__lane__->data + __lane__->pl, __pr__.fmtt, __outlen__);             \
 						;                                                                           \
-						SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl +=            \
-						    __outlen__;                                                             \
+						__lane__->pl += __outlen__;                                                 \
 						;                                                                           \
-						__len__ = snprintf(                                                         \
-						    SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->data +       \
-							SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl,      \
-						    SPL_CTRL_OBJ->krange -                                                  \
-							SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl,      \
-						    ___fmttt___, ##__VA_ARGS__);                                            \
+						__len__ = snprintf(__lane__->data + __lane__->pl,                           \
+						    SPL_CTRL_OBJ->krange - __lane__->pl, ___fmttt___, ##__VA_ARGS__);       \
 						; /*spl_console_log("--------------lllllllennnnnnnnnnnnnnnnn---r: %d, len:  \
 						     %d", (int)r, len);*/                                                   \
 						;                                                                           \
 						if (__len__ > 0) {                                                          \
 							;                                                                   \
-							__outlen__ = SPL_MIN_AB(__len__,                                    \
-							    SPL_CTRL_OBJ->krange -                                          \
-								SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)   \
-								    ->pl);                                                  \
+							__outlen__ =                                                        \
+							    SPL_MIN_AB(__len__, SPL_CTRL_OBJ->krange - __lane__->pl);       \
 							;                                                                   \
-							SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r)->pl +=    \
-							    __outlen__;                                                     \
+							__lane__->pl += __outlen__;                                         \
 						}                                                                           \
 					}                                                                                   \
 					/*}*/                                                                               \
