@@ -442,7 +442,7 @@ typedef struct __SPL_FMT_PARAM__ {
 		;                                                                                                           \
 		if (SPL_CTRL_OBJ->llevel <= (__lv__) && ___fmttt___[0] && SPL_CTRL_OBJ->arr_topic) {                        \
 			;                                                                                                   \
-			unsigned short const __tpp__ = (__tpic__ > SPL_CTRL_OBJ->n_topic) ? 0 : __tpic__;                   \
+			unsigned short const __tpp__ = (__tpic__ < SPL_CTRL_OBJ->n_topic) ? __tpic__ : 0;                   \
 			int __len__ = 0;                                                                                    \
 			;                                                                                                   \
 			const char *__pfn__ = 0;                                                                            \
