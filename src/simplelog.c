@@ -873,6 +873,8 @@ spl_get_fname_now(char *name)
 }
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+#define SPL_IO_BUF(__t__)	(__t__->data + __t__->pl)
+
 #ifndef UNIX_LINUX
 DWORD WINAPI
 spl_written_thread_routine(LPVOID lpParam)
@@ -968,7 +970,7 @@ spl_written_thread_routine(void *lpParam)
 					spl_mutex_lock(t->arr_mtx[i]);
 					/* //do { */
 					if (lane->pl > 0) {
-						memcpy(only_cast->data + only_cast->pl, lane->data, lane->pl);
+						memcpy(SPL_IO_BUF(only_cast), lane->data, lane->pl);
 						only_cast->pl += lane->pl;
 						lane->pl = 0;
 					}
@@ -995,8 +997,7 @@ spl_written_thread_routine(void *lpParam)
 							spl_mutex_lock(t->arr_mtx[j]);
 							/*//do */
 							if (lane->pl > 0) {
-								memcpy(
-								    only_cast->data + only_cast->pl, lane->data, lane->pl);
+								memcpy(SPL_IO_BUF(only_cast), lane->data, lane->pl);
 								only_cast->pl += lane->pl;
 								lane->pl = 0;
 							}
