@@ -888,9 +888,7 @@ spl_written_thread_routine(void *lpParam)
 
 	char is_off = 0;
 	int i = 0, j = 0;
-
-	char **main_src_thrd_buf = 0;
-	char ***src_topic_thrd_buf = 0;
+	spl_gen_data_st *lane = 0;
 
 #ifndef UNIX_LINUX
 	HANDLE trigger_handle_id = 0;
@@ -901,33 +899,11 @@ spl_written_thread_routine(void *lpParam)
 	char *only_buf = 0;
 	spl_gen_data_st *only_cast = 0;
 	spl_malloc((t->buff_size * t->ncpu), only_buf, char);
-	/*
-	//spl_malloc((t->buff_size * 3), only_buf, char);
-	//spl_create_memory((void**)&only_buf, "thread_buff_123", (t->buff_size * t->ncpu), 1);
-	*/
+
 	only_cast = SPL_CASTGEN(only_buf);
 	only_cast->total = (t->buff_size * t->ncpu);
 	only_cast->range = only_cast->total - sizeof(spl_gen_data_st);
 	only_cast->pl = only_cast->pc = 0;
-
-	spl_malloc(t->ncpu * sizeof(char *), main_src_thrd_buf, char *);
-	for (i = 0; i < t->ncpu; ++i) {
-		char *p = (char *)t->buf;
-		main_src_thrd_buf[i] = p + t->buff_size * i;
-	}
-
-	/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-
-	if (t->arr_topic) {
-		spl_malloc(t->n_topic * sizeof(char *), src_topic_thrd_buf, char **);
-		for (i = 0; i < t->n_topic; ++i) {
-			char *p = (char *)t->arr_topic[i].buf;
-			spl_malloc(t->ncpu * sizeof(char *), src_topic_thrd_buf[i], char *);
-			for (j = 0; j < t->ncpu; ++j) {
-				src_topic_thrd_buf[i][j] = p + t->buff_size * j;
-			}
-		}
-	}
 
 	/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 	if (t->trigger_thread > 0) {
@@ -988,14 +964,13 @@ spl_written_thread_routine(void *lpParam)
 				}
 				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				for (i = 0; i < t->ncpu; ++i) {
+					lane = SPL_KEYBUF(i);
 					spl_mutex_lock(t->arr_mtx[i]);
 					/* //do { */
-					if (SPL_CASTGEN(main_src_thrd_buf[i])->pl > 0) {
-						memcpy(only_cast->data + only_cast->pl,
-						    SPL_CASTGEN(main_src_thrd_buf[i])->data,
-						    SPL_CASTGEN(main_src_thrd_buf[i])->pl);
-						only_cast->pl += SPL_CASTGEN(main_src_thrd_buf[i])->pl;
-						SPL_CASTGEN(main_src_thrd_buf[i])->pl = 0;
+					if (lane->pl > 0) {
+						memcpy(only_cast->data + only_cast->pl, lane->data, lane->pl);
+						only_cast->pl += lane->pl;
+						lane->pl = 0;
 					}
 					/* //} while (0); */
 					spl_mutex_unlock(t->arr_mtx[i]);
@@ -1014,17 +989,16 @@ spl_written_thread_routine(void *lpParam)
 				}
 				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				if (t->n_topic > 0) {
-					char *src = 0;
 					for (i = 0; i < t->n_topic; ++i) {
 						for (j = 0; j < t->ncpu; ++j) {
-							src = src_topic_thrd_buf[i][j];
+							lane = SPL_TTOPIC_BUF(i, j);
 							spl_mutex_lock(t->arr_mtx[j]);
 							/*//do */
-							if (SPL_CASTGEN(src)->pl > 0) {
-								memcpy(only_cast->data + only_cast->pl,
-								    SPL_CASTGEN(src)->data, SPL_CASTGEN(src)->pl);
-								only_cast->pl += SPL_CASTGEN(src)->pl;
-								SPL_CASTGEN(src)->pl = 0;
+							if (lane->pl > 0) {
+								memcpy(
+								    only_cast->data + only_cast->pl, lane->data, lane->pl);
+								only_cast->pl += lane->pl;
+								lane->pl = 0;
 							}
 							/*//} while (0);*/
 							spl_mutex_unlock(t->arr_mtx[j]);
@@ -1058,11 +1032,7 @@ spl_written_thread_routine(void *lpParam)
 				}
 			}
 			spl_mutex_lock(t->mtx_rw);
-			/*
-			if (t->buf) {
-				spl_free(t->buf);
-			}
-			*/
+
 			for (i = 0; i < t->n_topic; ++i) {
 				if (t->arr_topic[i].buf) {
 					t->arr_topic[i].buf = 0;
@@ -1072,15 +1042,9 @@ spl_written_thread_routine(void *lpParam)
 		}
 
 	} while (0);
-	/* spl_free(thrd_buffer); */
-	spl_free(main_src_thrd_buf);
-	if (t->arr_topic) {
-		for (i = 0; i < t->n_topic; ++i) {
-			spl_free(src_topic_thrd_buf[i]);
-		}
-		spl_free(src_topic_thrd_buf);
-	}
+
 	spl_free(only_buf);
+
 	/* spl_del_memory((void *) only_buf); */
 	/* Send a signal to the waiting thread. */
 	if (t->trigger_thread) {
