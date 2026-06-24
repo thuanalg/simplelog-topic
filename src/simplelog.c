@@ -917,7 +917,7 @@ spl_written_thread_routine(void *lpParam)
 	pthread_t trigger_handle_id = 0;
 #endif
 
-	spl_gen_data_st *only_cast = spl_malloc_wbuf();
+	spl_gen_data_st *fwbuf = spl_malloc_wbuf();
 
 	/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 	if (t->trigger_thread > 0) {
@@ -982,17 +982,17 @@ spl_written_thread_routine(void *lpParam)
 					spl_mutex_lock(t->arr_mtx[i]);
 					/* //do { */
 					if (lane->pl > 0) {
-						memcpy(SPL_IO_BUF(only_cast), lane->data, lane->pl);
-						only_cast->pl += lane->pl;
+						memcpy(SPL_IO_BUF(fwbuf), lane->data, lane->pl);
+						fwbuf->pl += lane->pl;
 						lane->pl = 0;
 					}
 					/* //} while (0); */
 					spl_mutex_unlock(t->arr_mtx[i]);
 				}
 				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-				if (only_cast->pl > 0) {
-					k = (int)fwrite(only_cast->data, 1, only_cast->pl, t->fp);
-					only_cast->pl = 0;
+				if (fwbuf->pl > 0) {
+					k = (int)fwrite(fwbuf->data, 1, fwbuf->pl, t->fp);
+					fwbuf->pl = 0;
 					sz += k;
 					SPL_FFLUSH((t->fp), err);
 				}
@@ -1009,18 +1009,18 @@ spl_written_thread_routine(void *lpParam)
 							spl_mutex_lock(t->arr_mtx[j]);
 							/*//do */
 							if (lane->pl > 0) {
-								memcpy(SPL_IO_BUF(only_cast), lane->data, lane->pl);
-								only_cast->pl += lane->pl;
+								memcpy(SPL_IO_BUF(fwbuf), lane->data, lane->pl);
+								fwbuf->pl += lane->pl;
 								lane->pl = 0;
 							}
 							/*//} while (0);*/
 							spl_mutex_unlock(t->arr_mtx[j]);
 						}
-						if (only_cast->pl > 0) {
+						if (fwbuf->pl > 0) {
 							k = (int)fwrite(
-							    only_cast->data, 1, only_cast->pl, (FILE *)(t->arr_topic[i].fp));
+							    fwbuf->data, 1, fwbuf->pl, (FILE *)(t->arr_topic[i].fp));
 							t->arr_topic[i].fizize += k;
-							only_cast->pl = 0;
+							fwbuf->pl = 0;
 							SPL_FFLUSH((t->arr_topic[i].fp), err);
 							if (err) {
 								spl_console_log("--fflush, ret: %d --\n", err);
@@ -1056,7 +1056,7 @@ spl_written_thread_routine(void *lpParam)
 
 	} while (0);
 
-	spl_free(only_cast);
+	spl_free(fwbuf);
 
 	/* spl_del_memory((void *) only_buf); */
 	/* Send a signal to the waiting thread. */
