@@ -362,13 +362,13 @@ typedef struct __SPL_FMT_PARAM__ {
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #define SPL_CTRL_OBJ                    __spl_ctr_obj__
 
-#define SPL_KEYBUF(__t__, __i__) ((spl_gen_data_st *)((char *)__t__->buf + (__t__->buff_size * __i__)))
+#define SPL_KEYBUF(__i__) ((spl_gen_data_st *)((char *)SPL_CTRL_OBJ->buf + (SPL_CTRL_OBJ->buff_size * __i__)))
+
 #define __spl_log_buf_level__(__lv__, ___fmttt___, ...)                                                                     \
 	{                                                                                                                   \
 		;                                                                                                           \
 		if (SPL_CTRL_OBJ->llevel <= (__lv__) && ___fmttt___[0]) {                                                   \
 			;                                                                                                   \
-			int __outlen__ = 0;                                                                                 \
 			;                                                                                                   \
 			const char *__pfn__ = 0; /*char __isOof = 0;*/                                                      \
 			;                                                                                                   \
@@ -388,26 +388,26 @@ typedef struct __SPL_FMT_PARAM__ {
 					;                                                                                   \
 					int __len__ = 0;                                                                    \
 					;                                                                                   \
-					spl_gen_data_st *const __lane__ = SPL_KEYBUF(SPL_CTRL_OBJ, __pr__.r);               \
-					__outlen__ = __pr__.outlen;                                                         \
+					spl_gen_data_st *const __lane__ = SPL_KEYBUF(__pr__.r);                             \
+					/*__outlen__ = __pr__.outlen*/;                                                     \
 					;                                                                                   \
 					spl_mutex_lock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                    \
 					;                                                                                   \
 					if (SPL_CTRL_OBJ->range > __lane__->pl) {                                           \
 						;                                                                           \
-						memcpy(__lane__->data + __lane__->pl, __pr__.fmtt, __outlen__);             \
+						memcpy(__lane__->data + __lane__->pl, __pr__.fmtt, __pr__.outlen);          \
 						;                                                                           \
-						__lane__->pl += __outlen__;                                                 \
+						__lane__->pl += __pr__.outlen;                                              \
 						;                                                                           \
 						__len__ = snprintf(__lane__->data + __lane__->pl,                           \
 						    SPL_CTRL_OBJ->krange - __lane__->pl, ___fmttt___, ##__VA_ARGS__);       \
 						;                                                                           \
 						if (__len__ > 0) {                                                          \
 							;                                                                   \
-							__outlen__ =                                                        \
+							__lane__->pl +=                                                     \
 							    SPL_MIN_AB(__len__, SPL_CTRL_OBJ->krange - __lane__->pl);       \
 							;                                                                   \
-							__lane__->pl += __outlen__;                                         \
+							/*__lane__->pl += __outlen__*/;                                     \
 							;                                                                   \
 						};                                                                          \
 					}                                                                                   \
@@ -433,23 +433,21 @@ typedef struct __SPL_FMT_PARAM__ {
 		}                                                                                                           \
 	}
 
-#define SPL_ST_LOGBUFTOPIC(__t__, __i__) (&(__t__->arr_topic[__i__]))->buf
-#define SPL_ST_LOGBUFTOPIC_RANGE(__t__, __i__, __r__)                                                                       \
-	((spl_gen_data_st *)((char *)SPL_ST_LOGBUFTOPIC(__t__, __i__) + __t__->buff_size * __r__))
+#define SPL_ST_LOGBUFTOPIC(__i__) (&(SPL_CTRL_OBJ->arr_topic[__i__]))->buf
+
+#define SPL_ST_LOGBUFTOPIC_RANGE(__i__, __r__)                                                                              \
+	((spl_gen_data_st *)((char *)SPL_ST_LOGBUFTOPIC(__i__) + SPL_CTRL_OBJ->buff_size * __r__))
+#define SPL_TTOPIC_BUF                  SPL_ST_LOGBUFTOPIC_RANGE
+#define SPL_TT_INDEX(__t__) ((__t__ < SPL_CTRL_OBJ->n_topic) ? (__t__ < 0 ? 0 : __t__) : 0)
 
 #define __spl_log_buf_topic_level__(__lv__, __tpic__, ___fmttt___, ...)                                                     \
 	{                                                                                                                   \
 		;                                                                                                           \
 		if (SPL_CTRL_OBJ->llevel <= (__lv__) && ___fmttt___[0] && SPL_CTRL_OBJ->arr_topic) {                        \
 			;                                                                                                   \
-			unsigned short const __tpp__ = (__tpic__ < SPL_CTRL_OBJ->n_topic) ? __tpic__ : 0;                   \
 			int __len__ = 0;                                                                                    \
 			;                                                                                                   \
 			const char *__pfn__ = 0;                                                                            \
-			;                                                                                                   \
-			int __outlen__ = 0;                                                                                 \
-			;                                                                                                   \
-			/*__tpp__ = __tpic__ % SPL_CTRL_OBJ->n_topic;*/                                                     \
 			;                                                                                                   \
 			__FILLE__(__pfn__);                                                                                 \
 			;                                                                                                   \
@@ -461,14 +459,11 @@ typedef struct __SPL_FMT_PARAM__ {
 				__pr__.line = __LINE__;                                                                     \
 				__pr__.lv = (__lv__);                                                                       \
 				;                                                                                           \
-                                                                                                                            \
 				spl_fmt_now_ext(&__pr__);                                                                   \
 				;                                                                                           \
 				do {                                                                                        \
 					;                                                                                   \
-					spl_gen_data_st *const __lane__ =                                                   \
-					    SPL_ST_LOGBUFTOPIC_RANGE(SPL_CTRL_OBJ, __tpp__, __pr__.r);                      \
-					__outlen__ = __pr__.outlen;                                                         \
+					spl_gen_data_st *const __lane__ = SPL_TTOPIC_BUF(SPL_TT_INDEX(__tpic__), __pr__.r); \
 					;                                                                                   \
 					spl_mutex_lock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                    \
 					/*do                                                                                \
@@ -477,9 +472,9 @@ typedef struct __SPL_FMT_PARAM__ {
 					;                                                                                   \
 					if (SPL_CTRL_OBJ->range > __lane__->pl) {                                           \
 						;                                                                           \
-						memcpy(__lane__->data + __lane__->pl, __pr__.fmtt, __outlen__);             \
+						memcpy(__lane__->data + __lane__->pl, __pr__.fmtt, __pr__.outlen);          \
 						;                                                                           \
-						__lane__->pl += __outlen__;                                                 \
+						__lane__->pl += __pr__.outlen;                                              \
 						;                                                                           \
 						__len__ = snprintf(__lane__->data + __lane__->pl,                           \
 						    SPL_CTRL_OBJ->krange - __lane__->pl, ___fmttt___, ##__VA_ARGS__);       \
@@ -488,10 +483,10 @@ typedef struct __SPL_FMT_PARAM__ {
 						;                                                                           \
 						if (__len__ > 0) {                                                          \
 							;                                                                   \
-							__outlen__ =                                                        \
+							__lane__->pl +=                                                     \
 							    SPL_MIN_AB(__len__, SPL_CTRL_OBJ->krange - __lane__->pl);       \
 							;                                                                   \
-							__lane__->pl += __outlen__;                                         \
+							;                                                                   \
 						}                                                                           \
 					}                                                                                   \
 					/*}*/                                                                               \
