@@ -100,4 +100,4 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 - [meta-openembedded/LTS Wrynose/Yocto](https://layers.openembedded.org/layerindex/recipe/499762/)  
 - [openBMC(Meta, Google, IBM, Intel, Microsoft)](https://github.com/openbmc/openbmc/tree/master/upstream-layers/meta-openembedded/meta-oe/recipes-support/libsimplelog)
 - [Google](https://gbmc.googlesource.com/openbmc/+/refs/heads/master/upstream-layers/meta-openembedded/meta-oe/recipes-support/libsimplelog/)
-- [meta-voltumna](https://layers.openembedded.org/layerindex/branch/master/layer/meta-voltumna/) from [Elettra-Sincrotrone Trieste](https://www.elettra.eu/)
+- [meta-voltumna](https://layers.openembedded.org/layerindex/branch/master/layer/meta-voltumna/) from [Elettra-Sincrotrone Trieste - Scientific research institution - Operation of Synchrotron particle accelerator](https://www.elettra.eu/)
