@@ -875,12 +875,21 @@ spl_get_fname_now(char *name)
 }
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-static spl_gen_data_st * spl_malloc_wbuf()
+static spl_gen_data_st *
+spl_malloc_wbuf()
 {
 	spl_gen_data_st *t = 0;
 	char *buf = 0;
-	spl_malloc((SPL_CTRL_OBJ->buff_size * SPL_CTRL_OBJ->ncpu), buf, char);
-	t = (spl_gen_data_st*) buf;
+	spl_malloc(SPL_SEG_SZ, buf, char);
+	t = (spl_gen_data_st *)buf;
+	if (!t) {
+		return 0;
+	}
+
+	t->total = SPL_SEG_SZ;
+	t->range = t->total - sizeof(spl_gen_data_st);
+	t->pl = t->pc = 0;
+
 	return t;
 }
 #define SPL_IO_BUF(__t__) (__t__->data + __t__->pl)
@@ -909,10 +918,6 @@ spl_written_thread_routine(void *lpParam)
 #endif
 
 	spl_gen_data_st *only_cast = spl_malloc_wbuf();
-
-	only_cast->total = (t->buff_size * t->ncpu);
-	only_cast->range = only_cast->total - sizeof(spl_gen_data_st);
-	only_cast->pl = only_cast->pc = 0;
 
 	/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 	if (t->trigger_thread > 0) {

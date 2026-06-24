@@ -362,6 +362,8 @@ typedef struct __SPL_FMT_PARAM__ {
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #define SPL_CTRL_OBJ                    __spl_ctr_obj__
 
+#define SPL_SEG_SZ                      (SPL_CTRL_OBJ->buff_size * SPL_CTRL_OBJ->ncpu)
+
 #define SPL_KEYBUF(__i__) ((spl_gen_data_st *)((char *)SPL_CTRL_OBJ->buf + (SPL_CTRL_OBJ->buff_size * __i__)))
 
 #define __spl_log_buf_level__(__lv__, ___fmttt___, ...)                                                                     \
@@ -439,6 +441,7 @@ typedef struct __SPL_FMT_PARAM__ {
 	((spl_gen_data_st *)((char *)SPL_ST_LOGBUFTOPIC(__i__) + SPL_CTRL_OBJ->buff_size * __r__))
 #define SPL_TTOPIC_BUF                  SPL_ST_LOGBUFTOPIC_RANGE
 #define SPL_TT_INDEX(__t__) ((__t__ < SPL_CTRL_OBJ->n_topic) ? (__t__ < 0 ? 0 : __t__) : 0)
+#define SPL_TT_LANE(__tpic__, __r__)	SPL_TTOPIC_BUF(SPL_TT_INDEX(__tpic__), __r__)
 
 #define __spl_log_buf_topic_level__(__lv__, __tpic__, ___fmttt___, ...)                                                     \
 	{                                                                                                                   \
@@ -463,7 +466,7 @@ typedef struct __SPL_FMT_PARAM__ {
 				;                                                                                           \
 				do {                                                                                        \
 					;                                                                                   \
-					spl_gen_data_st *const __lane__ = SPL_TTOPIC_BUF(SPL_TT_INDEX(__tpic__), __pr__.r); \
+					spl_gen_data_st *const __lane__ = SPL_TT_LANE(__tpic__, __pr__.r); \
 					;                                                                                   \
 					spl_mutex_lock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                    \
 					/*do                                                                                \
