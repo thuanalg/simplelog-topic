@@ -200,7 +200,6 @@
 #define SPL_TEXT_ERROR            "E"
 #define SPL_TEXT_FATAL            "F"
 
-#define SPL_CASTGEN(__t__) ((spl_gen_data_st *)__t__)
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #ifndef UNIX_LINUX
 // DLL_API_SIMPLE_LOG
@@ -876,6 +875,14 @@ spl_get_fname_now(char *name)
 }
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+static spl_gen_data_st * spl_malloc_wbuf()
+{
+	spl_gen_data_st *t = 0;
+	char *buf = 0;
+	spl_malloc((SPL_CTRL_OBJ->buff_size * SPL_CTRL_OBJ->ncpu), buf, char);
+	t = (spl_gen_data_st*) buf;
+	return t;
+}
 #define SPL_IO_BUF(__t__) (__t__->data + __t__->pl)
 
 #ifndef UNIX_LINUX
@@ -901,11 +908,8 @@ spl_written_thread_routine(void *lpParam)
 	pthread_t trigger_handle_id = 0;
 #endif
 
-	char *only_buf = 0;
-	spl_gen_data_st *only_cast = 0;
-	spl_malloc((t->buff_size * t->ncpu), only_buf, char);
+	spl_gen_data_st *only_cast = spl_malloc_wbuf();
 
-	only_cast = SPL_CASTGEN(only_buf);
 	only_cast->total = (t->buff_size * t->ncpu);
 	only_cast->range = only_cast->total - sizeof(spl_gen_data_st);
 	only_cast->pl = only_cast->pc = 0;
@@ -1047,7 +1051,7 @@ spl_written_thread_routine(void *lpParam)
 
 	} while (0);
 
-	spl_free(only_buf);
+	spl_free(only_cast);
 
 	/* spl_del_memory((void *) only_buf); */
 	/* Send a signal to the waiting thread. */
