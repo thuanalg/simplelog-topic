@@ -7,6 +7,7 @@ INC=-I../ -I../../include
 PREFIX_SRC=../../tests
 #CFLAGS=-ansi
 CFLAGS=-std=c89 -D UNIX_LINUX -Werror=format -D _GNU_SOURCE -D __LINUX__
+#CFLAGS=-std=gnu89 -D UNIX_LINUX -Werror=format
 #CPPFLAGS=-std=c++98 
 #CPPFLAGS=-std=c++98 -D UNIX_LINUX -D __UNIX_LINUX_CPP11_AND_NEWERS
 CPPFLAGS=-D UNIX_LINUX -D __UNIX_LINUX_CPP11_AND_NEWERS__ -Wno-register -Werror=format -D _GNU_SOURCE -D __LINUX__

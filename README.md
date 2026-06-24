@@ -97,7 +97,7 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 - [Email](mailto:nguyenthaithuanalg@gmail.com)
 
 ### Contributed to / Used by:  
-- [meta-openembedded](https://layers.openembedded.org/layerindex/recipe/448479/)  
-- [openBMC](https://github.com/openbmc/openbmc/tree/master/meta-openembedded/meta-oe/recipes-support/libsimplelog)
-- [Google](https://gbmc.googlesource.com/openbmc/+/refs/heads/master/meta-openembedded/meta-oe/recipes-support/libsimplelog)
+- [meta-openembedded/LTS Wrynose/Yocto](https://layers.openembedded.org/layerindex/recipe/499762/)  
+- [openBMC](https://github.com/openbmc/openbmc/tree/master/upstream-layers/meta-openembedded/meta-oe/recipes-support/libsimplelog)
+- [Google](https://gbmc.googlesource.com/openbmc/+/refs/heads/master/upstream-layers/meta-openembedded/meta-oe/recipes-support/libsimplelog/)
 - [meta-voltumna](https://layers.openembedded.org/layerindex/branch/master/layer/meta-voltumna/) from [Elettra-Sincrotrone Trieste](https://www.elettra.eu/)
