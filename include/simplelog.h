@@ -246,7 +246,7 @@ typedef struct __SIMPLE_LOG_ST__ {
 	int index; /*Index of default log, not in a topic. No nead SYNC.*/
 	char folder[SPL_PATH_FOLDER]; /*Path of genera folder. No nead SYNC.*/
 	char off; /*Must be sync*/
-	void *mtx_rw; /*mtx: Need to close handle*/
+	void *mtx_off; /*mtx: Need to close handle*/
 	void *sem_rwfile; /*sem_rwfile: Need to close handle*/
 	void *sem_off; /*sem_off: Need to close handle*/
 	spl_local_time_st lc_time_now; /*Current time.*/

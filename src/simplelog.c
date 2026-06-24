@@ -168,7 +168,6 @@
 #define SPL_SEM_NAME_RW           "_SEM_RW"
 #define SPL_SEM_NAME_OFF          "_SEM_OFF"
 
-#define SPL_MTX_NAME_RW           "_MTX_RW"
 #define SPL_MTX_NAME_OFF          "_MTX_OFF"
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
@@ -429,11 +428,11 @@ spl_set_off(int isoff)
 	SIMPLE_LOG_ST *t = &__simple_log_static__;
 	int shouldWait = 0;
 
-	spl_mutex_lock(t->mtx_rw);
+	spl_mutex_lock(t->mtx_off);
 	do {
 		t->off = isoff;
 	} while (0);
-	spl_mutex_unlock(t->mtx_rw);
+	spl_mutex_unlock(t->mtx_off);
 
 	spl_rel_sem(t->sem_rwfile);
 	shouldWait = (!t->isProcessMode) ? 1 : (!!t->is_master);
@@ -883,6 +882,7 @@ spl_malloc_wbuf()
 	spl_malloc(SPL_SEG_SZ, buf, char);
 	t = (spl_gen_data_st *)buf;
 	if (!t) {
+		exit(1);
 		return 0;
 	}
 
@@ -920,9 +920,13 @@ spl_written_thread_routine(void *lpParam)
 	spl_gen_data_st *fwbuf = spl_malloc_wbuf();
 
 	/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+
 	if (t->trigger_thread > 0) {
 		spl_create_thread(spl_trigger_routine, t, &trigger_handle_id);
 	}
+
+	/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+
 	do {
 		if (is_off) {
 			break;
@@ -936,7 +940,7 @@ spl_written_thread_routine(void *lpParam)
 		/*
 		//spl_console_log("Semaphore: 0x%p.\n", t->sem_rwfile);
 		*/
-		if (!t->mtx_rw) {
+		if (!t->mtx_off) {
 			exit(1);
 		}
 		while (1) {
@@ -972,9 +976,9 @@ spl_written_thread_routine(void *lpParam)
 
 				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				if (!is_off) {
-					spl_mutex_lock(t->mtx_rw);
+					spl_mutex_lock(t->mtx_off);
 					is_off = t->off;
-					spl_mutex_unlock(t->mtx_rw);
+					spl_mutex_unlock(t->mtx_off);
 				}
 				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				for (i = 0; i < t->ncpu; ++i) {
@@ -1044,14 +1048,14 @@ spl_written_thread_routine(void *lpParam)
 					SPL_FCLOSE(t->arr_topic[i].fp, werr);
 				}
 			}
-			spl_mutex_lock(t->mtx_rw);
+			spl_mutex_lock(t->mtx_off);
 
 			for (i = 0; i < t->n_topic; ++i) {
 				if (t->arr_topic[i].buf) {
 					t->arr_topic[i].buf = 0;
 				}
 			}
-			spl_mutex_unlock(t->mtx_rw);
+			spl_mutex_unlock(t->mtx_off);
 		}
 
 	} while (0);
@@ -2069,7 +2073,7 @@ spl_calculate_size()
 		mtxsize = (1 + t->ncpu) * step_size;
 		semsize = 0;
 #else
-		/*t->mtx_rw: is NamedMutex*/
+		/*t->mtx_off: is NamedMutex*/
 		mtxsize = 0;
 		/*semsize*/
 		semsize = 0;
@@ -2134,7 +2138,7 @@ spl_calculate_size()
 #ifndef UNIX_LINUX
 #ifdef SPL_USING_SPIN_LOCK
 
-		t->mtx_rw = (void *)(buff + k);
+		t->mtx_off = (void *)(buff + k);
 
 		step_size = sizeof(volatile long);
 		p = (buff + k) + step_size;
@@ -2142,15 +2146,15 @@ spl_calculate_size()
 			t->arr_mtx[i] = (void *)(p + i * step_size);
 		}
 #else
-		/*t->mtx_rw: is NamedMutex*/
-		/*t->mtx_rw: is NamedSem*/
+		/*t->mtx_off: is NamedMutex*/
+		/*t->mtx_off: is NamedSem*/
 #endif
 		ret = spl_win32_sync_create();
 #else
-		t->mtx_rw = (void *)(buff + k);
+		t->mtx_off = (void *)(buff + k);
 #ifdef SPL_USING_SPIN_LOCK
-		if (t->mtx_rw) {
-			pthread_spinlock_t *mtx = (pthread_spinlock_t *)t->mtx_rw;
+		if (t->mtx_off) {
+			pthread_spinlock_t *mtx = (pthread_spinlock_t *)t->mtx_off;
 			if (t->isProcessMode) {
 				int err = 0;
 				err = pthread_spin_init(mtx, PTHREAD_PROCESS_SHARED);
@@ -2180,8 +2184,8 @@ spl_calculate_size()
 			}
 		}
 #else
-		if (t->mtx_rw) {
-			pthread_mutex_t *mtx = (pthread_mutex_t *)t->mtx_rw;
+		if (t->mtx_off) {
+			pthread_mutex_t *mtx = (pthread_mutex_t *)t->mtx_off;
 			ret = spl_mtx_init(mtx, t->isProcessMode);
 		}
 		step_size = sizeof(pthread_mutex_t);
@@ -2260,7 +2264,7 @@ spl_win32_sync_create()
 				spl_err("CreateMutexA");
 				break;
 			}
-			t->mtx_rw = hd;
+			t->mtx_off = hd;
 
 			for (i = 0; i < t->ncpu; ++i) {
 				snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s_%0.2d", SPL_MTX_NAME_OFF, t->shared_key, i);
@@ -2281,7 +2285,7 @@ spl_win32_sync_create()
 				spl_err("CreateMutexA");
 				break;
 			}
-			t->mtx_rw = hd;
+			t->mtx_off = hd;
 
 			for (i = 0; i < t->ncpu; ++i) {
 				hd = CreateMutexA(0, 0, 0);
@@ -2643,7 +2647,7 @@ spl_clean_sync_tool()
 #ifdef SPL_USING_SPIN_LOCK
 #else
 		int i = 0;
-		SPL_CloseHandle(t->mtx_rw);
+		SPL_CloseHandle(t->mtx_off);
 		for (i = 0; i < t->ncpu; ++i) {
 			SPL_CloseHandle(t->arr_mtx[i]);
 		}
