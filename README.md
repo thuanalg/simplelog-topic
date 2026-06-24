@@ -84,7 +84,7 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 **Thanks a lot to:**
 
 1. My family, friends.
-2. My colleagues: Lê Duy Cường, Bùi Khánh Duy, Nguyễn Công Đức , ... .
+2. My colleagues: [Lê Duy Cường](https://www.linkedin.com/in/le-duy-cuong-1212a743/), Bùi Khánh Duy, Nguyễn Công Đức , ... .
 3. [Jan Flik](https://www.linkedin.com/in/jan-flik/) from [Intel Corp.](https://www.intel.com)
 
 ---
