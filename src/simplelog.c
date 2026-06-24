@@ -562,7 +562,7 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 #if defined(_GNU_SOURCE) && defined(__LINUX__)
 			n = SPL_MAX_AB(sysconf(_SC_NPROCESSORS_ONLN), n);
 #endif
-#if defined(_GNU_SOURCE) 
+#if defined(_GNU_SOURCE)
 			n = SPL_MAX_AB(2, n);
 #endif
 			t->ncpu = n;
@@ -876,7 +876,7 @@ spl_get_fname_now(char *name)
 }
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-#define SPL_IO_BUF(__t__)	(__t__->data + __t__->pl)
+#define SPL_IO_BUF(__t__) (__t__->data + __t__->pl)
 
 #ifndef UNIX_LINUX
 DWORD WINAPI
