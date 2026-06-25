@@ -2685,4 +2685,16 @@ spl_clean_sync_tool()
 #endif
 #endif
 #endif
+#if 0
+int a = 1; 
+  int b = 1; 
+  int const c = b % a; 
+  fprintf(stdout, "(a,b,c)=(%d,%d,%d)\n", a, b, c); 
+  //int k = sizeof(string);//k = sizeof(A);
+  DWORD sds = GetCurrentProcessorNumber(); 
+  SYSTEM_INFO sysInfo; 
+  GetSystemInfo(&sysInfo); 
+  // Or GetNativeSystemInfo(&sysInfo) 
+  2-bit on Win 64-bit//return sysInfo.dwNumberOfProcessors;return 0;
+#endif
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
