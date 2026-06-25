@@ -1048,6 +1048,7 @@ spl_written_thread_routine(void *lpParam)
 					SPL_FCLOSE(t->arr_topic[i].fp, werr);
 				}
 			}
+#if 0			
 			spl_mutex_lock(t->mtx_off);
 
 			for (i = 0; i < t->n_topic; ++i) {
@@ -1056,6 +1057,7 @@ spl_written_thread_routine(void *lpParam)
 				}
 			}
 			spl_mutex_unlock(t->mtx_off);
+#endif
 		}
 
 	} while (0);
@@ -2531,11 +2533,32 @@ spl_mtx_init(void *obj, char shared)
 static void
 spl_fmt_segment(spl_gen_data_st *sgment)
 {
-	SIMPLE_LOG_ST *t = &__simple_log_static__;
-	sgment->total = t->buff_size;
+	sgment->total = SPL_CTRL_OBJ->buff_size;
 	sgment->pl = 0;
 	sgment->pc = 0;
 }
+
+int
+spl_init_segments() {
+	int ret = 0;
+	int i = 0;
+	int k = 0;
+
+	k = sizeof(spl_gen_data_st) + SPL_CTRL_OBJ->max_sz_msg + SPL_RL_BUF;
+	SPL_CTRL_OBJ->range = SPL_CTRL_OBJ->buff_size - k;
+	SPL_CTRL_OBJ->krange = SPL_CTRL_OBJ->range + SPL_CTRL_OBJ->max_sz_msg;
+	
+	for (i = 0; i < SPL_CTRL_OBJ->ncpu; ++i) {
+		spl_fmt_segment(SPL_KEYBUF(i));
+	}
+	for (k = 0; k < SPL_CTRL_OBJ->n_topic; ++k) {
+		for (i = 0; i < SPL_CTRL_OBJ->ncpu; ++i) {
+			spl_fmt_segment(SPL_TTOPIC_BUF(k, i));
+		}		
+	}
+	return ret;
+}
+#if 0
 int
 spl_init_segments()
 {
@@ -2556,7 +2579,11 @@ spl_init_segments()
 		for (i = 0; i < t->ncpu; ++i) {
 			seg = p + i * t->buff_size;
 			sgment = (spl_gen_data_st *)seg;
+#if 0			
 			spl_fmt_segment(sgment);
+#else
+			spl_fmt_segment(SPL_KEYBUF(i));
+#endif
 		}
 		step = t->buff_size * t->ncpu;
 		for (k = 0; k < t->n_topic; ++k) {
@@ -2565,12 +2592,17 @@ spl_init_segments()
 			for (i = 0; i < t->ncpu; ++i) {
 				seg = p + i * t->buff_size;
 				sgment = (spl_gen_data_st *)seg;
+#if	0			
 				spl_fmt_segment(sgment);
+#else
+				spl_fmt_segment(SPL_TTOPIC_BUF(k, i));
+#endif
 			}
 		}
 	} while (0);
 	return ret;
 }
+#endif
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 int

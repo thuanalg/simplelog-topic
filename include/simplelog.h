@@ -230,7 +230,9 @@ typedef struct __spl_local_time_st__ {
 typedef struct __SIMPLE_LOG_TOPIC_ST__ {
 	int index; /*Index of a topic*/
 	char topic[SPL_TOPIC_SIZE]; /*Name of topic*/
+#if 0	
 	spl_gen_data_st *buf; /*Buff for writing*/
+#endif
 	int fizize; /*Size of file.*/
 	void *fp; /*File stream.*/
 } SIMPLE_LOG_TOPIC_ST;
@@ -370,7 +372,7 @@ typedef struct __SPL_FMT_PARAM__ {
 
 #define SPL_SEG_SZ                      (SPL_CTRL_OBJ->buff_size * SPL_CTRL_OBJ->ncpu)
 
-#define SPL_KEYBUF(__i__) ((spl_gen_data_st *)((char *)SPL_CTRL_OBJ->buf + (SPL_CTRL_OBJ->buff_size * __i__)))
+#define SPL_KEYBUF(__i__) ((spl_gen_data_st *)((char *)(SPL_CTRL_OBJ->buf) + (SPL_CTRL_OBJ->buff_size * __i__)))
 
 #define __spl_log_buf_level__(__lv__, ___fmttt___, ...)                                                                     \
 	{                                                                                                                   \
@@ -434,11 +436,17 @@ typedef struct __SPL_FMT_PARAM__ {
 			}                                                                                                   \
 		}                                                                                                           \
 	}
-
+#if 0
 #define SPL_ST_LOGBUFTOPIC(__i__) (&(SPL_CTRL_OBJ->arr_topic[__i__]))->buf
+#else
+#define SPL_ST_LOGBUFTOPIC(__i__) (((char*)(SPL_CTRL_OBJ->buf))  + (1 + __i__) *SPL_SEG_SZ)
+#endif
+
+
 
 #define SPL_ST_LOGBUFTOPIC_RANGE(__i__, __r__)                                                                              \
 	((spl_gen_data_st *)((char *)SPL_ST_LOGBUFTOPIC(__i__) + SPL_CTRL_OBJ->buff_size * __r__))
+
 #define SPL_TTOPIC_BUF                  SPL_ST_LOGBUFTOPIC_RANGE
 #define SPL_TT_INDEX(__t__) ((__t__ < SPL_CTRL_OBJ->n_topic) ? (__t__ < 0 ? 0 : __t__) : 0)
 #define SPL_TT_LANE(__tpic__, __r__) SPL_TTOPIC_BUF(SPL_TT_INDEX(__tpic__), __r__)
