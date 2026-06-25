@@ -2686,6 +2686,7 @@ spl_clean_sync_tool()
 #endif
 #endif
 #if 0
+/*
 int a = 1; 
   int b = 1; 
   int const c = b % a; 
@@ -2696,5 +2697,6 @@ int a = 1;
   GetSystemInfo(&sysInfo); 
   // Or GetNativeSystemInfo(&sysInfo) 
   2-bit on Win 64-bit//return sysInfo.dwNumberOfProcessors;return 0;
+*/
 #endif
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/

@@ -38,6 +38,9 @@ main(int argc, char *argv[])
 	for (i = 1; i < argc; ++i) {
 		if (strstr(argv[i], TNUMBEER_OF_THREADS) == argv[i]) {
 			ret = sscanf(argv[i], TNUMBEER_OF_THREADS"%d", &num_threads);
+			if(!ret) {
+				return 1;
+			}
 			continue;
 		}
 		if (strstr(argv[i], TLOOP_COUNT) == argv[i]) {
@@ -113,6 +116,9 @@ dotest()
 	}
 	for (i = 0; i < num_threads; ++i) {
 		int err = pthread_create(pidds + i, 0, posix_thread_routine, 0);
+		if(err) {
+			exit(1);
+		}
 	}
 	for (i = 0; i < num_threads; i++) {
 		int s = pthread_join(pidds[i], 0);
