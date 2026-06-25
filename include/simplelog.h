@@ -261,7 +261,7 @@ typedef struct __SIMPLE_LOG_ST__ {
 
 	char *btopics; /*btopics: binary topics string. Must be freed */
 	int n_btopic; /*Number of binary topics, SIMPLE_LOG_TOPIC_ST.*/
-	SIMPLE_LOG_TOPIC_ST *arr_ntopic; /*List of binary topics: SIMPLE_LOG_TOPIC_ST. Must be freed*/	
+	SIMPLE_LOG_TOPIC_ST *arr_ntopic; /*List of binary topics: SIMPLE_LOG_TOPIC_ST. Must be freed*/
 
 	int renew; /*In a thread of logger, NO NEED SYNC.*/
 	char path_template[SPL_TEMPLATE_LEN]; /*In a thread of logger, NO NEED SYNC.*/
@@ -439,10 +439,8 @@ typedef struct __SPL_FMT_PARAM__ {
 #if 0
 #define SPL_ST_LOGBUFTOPIC(__i__) (&(SPL_CTRL_OBJ->arr_topic[__i__]))->buf
 #else
-#define SPL_ST_LOGBUFTOPIC(__i__) (((char*)(SPL_CTRL_OBJ->buf))  + (1 + __i__) *SPL_SEG_SZ)
+#define SPL_ST_LOGBUFTOPIC(__i__) (((char *)(SPL_CTRL_OBJ->buf)) + (1 + __i__) * SPL_SEG_SZ)
 #endif
-
-
 
 #define SPL_ST_LOGBUFTOPIC_RANGE(__i__, __r__)                                                                              \
 	((spl_gen_data_st *)((char *)SPL_ST_LOGBUFTOPIC(__i__) + SPL_CTRL_OBJ->buff_size * __r__))

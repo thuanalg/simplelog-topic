@@ -541,13 +541,13 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 			if (n < 1) {
 				break;
 			}
-			
+
 			ret = spl_stdz_topics(buff, &n, &count, &p);
 			if (ret) {
 				break;
 			}
 			t->n_topic = count;
-			
+
 			t->topics = p;
 			break;
 		}
@@ -2541,7 +2541,8 @@ spl_fmt_segment(spl_gen_data_st *sgment)
 }
 
 int
-spl_init_segments() {
+spl_init_segments()
+{
 	int ret = 0;
 	int i = 0;
 	int k = 0;
@@ -2549,14 +2550,14 @@ spl_init_segments() {
 	k = sizeof(spl_gen_data_st) + SPL_CTRL_OBJ->max_sz_msg + SPL_RL_BUF;
 	SPL_CTRL_OBJ->range = SPL_CTRL_OBJ->buff_size - k;
 	SPL_CTRL_OBJ->krange = SPL_CTRL_OBJ->range + SPL_CTRL_OBJ->max_sz_msg;
-	
+
 	for (i = 0; i < SPL_CTRL_OBJ->ncpu; ++i) {
 		spl_fmt_segment(SPL_KEYBUF(i));
 	}
 	for (k = 0; k < SPL_CTRL_OBJ->n_topic; ++k) {
 		for (i = 0; i < SPL_CTRL_OBJ->ncpu; ++i) {
 			spl_fmt_segment(SPL_TTOPIC_BUF(k, i));
-		}		
+		}
 	}
 	spl_console_log("n_topic: %d", SPL_CTRL_OBJ->n_topic);
 	return ret;
@@ -2595,7 +2596,7 @@ spl_init_segments()
 			for (i = 0; i < t->ncpu; ++i) {
 				seg = p + i * t->buff_size;
 				sgment = (spl_gen_data_st *)seg;
-#if	0			
+#if 0			
 				spl_fmt_segment(sgment);
 #else
 				spl_fmt_segment(SPL_TTOPIC_BUF(k, i));
