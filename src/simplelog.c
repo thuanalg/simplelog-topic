@@ -541,11 +541,13 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 			if (n < 1) {
 				break;
 			}
+			
 			ret = spl_stdz_topics(buff, &n, &count, &p);
 			if (ret) {
 				break;
 			}
 			t->n_topic = count;
+			
 			t->topics = p;
 			break;
 		}
@@ -2556,6 +2558,7 @@ spl_init_segments() {
 			spl_fmt_segment(SPL_TTOPIC_BUF(k, i));
 		}		
 	}
+	spl_console_log("n_topic: %d", SPL_CTRL_OBJ->n_topic);
 	return ret;
 }
 #if 0
