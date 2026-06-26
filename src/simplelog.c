@@ -271,15 +271,6 @@ static void *
 spl_written_thread_routine(void *);
 #endif
 
-#if 0
-static int
-spl_fclose_err(int t, void *fpp);
-
-
-static int
-spl_fflush_err(int t, void *fpp);
-#endif
-
 #ifndef UNIX_LINUX
 static int
 spl_create_thread(THREAD_ROUTINE f, void *arg, HANDLE *outhd);
@@ -876,24 +867,7 @@ spl_get_fname_now(char *name)
 }
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-static spl_gen_data_st *
-spl_malloc_wbuf()
-{
-	spl_gen_data_st *t = 0;
-	char *buf = 0;
-	spl_malloc(SPL_SEG_SZ, buf, char);
-	t = (spl_gen_data_st *)buf;
-	if (!t) {
-		exit(1);
-		return 0;
-	}
 
-	t->total = SPL_SEG_SZ;
-	t->range = t->total - sizeof(spl_gen_data_st);
-	t->pl = t->pc = 0;
-
-	return t;
-}
 #define SPL_IO_BUF(__t__) (__t__->data + __t__->pl)
 
 #ifndef UNIX_LINUX
@@ -911,7 +885,7 @@ spl_written_thread_routine(void *lpParam)
 
 	char is_off = 0;
 	int i = 0, j = 0;
-	spl_gen_data_st * lane = 0;
+	spl_gen_data_st *lane = 0;
 
 #ifndef UNIX_LINUX
 	HANDLE trigger_handle_id = 0;
@@ -921,7 +895,7 @@ spl_written_thread_routine(void *lpParam)
 #if 0
 	spl_gen_data_st * const fwbuf = spl_malloc_wbuf();
 #else
-	spl_gen_data_st * const fwbuf = SPL_FW_BUF;
+	spl_gen_data_st *const fwbuf = SPL_FW_BUF;
 #endif
 	/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
@@ -1052,16 +1026,6 @@ spl_written_thread_routine(void *lpParam)
 					SPL_FCLOSE(t->arr_topic[i].fp, werr);
 				}
 			}
-#if 0			
-			spl_mutex_lock(t->mtx_off);
-
-			for (i = 0; i < t->n_topic; ++i) {
-				if (t->arr_topic[i].buf) {
-					t->arr_topic[i].buf = 0;
-				}
-			}
-			spl_mutex_unlock(t->mtx_off);
-#endif
 		}
 
 	} while (0);
@@ -1802,45 +1766,7 @@ spl_milli_now()
 	} while (0);
 	return ret;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-#if 0
-int
-spl_fclose_err(int terr, void *ffp)
-{
-	int ret = 0;
-	do {
-#ifndef UNIX_LINUX
-		spl_console_log("ffp: %p, terr: %d, GetLastError: 0x%x,", ffp, terr, (int)GetLastError());
-#else
-		char buf[64];
-		/* https://linux.die.net/man/3/strerror_r , */
-		/* - The strerror_r() function is similar to strerror(), but is thread safe */
-		strerror_r(errno, buf, 64);
-		spl_console_log("ffp: %p,terr: %d, errno: %d, strerror_r: %s", ffp, terr, (int)errno, buf);
-#endif
-	} while (0);
-	return ret;
-}
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-int
-spl_fflush_err(int terr, void *ffp)
-{
-	int ret = 0;
-	do {
-#ifndef UNIX_LINUX
-		spl_console_log("ffp: %p, terr: %d, GetLastError: 0x%x,", ffp, terr, (int)GetLastError());
-#else
-		char buf[64];
-		/* https://linux.die.net/man/3/strerror_r , */
-		/* - The strerror_r() function is similar to strerror(), but is thread safe */
-		strerror_r(errno, buf, 64);
-		spl_console_log("ffp: %p,terr: %d, errno: %d, strerror_r: %s", ffp, terr, (int)errno, buf);
-#endif
-	} while (0);
-	return ret;
-}
-#endif
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #ifndef UNIX_LINUX
 void

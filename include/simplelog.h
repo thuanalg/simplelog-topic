@@ -373,7 +373,7 @@ typedef struct __SPL_FMT_PARAM__ {
 #define SPL_BUF_TOTAL                   ((1 + SPL_CTRL_OBJ->n_topic + SPL_CTRL_OBJ->n_bintopic + 1) * (SPL_SEG_SZ))
 
 #define SPL_FW_INDEX                    (1 + SPL_CTRL_OBJ->n_topic + SPL_CTRL_OBJ->n_bintopic)
-#define SPL_FW_BUF_CHAR					((char *)(SPL_CTRL_OBJ->buf) + (SPL_FW_INDEX * SPL_SEG_SZ))
+#define SPL_FW_BUF_CHAR                 ((char *)(SPL_CTRL_OBJ->buf) + (SPL_FW_INDEX * SPL_SEG_SZ))
 #define SPL_FW_BUF                      ((spl_gen_data_st *)SPL_FW_BUF_CHAR)
 
 #define SPL_KEYBUF(__i__) ((spl_gen_data_st *)((char *)(SPL_CTRL_OBJ->buf) + (SPL_CTRL_OBJ->buff_size * __i__)))
