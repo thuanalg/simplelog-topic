@@ -1110,9 +1110,11 @@ spl_fmt_now_ext(SPL_FMT_PARAM *const p)
 	p->r = sched_getcpu();
 #else
 	/* https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentprocessornumberex
+	 *	GetCurrentProcessorNumber,  GetSystemInfo, GetActiveProcessorCount(ALL_PROCESSOR_GROUPS)
 	 */
 	p->r = (SPL_CTRL_OBJ->mode_straight ? threadiid : stt.nn) % SPL_CTRL_OBJ->ncpu;
 #endif
+
 #else
 #ifndef __MODE_STRAIGHT__
 	*r = (stt.nn % SPL_CTRL_OBJ->ncpu);
@@ -2644,18 +2646,5 @@ spl_clean_sync_tool()
 #endif
 #endif
 #endif
-#if 0
-/*
-int a = 1; 
-  int b = 1; 
-  int const c = b % a; 
-  fprintf(stdout, "(a,b,c)=(%d,%d,%d)\n", a, b, c); 
-  //int k = sizeof(string);//k = sizeof(A);
-  DWORD sds = GetCurrentProcessorNumber(); 
-  SYSTEM_INFO sysInfo; 
-  GetSystemInfo(&sysInfo); 
-  // Or GetNativeSystemInfo(&sysInfo) 
-  2-bit on Win 64-bit//return sysInfo.dwNumberOfProcessors;return 0;
-*/
-#endif
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
