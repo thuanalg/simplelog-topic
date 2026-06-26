@@ -892,11 +892,9 @@ spl_written_thread_routine(void *lpParam)
 #else
 	pthread_t trigger_handle_id = 0;
 #endif
-#if 0
-	spl_gen_data_st * const fwbuf = spl_malloc_wbuf();
-#else
+
 	spl_gen_data_st *const fwbuf = SPL_FW_BUF;
-#endif
+
 	/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 	if (t->trigger_thread > 0) {
