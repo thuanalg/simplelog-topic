@@ -911,16 +911,18 @@ spl_written_thread_routine(void *lpParam)
 
 	char is_off = 0;
 	int i = 0, j = 0;
-	spl_gen_data_st *lane = 0;
+	spl_gen_data_st * lane = 0;
 
 #ifndef UNIX_LINUX
 	HANDLE trigger_handle_id = 0;
 #else
 	pthread_t trigger_handle_id = 0;
 #endif
-
-	spl_gen_data_st *fwbuf = spl_malloc_wbuf();
-
+#if 0
+	spl_gen_data_st * const fwbuf = spl_malloc_wbuf();
+#else
+	spl_gen_data_st * const fwbuf = SPL_FW_BUF;
+#endif
 	/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 	if (t->trigger_thread > 0) {
@@ -1063,9 +1065,9 @@ spl_written_thread_routine(void *lpParam)
 		}
 
 	} while (0);
-
+#if 0
 	spl_free(fwbuf);
-
+#endif
 	/* spl_del_memory((void *) only_buf); */
 	/* Send a signal to the waiting thread. */
 	if (t->trigger_thread) {
@@ -2038,7 +2040,7 @@ int
 spl_calculate_size()
 {
 	int ret = 0;
-	int k = 0;
+	int const k = SPL_BUF_TOTAL;
 	int n = 0;
 	int mtxsize = 0;
 	int semsize = 0;
@@ -2060,7 +2062,7 @@ spl_calculate_size()
 	SIMPLE_LOG_ST *t = &__simple_log_static__;
 	size_arr_mtx = t->ncpu * sizeof(void *);
 	/*k: For buffer.*/
-	k = t->buff_size * t->ncpu * (t->n_topic + 1);
+	/*k = t->buff_size * t->ncpu * (t->n_topic + 1);*/
 	/*k = t->buff_size * t->ncpu + t->buff_size * t->ncpu * t->n_topic;*/
 	do {
 		if (!t->arr_mtx) {

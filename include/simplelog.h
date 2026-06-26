@@ -259,9 +259,9 @@ typedef struct __SIMPLE_LOG_ST__ {
 	int n_topic; /*Number of topics, SIMPLE_LOG_TOPIC_ST.*/
 	SIMPLE_LOG_TOPIC_ST *arr_topic; /*List of topics: SIMPLE_LOG_TOPIC_ST. Must be freed*/
 
-	char *btopics; /*btopics: binary topics string. Must be freed */
-	int n_btopic; /*Number of binary topics, SIMPLE_LOG_TOPIC_ST.*/
-	SIMPLE_LOG_TOPIC_ST *arr_ntopic; /*List of binary topics: SIMPLE_LOG_TOPIC_ST. Must be freed*/
+	char *bintopics; /*btopics: binary topics string. Must be freed */
+	int n_bintopic; /*Number of binary topics, SIMPLE_LOG_TOPIC_ST.*/
+	SIMPLE_LOG_TOPIC_ST *arr_bintopic; /*List of binary topics: SIMPLE_LOG_TOPIC_ST. Must be freed*/
 
 	int renew; /*In a thread of logger, NO NEED SYNC.*/
 	char path_template[SPL_TEMPLATE_LEN]; /*In a thread of logger, NO NEED SYNC.*/
@@ -347,7 +347,7 @@ typedef struct __SPL_FMT_PARAM__ {
 		    spl_get_threadid(), ##__VA_ARGS__);                                                                     \
 	}
 #endif
-
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #define spl_malloc(__nn__, __obj__, __type__)                                                                               \
 	{                                                                                                                   \
 		(__obj__) = (__type__ *)malloc(__nn__);                                                                     \
@@ -369,8 +369,12 @@ typedef struct __SPL_FMT_PARAM__ {
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #define SPL_CTRL_OBJ                    __spl_ctr_obj__
-
 #define SPL_SEG_SZ                      (SPL_CTRL_OBJ->buff_size * SPL_CTRL_OBJ->ncpu)
+#define SPL_BUF_TOTAL                   ((1 + SPL_CTRL_OBJ->n_topic + SPL_CTRL_OBJ->n_bintopic + 1) * (SPL_SEG_SZ))
+
+#define SPL_FW_INDEX                    (1 + SPL_CTRL_OBJ->n_topic + SPL_CTRL_OBJ->n_bintopic)
+#define SPL_FW_BUF_CHAR					((char *)(SPL_CTRL_OBJ->buf) + (SPL_FW_INDEX * SPL_SEG_SZ))
+#define SPL_FW_BUF                      ((spl_gen_data_st *)SPL_FW_BUF_CHAR)
 
 #define SPL_KEYBUF(__i__) ((spl_gen_data_st *)((char *)(SPL_CTRL_OBJ->buf) + (SPL_CTRL_OBJ->buff_size * __i__)))
 
@@ -436,11 +440,9 @@ typedef struct __SPL_FMT_PARAM__ {
 			}                                                                                                   \
 		}                                                                                                           \
 	}
-#if 0
-#define SPL_ST_LOGBUFTOPIC(__i__) (&(SPL_CTRL_OBJ->arr_topic[__i__]))->buf
-#else
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+
 #define SPL_ST_LOGBUFTOPIC(__i__) (((char *)(SPL_CTRL_OBJ->buf)) + (1 + __i__) * SPL_SEG_SZ)
-#endif
 
 #define SPL_ST_LOGBUFTOPIC_RANGE(__i__, __r__)                                                                              \
 	((spl_gen_data_st *)((char *)SPL_ST_LOGBUFTOPIC(__i__) + SPL_CTRL_OBJ->buff_size * __r__))
