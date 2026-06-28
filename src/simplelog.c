@@ -236,10 +236,7 @@ static const char *__splog_pathfolder[] = {SPL_LOG_PATHFOLDR, SPL_LOG_LEVEL, SPL
 
 static SIMPLE_LOG_ST __simple_log_static__;
 SIMPLE_LOG_ST *const __spl_ctr_obj__ = &__simple_log_static__;
-#if 0
-void
-spl_err_txt_init();
-#endif
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 static int
@@ -264,8 +261,25 @@ static int
 spl_stdz_topics(char *buff, int *inoutlen, int *, char **);
 
 #ifndef UNIX_LINUX
+
+#ifdef _OPTIMZE_MORE_64CORE_
+
+#define SPL_GROUP_CORES 64
+
+typedef struct __SPL_WIN_GROUP_CORES__ {
+	int group;
+	int ncores;
+} SPL_WIN_GROUP_CORES;
+
+static SPL_WIN_GROUP_CORES __spl_group_core__[SPL_GROUP_CORES];
+
+#endif
+
 static DWORD WINAPI
 spl_written_thread_routine(LPVOID lpParam);
+
+static int
+spl_win_totalcores();
 #else
 static void *
 spl_written_thread_routine(void *);
@@ -545,14 +559,20 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 		if (strcmp(key, SPL_LOG_NCPU) == 0) {
 			int sz = 0;
 			int n = 0;
+			int cores = 1;
 			sz = sscanf(buff, "%d", &n);
 			if (sz < 1) {
 				n = 1;
 				break;
 			}
-#if defined(_GNU_SOURCE) && defined(__LINUX__)
-			n = SPL_MAX_AB(sysconf(_SC_NPROCESSORS_ONLN), n);
+#ifndef UNIX_LINUX
+			cores = spl_win_totalcores();
+#else
+	#if defined(_GNU_SOURCE) && defined(__LINUX__)
+			core = sysconf(_SC_NPROCESSORS_ONLN);
+	#endif
 #endif
+			n = SPL_MAX_AB(cores, n);
 			t->ncpu = n;
 			break;
 		}
@@ -1105,16 +1125,24 @@ spl_fmt_now_ext(SPL_FMT_PARAM *const p)
 		return;
 	}
 #if 1
-
-#if defined(_GNU_SOURCE) && defined(__LINUX__)
-	p->r = sched_getcpu();
-#else
-	/* https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getcurrentprocessornumberex
-	 *	GetCurrentProcessorNumber,  GetSystemInfo, GetActiveProcessorCount(ALL_PROCESSOR_GROUPS)
-	 */
-	p->r = (SPL_CTRL_OBJ->mode_straight ? threadiid : stt.nn) % SPL_CTRL_OBJ->ncpu;
-#endif
-
+	#ifndef UNIX_LINUX
+		#if defined(_OPTIMZE_64CORE_)
+				p->r = (unsigned short)GetCurrentProcessorNumber();	
+		#else
+			#if defined(_OPTIMZE_MORE_64CORE_)
+					p->r = (SPL_CTRL_OBJ->mode_straight ? threadiid : stt.nn) % SPL_CTRL_OBJ->ncpu;
+			#else
+					p->r = (SPL_CTRL_OBJ->mode_straight ? threadiid : stt.nn) % SPL_CTRL_OBJ->ncpu;
+			#endif
+		#endif
+	#else
+		#if defined(_GNU_SOURCE) && defined(__LINUX__)
+			p->r = sched_getcpu();
+		#else
+			p->r = (SPL_CTRL_OBJ->mode_straight ? threadiid : stt.nn) % SPL_CTRL_OBJ->ncpu;	
+		#endif
+		
+	#endif
 #else
 #ifndef __MODE_STRAIGHT__
 	*r = (stt.nn % SPL_CTRL_OBJ->ncpu);
@@ -2165,6 +2193,37 @@ spl_calculate_size()
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 #ifndef UNIX_LINUX
+
+/**
+ * Dynamically retrieves the exact total number of active logical processors.
+ * Works perfectly for systems with < 64 cores and > 64 cores alike.
+ * Refer Google GemInI
+ */
+int
+spl_win_totalcores()
+{
+	/* Function pointer type for GetActiveProcessorCount */
+	typedef DWORD(WINAPI * PFN_GAPC)(WORD);
+
+	HMODULE hKernel32 = GetModuleHandleA("kernel32.dll");
+	if (hKernel32) {
+		PFN_GAPC pGetActiveProcessorCount = (PFN_GAPC)GetProcAddress(hKernel32, "GetActiveProcessorCount");
+
+		if (pGetActiveProcessorCount != 0) {
+			/*
+			// 0xFFFF is the value for ALL_PROCESSOR_GROUPS.
+			// This forces Windows to sum up cores across every single processor group.
+			*/
+			return (int)pGetActiveProcessorCount(0xFFFF);
+		}
+	}
+	{
+		SYSTEM_INFO sysInfo;
+		GetSystemInfo(&sysInfo);
+		return (int)sysInfo.dwNumberOfProcessors;
+	}
+}
+
 int
 spl_win32_sync_create()
 {
