@@ -1048,6 +1048,26 @@ spl_written_thread_routine(void *lpParam)
 					}
 				}
 				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+				if (t->n_bintopic > 0) {
+					for (i = 0; i < t->n_bintopic; ++i) {
+						for (j = 0; j < t->ncpu; ++j) {
+							lane = SPL_TB_LANE(i, j);
+							spl_mutex_lock(t->arr_mtx[j]);
+							/*//do */
+							if (lane->pl > 0) {
+								memcpy(SPL_IO_BUF(fwbuf), lane->data, lane->pl);
+								fwbuf->pl += lane->pl;
+								lane->pl = 0;
+							}
+							/*//} while (0);*/
+							spl_mutex_unlock(t->arr_mtx[j]);
+						}
+						if (fwbuf->pl > 0) {
+							fwbuf->pl = 0;
+						}
+					}
+				}
+				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				if (is_off) {
 					break;
 				}
