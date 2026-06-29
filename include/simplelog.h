@@ -259,6 +259,7 @@ typedef struct __SIMPLE_LOG_ST__ {
 	int n_topic; /*Number of topics, SIMPLE_LOG_TOPIC_ST.*/
 	SIMPLE_LOG_TOPIC_ST *arr_topic; /*List of topics: SIMPLE_LOG_TOPIC_ST. Must be freed*/
 
+	/*Binary logging inspired by UTF-8. https://en.wikipedia.org/wiki/UTF-8 */
 	char *bintopics; /*btopics: binary topics string. Must be freed */
 	int n_bintopic; /*Number of binary topics, SIMPLE_LOG_TOPIC_ST.*/
 	SIMPLE_LOG_TOPIC_ST *arr_bintopic; /*List of binary topics: SIMPLE_LOG_TOPIC_ST. Must be freed*/
