@@ -250,7 +250,7 @@ spl_simple_log_thread(SIMPLE_LOG_ST *t);
 static int
 spl_gen_file(SIMPLE_LOG_ST *t, int *n, int limit, int *);
 static int
-spl_gen_topics(SIMPLE_LOG_ST *t);
+spl_gen_topics(char);
 static int
 spl_get_fname_now(char *name);
 static int
@@ -981,7 +981,7 @@ spl_written_thread_routine(void *lpParam)
 					spl_console_log("--spl_gen_file, ret: %d --\n", ret);
 					continue;
 				}
-				ret = spl_gen_topics(t);
+				ret = spl_gen_topics(0);
 				if (ret) {
 					spl_console_log("--spl_gen_topics, ret: %d --\n", ret);
 					continue;
@@ -1663,10 +1663,11 @@ spl_stdz_topics(char *buff, int *inoutlen, int *ntopics, char **pchar)
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
-spl_gen_topics(SIMPLE_LOG_ST *t)
+spl_gen_topics(char isBin)
 {
 	int ret = 0;
 	char path[SPL_FULLPATH_LEN + 1];
+	SIMPLE_LOG_ST *const t = SPL_CTRL_OBJ;
 	/*
 	//int renew = 0;
 	*/
