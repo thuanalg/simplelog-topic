@@ -1764,7 +1764,7 @@ spl_gen_topics(char isBin)
 					break;
 				}
 				FFSEEK(arr_target[i].fp, 0, SEEK_END);
-				cszize = (LLU)FFTELL(t->arr_topic[i].fp);
+				cszize = (LLU)FFTELL(arr_target[i].fp);
 				if (cszize < t->file_limit_size) {
 					break;
 				}
