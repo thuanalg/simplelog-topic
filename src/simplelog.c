@@ -2586,51 +2586,7 @@ spl_init_segments()
 	spl_console_log("n_topic: %d", SPL_CTRL_OBJ->n_topic);
 	return ret;
 }
-#if 0
-int
-spl_init_segments()
-{
-	int ret = 0;
-	char *p = 0;
-	char *seg = 0;
-	int i = 0;
-	int k = 0;
-	int step = 0;
-	spl_gen_data_st *sgment = 0;
-	SIMPLE_LOG_ST *t = &__simple_log_static__;
-	p = (char *)t->buf;
-	if (!t->range) {
-		t->range = t->buff_size - (sizeof(spl_gen_data_st) + t->max_sz_msg + SPL_RL_BUF);
-		t->krange = t->range + t->max_sz_msg;
-	}
-	do {
-		for (i = 0; i < t->ncpu; ++i) {
-			seg = p + i * t->buff_size;
-			sgment = (spl_gen_data_st *)seg;
-#if 0			
-			spl_fmt_segment(sgment);
-#else
-			spl_fmt_segment(SPL_KEYBUF(i));
-#endif
-		}
-		step = t->buff_size * t->ncpu;
-		for (k = 0; k < t->n_topic; ++k) {
-			p += step;
-			t->arr_topic[k].buf = (spl_gen_data_st *)p;
-			for (i = 0; i < t->ncpu; ++i) {
-				seg = p + i * t->buff_size;
-				sgment = (spl_gen_data_st *)seg;
-#if 0			
-				spl_fmt_segment(sgment);
-#else
-				spl_fmt_segment(SPL_TTOPIC_BUF(k, i));
-#endif
-			}
-		}
-	} while (0);
-	return ret;
-}
-#endif
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 int

@@ -160,6 +160,8 @@ posix_thread_routine(void *lpParam)
 	} else {
 		while (count < loop_count) {
 			spllogtopic(SPL_LOG_INFO, topicindex - 1, SPL_TEST_FMT, count);
+			char data[32];
+			spllogbintopic(0, 0, 0, data, 32);
 			++count;
 		}
 	}
