@@ -1668,45 +1668,41 @@ spl_gen_topics(char isBin)
 	int ret = 0;
 	char path[SPL_FULLPATH_LEN + 1];
 	SIMPLE_LOG_ST *const t = SPL_CTRL_OBJ;
-	/*
-	//int renew = 0;
-	*/
 	LLU cszize = 0;
+	int const num_top = isBin ? t->n_bintopic : t->n_topic;
+	SIMPLE_LOG_TOPIC_ST *const arr_target = isBin ? t->arr_bintopic : t->arr_topic;
 	do {
 		int i = 0;
-		if (t->n_topic < 1) {
-			/*
-			//ret = SPL_LOG_TOPIC_ZERO;
-			*/
+		if (num_top < 1) {
 			break;
 		}
-		for (i = 0; i < t->n_topic; ++i) {
-			if (t->arr_topic[i].fp) {
+		for (i = 0; i < num_top; ++i) {
+			if (arr_target[i].fp) {
 				continue;
 			}
 			do {
 				int err = 0;
-				snprintf(path, SPL_FULLPATH_LEN, "%s-%s-%.7d.log", t->path_template, t->arr_topic[i].topic,
-				    t->arr_topic[i].index);
+				snprintf(path, SPL_FULLPATH_LEN, "%s-%s-%.7d.log", t->path_template, arr_target[i].topic,
+				    arr_target[i].index);
 
-				FFOPEN(t->arr_topic[i].fp, path, "a+");
-				if (!t->arr_topic[i].fp) {
+				FFOPEN(arr_target[i].fp, path, "a+");
+				if (!arr_target[i].fp) {
 					ret = SPL_LOG_TOPIC_FOPEN;
 					break;
 				}
-				FFSEEK(t->arr_topic[i].fp, 0, SEEK_END);
-				cszize = (LLU)FFTELL(t->arr_topic[i].fp);
+				FFSEEK(arr_target[i].fp, 0, SEEK_END);
+				cszize = (LLU)FFTELL(arr_target[i].fp);
 				if (cszize < t->file_limit_size) {
-					t->arr_topic[i].fizize = (int)cszize;
+					arr_target[i].fizize = (int)cszize;
 					break;
 				}
-				t->arr_topic[i].fizize = (int)cszize;
-				SPL_FCLOSE(t->arr_topic[i].fp, err);
+				arr_target[i].fizize = (int)cszize;
+				SPL_FCLOSE(arr_target[i].fp, err);
 				if (err) {
 					ret = SPL_LOG_CLOSE_FILE_ERROR;
 					break;
 				}
-				t->arr_topic[i].index++;
+				arr_target[i].index++;
 			} while (1);
 		}
 		if (ret) {
@@ -1718,23 +1714,21 @@ spl_gen_topics(char isBin)
 		}
 		/*--------------*/
 		if (t->renew > SPL_CHANGE_FILE_SIZE) {
-			for (i = 0; i < t->n_topic; ++i) {
+			for (i = 0; i < num_top; ++i) {
 				do {
 					int err = 0;
-					SPL_FCLOSE(t->arr_topic[i].fp, err);
+					SPL_FCLOSE(arr_target[i].fp, err);
 					if (err) {
 						ret = SPL_LOG_CLOSE_FILE_ERROR;
 						break;
 					}
-					t->arr_topic[i].index = 0;
-					t->arr_topic[i].fizize = 0;
+					arr_target[i].index = 0;
+					arr_target[i].fizize = 0;
 					snprintf(path, SPL_FULLPATH_LEN, "%s-%s-%.7d.log", t->path_template,
-					    t->arr_topic[i].topic, t->arr_topic[i].index);
-					/*
-					//t->arr_topic[i].fp = fopen(path, "a+");
-					*/
-					FFOPEN(t->arr_topic[i].fp, path, "a+");
-					if (!t->arr_topic[i].fp) {
+					    arr_target[i].topic, arr_target[i].index);
+		
+					FFOPEN(arr_target[i].fp, path, "a+");
+					if (!arr_target[i].fp) {
 						ret = SPL_LOG_TOPIC_FOPEN;
 						break;
 					}
@@ -1745,43 +1739,41 @@ spl_gen_topics(char isBin)
 			}
 			break;
 		}
-		for (i = 0; i < t->n_topic;) {
-			if ((t->arr_topic[i].fizize) < t->file_limit_size) {
+		for (i = 0; i < num_top;) {
+			if ((arr_target[i].fizize) < t->file_limit_size) {
 				++i;
 				continue;
 			}
 			do {
 				int err = 0;
 
-				SPL_FCLOSE(t->arr_topic[i].fp, err);
+				SPL_FCLOSE(arr_target[i].fp, err);
 				if (err) {
 					ret = SPL_LOG_CLOSE_FILE_ERROR;
 					break;
 				}
 
-				t->arr_topic[i].fizize = 0;
+				arr_target[i].fizize = 0;
 
-				snprintf(path, SPL_FULLPATH_LEN, "%s-%s-%.7d.log", t->path_template, t->arr_topic[i].topic,
-				    t->arr_topic[i].index);
-				/*
-				//t->arr_topic[i].fp = fopen(path, "a+");
-				*/
-				FFOPEN(t->arr_topic[i].fp, path, "a+");
-				if (!t->arr_topic[i].fp) {
+				snprintf(path, SPL_FULLPATH_LEN, "%s-%s-%.7d.log", t->path_template, arr_target[i].topic,
+				    arr_target[i].index);
+
+				FFOPEN(arr_target[i].fp, path, "a+");
+				if (!arr_target[i].fp) {
 					ret = SPL_LOG_TOPIC_FOPEN;
 					break;
 				}
-				FFSEEK(t->arr_topic[i].fp, 0, SEEK_END);
+				FFSEEK(arr_target[i].fp, 0, SEEK_END);
 				cszize = (LLU)FFTELL(t->arr_topic[i].fp);
 				if (cszize < t->file_limit_size) {
 					break;
 				}
-				SPL_FCLOSE(t->arr_topic[i].fp, err);
+				SPL_FCLOSE(arr_target[i].fp, err);
 				if (err) {
 					ret = SPL_LOG_CLOSE_FILE_ERROR;
 					break;
 				}
-				t->arr_topic[i].index++;
+				arr_target[i].index++;
 			} while (1);
 			++i;
 			if (ret) {
