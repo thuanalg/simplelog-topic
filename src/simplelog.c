@@ -1671,6 +1671,8 @@ spl_gen_topics(char isBin)
 	LLU cszize = 0;
 	int const num_top = isBin ? t->n_bintopic : t->n_topic;
 	SIMPLE_LOG_TOPIC_ST *const arr_target = isBin ? t->arr_bintopic : t->arr_topic;
+	const char *const fext = isBin ? "%s-%s-%.7d.bin" : "%s-%s-%.7d.log";
+	const char *const fmode = isBin ? "a+" : "a+";
 	do {
 		int i = 0;
 		if (num_top < 1) {
@@ -1682,10 +1684,10 @@ spl_gen_topics(char isBin)
 			}
 			do {
 				int err = 0;
-				snprintf(path, SPL_FULLPATH_LEN, "%s-%s-%.7d.log", t->path_template, arr_target[i].topic,
+				snprintf(path, SPL_FULLPATH_LEN, fext, t->path_template, arr_target[i].topic,
 				    arr_target[i].index);
 
-				FFOPEN(arr_target[i].fp, path, "a+");
+				FFOPEN(arr_target[i].fp, path, fmode);
 				if (!arr_target[i].fp) {
 					ret = SPL_LOG_TOPIC_FOPEN;
 					break;
@@ -1724,10 +1726,10 @@ spl_gen_topics(char isBin)
 					}
 					arr_target[i].index = 0;
 					arr_target[i].fizize = 0;
-					snprintf(path, SPL_FULLPATH_LEN, "%s-%s-%.7d.log", t->path_template,
+					snprintf(path, SPL_FULLPATH_LEN, fext, t->path_template,
 					    arr_target[i].topic, arr_target[i].index);
 		
-					FFOPEN(arr_target[i].fp, path, "a+");
+					FFOPEN(arr_target[i].fp, path, fmode);
 					if (!arr_target[i].fp) {
 						ret = SPL_LOG_TOPIC_FOPEN;
 						break;
@@ -1755,10 +1757,10 @@ spl_gen_topics(char isBin)
 
 				arr_target[i].fizize = 0;
 
-				snprintf(path, SPL_FULLPATH_LEN, "%s-%s-%.7d.log", t->path_template, arr_target[i].topic,
+				snprintf(path, SPL_FULLPATH_LEN, fext, t->path_template, arr_target[i].topic,
 				    arr_target[i].index);
 
-				FFOPEN(arr_target[i].fp, path, "a+");
+				FFOPEN(arr_target[i].fp, path, fmode);
 				if (!arr_target[i].fp) {
 					ret = SPL_LOG_TOPIC_FOPEN;
 					break;
