@@ -177,6 +177,7 @@
 #define SPL_MAX_SZ_MSG            "max_sz_msg="
 #define SPL_LOG_ROT_SIZE          "rotation_size="
 #define SPL_LOG_TOPIC             "topic="
+#define SPL_LOG_TOPIC_BIN             "topic_bin="
 #define SPL_LOG_NCPU              "ncpu="
 #define SPL_LOG_TRIGGER           "trigger="
 #define SPL_LOG_SHARED_KEY        "shared_key="
@@ -231,7 +232,7 @@ typedef enum __CHANGE_NAME_E__ {
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 static const char *__splog_pathfolder[] = {SPL_LOG_PATHFOLDR, SPL_LOG_LEVEL, SPL_LOG_BUFF_SIZE, SPL_MAX_SZ_MSG,
-    SPL_LOG_ROT_SIZE, SPL_LOG_TOPIC, SPL_LOG_NCPU, SPL_LOG_TRIGGER, SPL_LOG_SHARED_KEY, SPL_LOG_MODE_STRAIGHT,
+    SPL_LOG_ROT_SIZE, SPL_LOG_TOPIC, SPL_LOG_TOPIC_BIN, SPL_LOG_NCPU, SPL_LOG_TRIGGER, SPL_LOG_SHARED_KEY, SPL_LOG_MODE_STRAIGHT,
     SPL_LOG_END_CFG, 0};
 
 static SIMPLE_LOG_ST __simple_log_static__;
@@ -320,7 +321,7 @@ spl_calculate_size();
 static int
 spl_init_segments();
 static int
-spl_allocate_topics();
+spl_allocate_topics(char);
 static int
 spl_gen_sync_tool();
 static int
@@ -554,6 +555,25 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 			t->n_topic = count;
 
 			t->topics = p;
+			spl_console_log("n Topic: %d.\n", t->n_topic);
+			break;
+		}
+		if (strcmp(key, SPL_LOG_TOPIC_BIN) == 0) {
+			int n = 0, count = 0;
+			char *p = 0;
+			n = (int)strlen(buff);
+			if (n < 1) {
+				break;
+			}
+
+			ret = spl_stdz_topics(buff, &n, &count, &p);
+			if (ret) {
+				break;
+			}
+			t->n_bintopic = count;
+
+			t->bintopics = p;
+			spl_console_log("n Topic BIN: %d.\n", t->n_bintopic);
 			break;
 		}
 		if (strcmp(key, SPL_LOG_NCPU) == 0) {
@@ -1611,7 +1631,7 @@ spl_stdz_topics(char *buff, int *inoutlen, int *ntopics, char **pchar)
 		}
 		(*pchar) = p;
 		*ntopics = count;
-		spl_console_log("Topic.\n");
+		
 
 	} while (0);
 	/*
@@ -2594,7 +2614,7 @@ spl_init_segments()
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 int
-spl_allocate_topics()
+spl_allocate_topics(char isbin)
 {
 	int ret = 0;
 	int i = 0;
@@ -2602,30 +2622,39 @@ spl_allocate_topics()
 	char *p1 = 0;
 	int n = 0;
 	int szitopics = 0;
+	SIMPLE_LOG_TOPIC_ST *tmp = 0;
 	SIMPLE_LOG_ST *t = &__simple_log_static__;
+	int num_top = 0;
+
 	do {
-		if (!t->n_topic) {
+		num_top = isbin ? t->n_bintopic : t->n_topic;
+		if (!num_top) {
 			break;
 		}
-		szitopics = sizeof(SIMPLE_LOG_TOPIC_ST) * t->n_topic;
-		spl_malloc(szitopics, t->arr_topic, SIMPLE_LOG_TOPIC_ST);
-		if (!t->arr_topic) {
+		szitopics = sizeof(SIMPLE_LOG_TOPIC_ST) * num_top;
+		spl_malloc(szitopics, tmp, SIMPLE_LOG_TOPIC_ST);
+		if (!tmp) {
 			ret = SPL_LOG_TOPIC_MEMORY;
 			break;
 		}
-		p0 = t->topics;
-		for (i = 0; i < t->n_topic; ++i) {
+		p0 = isbin ? t->bintopics : t->topics;
+		for (i = 0; i < num_top; ++i) {
 			p1 = strstr(p0, ",");
 			if (!p1) {
-				snprintf(t->arr_topic[i].topic, SPL_TOPIC_SIZE, "%s", p0);
+				snprintf(tmp[i].topic, SPL_TOPIC_SIZE, "%s", p0);
 				continue;
 			}
 			n = (int)(p1 - p0);
 			if (n > 0) {
-				snprintf(t->arr_topic[i].topic, SPL_MIN_AB(SPL_TOPIC_SIZE, n + 1), "%s", p0);
+				snprintf(tmp[i].topic, SPL_MIN_AB(SPL_TOPIC_SIZE, n + 1), "%s", p0);
 			}
 			p1++;
 			p0 = p1;
+		}
+		if (isbin) {
+			t->arr_bintopic = tmp;
+		} else {
+			t->arr_topic = tmp;
 		}
 	} while (0);
 	return ret;
@@ -2636,7 +2665,11 @@ spl_gen_sync_tool()
 {
 	int ret = 0;
 	do {
-		ret = spl_allocate_topics();
+		ret = spl_allocate_topics(0);
+		if (ret) {
+			break;
+		}
+		ret = spl_allocate_topics(1);
 		if (ret) {
 			break;
 		}
