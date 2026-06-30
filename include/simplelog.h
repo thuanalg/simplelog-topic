@@ -38,7 +38,7 @@
 #define SPL_MIN_AB(a, b) ((a) < (b)) ? (a) : (b)
 #define SPL_MAX_AB(a, b) ((a) > (b)) ? (a) : (b)
 
-#if 0
+#if 1
 #ifndef UNIX_LINUX
 #define UNIX_LINUX                      
 #endif
@@ -96,10 +96,10 @@ extern "C" {
 #define SPL_FNAME_LEN                   (SPL_IDD_NAME + 32)
 #define SPL_TEMPLATE_LEN                (SPL_PATH_FOLDER + SPL_FNAME_LEN + 32)
 #define SPL_FULLPATH_LEN                (SPL_TEMPLATE_LEN + 32 + 16)
-#define SPL_MILLION                     1000000
-#define SPL_RANGE_YEAR                  10000
-#define SPL_RANGE_MONTH                 13
-#define SPL_RANGE_DAY                   32
+#define SPL_MILLION                     (1000000)
+#define SPL_RANGE_YEAR                  (10000)
+#define SPL_RANGE_MONTH                 (13)
+#define SPL_RANGE_DAY                   (32)
 
 #ifndef UNIX_LINUX
 #ifndef __SIMPLE_STATIC_LOG__
@@ -304,6 +304,19 @@ typedef struct __SPL_FMT_PARAM__ {
 	unsigned short r; /* Random slot. */
 	int outlen; /* Real length of fmtt. */
 } SPL_FMT_PARAM;
+
+typedef struct __SPL_HEADER__ {
+	int total;
+	int type_id;
+	LLU timestamp;
+	char data[0];
+} SPL_HEADER;
+
+typedef struct __SPL_HD_PARAM__ {
+	unsigned short r; /* Random slot. */
+	SPL_HEADER header; /* Header like UTF-8 */
+} SPL_HD_PARAM;
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 #define __FILLE__(__p__)                                                                                                    \
@@ -513,20 +526,19 @@ typedef struct __SPL_FMT_PARAM__ {
 		}                                                                                                           \
 	}
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-#define SPL_ST_BUFBINTOPIC(__i__) \
-	(((char *)(SPL_CTRL_OBJ->buf)) + (1 + SPL_CTRL_OBJ->n_topic + __i__) * SPL_SEG_SZ)
+#define SPL_ST_BUFBINTOPIC(__i__) (((char *)(SPL_CTRL_OBJ->buf)) + (1 + SPL_CTRL_OBJ->n_topic + __i__) * SPL_SEG_SZ)
 
 #define SPL_ST_BUFBINTOPIC_RANGE(__i__, __r__)                                                                              \
 	((spl_gen_data_st *)((char *)SPL_ST_BUFBINTOPIC(__i__) + SPL_CTRL_OBJ->buff_size * __r__))
 
-#define SPL_TTOPIC_BINBUF SPL_ST_BUFBINTOPIC_RANGE
+#define SPL_TTOPIC_BINBUF               SPL_ST_BUFBINTOPIC_RANGE
 #define SPL_TB_INDEX(__t__) ((__t__ < SPL_CTRL_OBJ->n_bintopic) ? (__t__ < 0 ? 0 : __t__) : 0)
 #define SPL_TB_LANE(__tpic__, __r__) SPL_TTOPIC_BINBUF(SPL_TB_INDEX(__tpic__), __r__)
 
-#define __spl_binlog_buf_topic_level__(__lv__, __tpic__, ___type___, __data__, __sz__)                                                     \
+#define __spl_binlog_buf_topic_level__(__lv__, __tpic__, ___type___, __data__, __sz__)                                      \
 	{                                                                                                                   \
-		if (SPL_CTRL_OBJ->llevel <= (__lv__) && SPL_CTRL_OBJ->bintopics && (__sz__ > 0)) {                        \
-			; /*                                                                                                   \
+		if (SPL_CTRL_OBJ->llevel <= (__lv__) && SPL_CTRL_OBJ->bintopics && (__sz__ > 0)) {                          \
+			; /*                                                                                                \
 			int __len__ = 0;                                                                                    \
 			;                                                                                                   \
 			const char *__pfn__ = 0;                                                                            \
@@ -579,7 +591,7 @@ typedef struct __SPL_FMT_PARAM__ {
 				if (!SPL_CTRL_OBJ->trigger_thread)                                                          \
 					spl_rel_sem(SPL_CTRL_OBJ->sem_rwfile);                                              \
 				;                                                                                           \
-			}     */                                                                                              \
+			}     */                                                                                            \
 		}                                                                                                           \
 	}
 
@@ -605,7 +617,7 @@ spl_init_log_ext(SPL_INPUT_ARG *input);
  */
 #define spllogtopic                     __spl_log_buf_topic_level__
 
-#define spllogbintopic					__spl_binlog_buf_topic_level__
+#define spllogbintopic                  __spl_binlog_buf_topic_level__
 
 /* Please demo with spl_finish_log */
 DLL_API_SIMPLE_LOG int
@@ -615,6 +627,9 @@ spl_finish_log();
 
 DLL_API_SIMPLE_LOG void
 spl_fmt_now_ext(SPL_FMT_PARAM *const p);
+
+DLL_API_SIMPLE_LOG void
+spl_bin_now_ext(SPL_HD_PARAM *const p);
 
 DLL_API_SIMPLE_LOG int
 spl_mutex_lock(void *mtx);

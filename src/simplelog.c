@@ -177,7 +177,7 @@
 #define SPL_MAX_SZ_MSG            "max_sz_msg="
 #define SPL_LOG_ROT_SIZE          "rotation_size="
 #define SPL_LOG_TOPIC             "topic="
-#define SPL_LOG_TOPIC_BIN             "topic_bin="
+#define SPL_LOG_TOPIC_BIN         "topic_bin="
 #define SPL_LOG_NCPU              "ncpu="
 #define SPL_LOG_TRIGGER           "trigger="
 #define SPL_LOG_SHARED_KEY        "shared_key="
@@ -232,8 +232,8 @@ typedef enum __CHANGE_NAME_E__ {
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 static const char *__splog_pathfolder[] = {SPL_LOG_PATHFOLDR, SPL_LOG_LEVEL, SPL_LOG_BUFF_SIZE, SPL_MAX_SZ_MSG,
-    SPL_LOG_ROT_SIZE, SPL_LOG_TOPIC, SPL_LOG_TOPIC_BIN, SPL_LOG_NCPU, SPL_LOG_TRIGGER, SPL_LOG_SHARED_KEY, SPL_LOG_MODE_STRAIGHT,
-    SPL_LOG_END_CFG, 0};
+    SPL_LOG_ROT_SIZE, SPL_LOG_TOPIC, SPL_LOG_TOPIC_BIN, SPL_LOG_NCPU, SPL_LOG_TRIGGER, SPL_LOG_SHARED_KEY,
+    SPL_LOG_MODE_STRAIGHT, SPL_LOG_END_CFG, 0};
 
 static SIMPLE_LOG_ST __simple_log_static__;
 SIMPLE_LOG_ST *const __spl_ctr_obj__ = &__simple_log_static__;
@@ -265,7 +265,7 @@ spl_stdz_topics(char *buff, int *inoutlen, int *, char **);
 
 #ifdef _OPTIMZE_MORE_64CORE_
 
-#define SPL_GROUP_CORES 64
+#define SPL_GROUP_CORES           64
 
 typedef struct __SPL_WIN_GROUP_CORES__ {
 	int group;
@@ -588,9 +588,9 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 #ifndef UNIX_LINUX
 			cores = spl_win_totalcores();
 #else
-	#if defined(_GNU_SOURCE) && defined(__LINUX__)
+#if defined(_GNU_SOURCE) && defined(__LINUX__)
 			cores = sysconf(_SC_NPROCESSORS_ONLN);
-	#endif
+#endif
 #endif
 			n = SPL_MAX_AB(cores, n);
 			t->ncpu = n;
@@ -1153,6 +1153,168 @@ spl_simple_log_thread(SIMPLE_LOG_ST *t)
 }
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+#define SPL_RAND_FORM(__tid__, __nn__)                                                                                      \
+	((unsigned short)(SPL_CTRL_OBJ->mode_straight ? __tid__ : __nn__) % SPL_CTRL_OBJ->ncpu)
+
+DLL_API_SIMPLE_LOG void
+spl_bin_now_ext(SPL_HD_PARAM *const p)
+{
+	int ret = 0;
+#if 0
+	int ret = 0;
+#ifndef UNIX_LINUX
+	SYSTEMTIME lt;
+#else
+	struct tm *lt, rlt;
+	struct timespec nanosec;
+#ifdef __MACH__
+	clock_serv_t cclock;
+	mach_timespec_t mts;
+	kern_return_t result;
+#endif
+#endif
+	do {
+		if (!stt) {
+			ret = SPL_LOG_ST_NAME_NULL_ERROR;
+			break;
+		}
+#ifndef UNIX_LINUX
+		LARGE_INTEGER counter;
+		GetLocalTime(&lt);
+		QueryPerformanceCounter(&counter);
+		stt->year = (unsigned int)lt.wYear;
+		stt->month = (unsigned char)lt.wMonth;
+		stt->day = (unsigned char)lt.wDay;
+
+		stt->hour = (unsigned char)lt.wHour;
+		stt->minute = (unsigned char)lt.wMinute;
+		stt->sec = (unsigned char)lt.wSecond;
+		stt->nn = (unsigned int)lt.wMilliseconds * SPL_MILLION + counter.QuadPart % SPL_MILLION;
+#else
+		time_t t = time(0);
+		lt = localtime_r(&t, &rlt);
+		if (!lt) {
+			ret = SPL_LOG_TIME_NULL_ERROR;
+			break;
+		}
+		lt = (struct tm *)&rlt;
+		/* No need freeing,
+		 * https://stackoverflow.com/questions/35031647/do-i-need-to-free-the-returned-pointer-from-localtime-function
+		 */
+#ifdef __MACH__
+		result = host_get_clock_service(mach_host_self(), REALTIME_CLOCK, &cclock);
+		if (result != KERN_SUCCESS) {
+			ret = SPL_LOG_MACH_CLOCK_SERVICE_ERROR;
+			spl_console_log("SPL_LOG_MACH_CLOCK_SERVICE_ERROR.");
+			break;
+		}
+		result = clock_get_time(cclock, &mts);
+		if (result != KERN_SUCCESS) {
+			ret = SPL_LOG_MACH_GETTIME_ERROR;
+			spl_console_log("SPL_LOG_MACH_GETTIME_ERROR.");
+			break;
+		}
+		mach_port_deallocate(mach_task_self(), cclock);
+		nanosec.tv_sec = mts.tv_sec;
+		nanosec.tv_nsec = mts.tv_nsec;
+#else
+		/* https://linux.die.net/man/3/localtime */
+		/* https://linux.die.net/man/3/clock_gettime */
+		ret = clock_gettime(CLOCK_REALTIME, &nanosec);
+		if (ret) {
+			ret = SPL_LOG_TIME_NANO_NULL_ERROR;
+			break;
+		}
+
+#endif
+		stt->year = lt->tm_year;
+		stt->month = lt->tm_mon;
+		stt->day = lt->tm_mday;
+
+		stt->hour = lt->tm_hour;
+		stt->minute = (spl_uchar)lt->tm_min;
+		stt->sec = lt->tm_sec;
+		stt->nn = (spl_uint)nanosec.tv_nsec;
+
+#endif
+	} while (0);
+	return ret;
+#endif
+
+#ifndef UNIX_LINUX
+	SYSTEMTIME lt;
+#else
+
+#ifdef __MACH__
+	clock_serv_t cclock;
+	mach_timespec_t mts;
+	kern_return_t result;
+#else
+	struct timespec nanosec = {0};
+#endif
+#endif
+	if (!p) {
+		ret = SPL_LOG_ST_NAME_NULL_ERROR;
+		spl_err("SPL_LOG_ST_NAME_NULL_ERROR");
+		return;
+	}
+	do {
+#ifndef UNIX_LINUX
+#if defined(_OPTIMZE_64CORE_)
+		p->r = (unsigned short)GetCurrentProcessorNumber();
+#else
+		LLU thid = 0;
+		spl_local_time_st stt = {0};
+		ret = spl_local_time_now(&stt);
+		if (ret) {
+			spl_err("ret: %d", ret);
+		}
+		thid = (LLU)spl_get_threadid();
+#if defined(_OPTIMZE_MORE_64CORE_)
+		p->r = (SPL_CTRL_OBJ->mode_straight ? thid : stt.nn) % SPL_CTRL_OBJ->ncpu;
+#else
+		p->r = (SPL_CTRL_OBJ->mode_straight ? thid : stt.nn) % SPL_CTRL_OBJ->ncpu;
+#endif
+#endif
+#else
+#ifdef __MACH__
+		LLU thid = 0;
+		spl_local_time_st stt = {0};
+		ret = spl_local_time_now(&stt);
+		if (ret) {
+			spl_err("ret: %d", ret);
+		}
+		thid = (LLU)spl_get_threadid();
+#define SPL_RAND_FORM(__tid__, __nn__)
+		p->r = SPL_RAND_FORM(thid, stt.nn);
+#else
+		ret = clock_gettime(CLOCK_REALTIME, &nanosec);
+		if (ret) {
+			ret = SPL_LOG_TIME_NANO_NULL_ERROR;
+			spl_err("SPL_LOG_TIME_NANO_NULL_ERROR");
+			break;
+		}
+		p->header.timestamp = nanosec.tv_sec * SPL_MILLION + nanosec.tv_nsec;
+#if defined(_GNU_SOURCE) && defined(__LINUX__)
+		p->r = sched_getcpu();
+#else
+		{
+			LLU thid = 0;
+			spl_local_time_st stt = {0};
+			ret = spl_local_time_now(&stt);
+			if (ret) {
+				spl_err("ret: %d", ret);
+			}
+			thid = (LLU)spl_get_threadid();
+			p->r = SPL_RAND_FORM(thid, stt.nn);
+		}
+#endif
+#endif
+#endif
+
+	} while (0);
+}
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 void
 spl_fmt_now_ext(SPL_FMT_PARAM *const p)
@@ -1169,24 +1331,24 @@ spl_fmt_now_ext(SPL_FMT_PARAM *const p)
 		return;
 	}
 #if 1
-	#ifndef UNIX_LINUX
-		#if defined(_OPTIMZE_64CORE_)
-				p->r = (unsigned short)GetCurrentProcessorNumber();	
-		#else
-			#if defined(_OPTIMZE_MORE_64CORE_)
-					p->r = (SPL_CTRL_OBJ->mode_straight ? threadiid : stt.nn) % SPL_CTRL_OBJ->ncpu;
-			#else
-					p->r = (SPL_CTRL_OBJ->mode_straight ? threadiid : stt.nn) % SPL_CTRL_OBJ->ncpu;
-			#endif
-		#endif
-	#else
-		#if defined(_GNU_SOURCE) && defined(__LINUX__)
-			p->r = sched_getcpu();
-		#else
-			p->r = (SPL_CTRL_OBJ->mode_straight ? threadiid : stt.nn) % SPL_CTRL_OBJ->ncpu;	
-		#endif
-		
-	#endif
+#ifndef UNIX_LINUX
+#if defined(_OPTIMZE_64CORE_)
+	p->r = (unsigned short)GetCurrentProcessorNumber();
+#else
+#if defined(_OPTIMZE_MORE_64CORE_)
+	p->r = SPL_RAND_FORM(threadiid, stt.nn);
+#else
+	p->r = SPL_RAND_FORM(threadiid, stt.nn);
+#endif
+#endif
+#else
+#if defined(_GNU_SOURCE) && defined(__LINUX__)
+	p->r = sched_getcpu();
+#else
+	p->r = SPL_RAND_FORM(threadiid, stt.nn);
+#endif
+
+#endif
 #else
 #ifndef __MODE_STRAIGHT__
 	*r = (stt.nn % SPL_CTRL_OBJ->ncpu);
@@ -1655,7 +1817,6 @@ spl_stdz_topics(char *buff, int *inoutlen, int *ntopics, char **pchar)
 		}
 		(*pchar) = p;
 		*ntopics = count;
-		
 
 	} while (0);
 	/*
@@ -1730,9 +1891,9 @@ spl_gen_topics(char isBin)
 					}
 					arr_target[i].index = 0;
 					arr_target[i].fizize = 0;
-					snprintf(path, SPL_FULLPATH_LEN, fext, t->path_template,
-					    arr_target[i].topic, arr_target[i].index);
-		
+					snprintf(path, SPL_FULLPATH_LEN, fext, t->path_template, arr_target[i].topic,
+					    arr_target[i].index);
+
 					FFOPEN(arr_target[i].fp, path, fmode);
 					if (!arr_target[i].fp) {
 						ret = SPL_LOG_TOPIC_FOPEN;
@@ -1957,7 +2118,7 @@ spl_create_memory(void **output, char *shared_key, int size_shared, char isCreat
 		if (!output) {
 			ret = SPL_LOG_SHM_CREATE_NULL;
 			break;
-		}		
+		}
 		if (isCreating) {
 			hMapFile = CreateFileMappingA(INVALID_HANDLE_VALUE, /* use paging file */
 			    NULL, /* // default security */
