@@ -1296,7 +1296,7 @@ spl_bin_now_ext(SPL_HD_PARAM *const p)
 		p->header.timestamp = nanosec.tv_sec * SPL_MILLION + nanosec.tv_nsec;
 #if defined(_GNU_SOURCE) && defined(__LINUX__)
 		p->r = sched_getcpu();
-#else		
+#else
 		LLU thid = 0;
 		spl_local_time_st stt = {0};
 		ret = spl_local_time_now(&stt);
@@ -1304,7 +1304,7 @@ spl_bin_now_ext(SPL_HD_PARAM *const p)
 			spl_err("ret: %d", ret);
 		}
 		thid = (LLU)spl_get_threadid();
-		p->r = SPL_RAND_FORM(thid, stt.nn);		
+		p->r = SPL_RAND_FORM(thid, stt.nn);
 #endif
 #endif
 #endif
