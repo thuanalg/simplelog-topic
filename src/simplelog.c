@@ -1160,95 +1160,14 @@ DLL_API_SIMPLE_LOG void
 spl_bin_now_ext(SPL_HD_PARAM *const p)
 {
 	int ret = 0;
-#if 0
-	int ret = 0;
 #ifndef UNIX_LINUX
-	SYSTEMTIME lt;
+	SYSTEMTIME lt = {0};
 #else
-	struct tm *lt, rlt;
-	struct timespec nanosec;
 #ifdef __MACH__
 	clock_serv_t cclock;
 	mach_timespec_t mts;
 	kern_return_t result;
-#endif
-#endif
-	do {
-		if (!stt) {
-			ret = SPL_LOG_ST_NAME_NULL_ERROR;
-			break;
-		}
-#ifndef UNIX_LINUX
-		LARGE_INTEGER counter;
-		GetLocalTime(&lt);
-		QueryPerformanceCounter(&counter);
-		stt->year = (unsigned int)lt.wYear;
-		stt->month = (unsigned char)lt.wMonth;
-		stt->day = (unsigned char)lt.wDay;
-
-		stt->hour = (unsigned char)lt.wHour;
-		stt->minute = (unsigned char)lt.wMinute;
-		stt->sec = (unsigned char)lt.wSecond;
-		stt->nn = (unsigned int)lt.wMilliseconds * SPL_MILLION + counter.QuadPart % SPL_MILLION;
-#else
-		time_t t = time(0);
-		lt = localtime_r(&t, &rlt);
-		if (!lt) {
-			ret = SPL_LOG_TIME_NULL_ERROR;
-			break;
-		}
-		lt = (struct tm *)&rlt;
-		/* No need freeing,
-		 * https://stackoverflow.com/questions/35031647/do-i-need-to-free-the-returned-pointer-from-localtime-function
-		 */
-#ifdef __MACH__
-		result = host_get_clock_service(mach_host_self(), REALTIME_CLOCK, &cclock);
-		if (result != KERN_SUCCESS) {
-			ret = SPL_LOG_MACH_CLOCK_SERVICE_ERROR;
-			spl_console_log("SPL_LOG_MACH_CLOCK_SERVICE_ERROR.");
-			break;
-		}
-		result = clock_get_time(cclock, &mts);
-		if (result != KERN_SUCCESS) {
-			ret = SPL_LOG_MACH_GETTIME_ERROR;
-			spl_console_log("SPL_LOG_MACH_GETTIME_ERROR.");
-			break;
-		}
-		mach_port_deallocate(mach_task_self(), cclock);
-		nanosec.tv_sec = mts.tv_sec;
-		nanosec.tv_nsec = mts.tv_nsec;
-#else
-		/* https://linux.die.net/man/3/localtime */
-		/* https://linux.die.net/man/3/clock_gettime */
-		ret = clock_gettime(CLOCK_REALTIME, &nanosec);
-		if (ret) {
-			ret = SPL_LOG_TIME_NANO_NULL_ERROR;
-			break;
-		}
-
-#endif
-		stt->year = lt->tm_year;
-		stt->month = lt->tm_mon;
-		stt->day = lt->tm_mday;
-
-		stt->hour = lt->tm_hour;
-		stt->minute = (spl_uchar)lt->tm_min;
-		stt->sec = lt->tm_sec;
-		stt->nn = (spl_uint)nanosec.tv_nsec;
-
-#endif
-	} while (0);
-	return ret;
-#endif
-
-#ifndef UNIX_LINUX
-	SYSTEMTIME lt;
-#else
-
-#ifdef __MACH__
-	clock_serv_t cclock;
-	mach_timespec_t mts;
-	kern_return_t result;
+	struct timespec nanosec = {0};
 #else
 	struct timespec nanosec = {0};
 #endif
@@ -1280,12 +1199,30 @@ spl_bin_now_ext(SPL_HD_PARAM *const p)
 #ifdef __MACH__
 		LLU thid = 0;
 		spl_local_time_st stt = {0};
+
+		result = host_get_clock_service(mach_host_self(), REALTIME_CLOCK, &cclock);
+		if (result != KERN_SUCCESS) {
+			ret = SPL_LOG_MACH_CLOCK_SERVICE_ERROR;
+			spl_err("SPL_LOG_MACH_CLOCK_SERVICE_ERROR.");
+			break;
+		}
+		result = clock_get_time(cclock, &mts);
+		if (result != KERN_SUCCESS) {
+			ret = SPL_LOG_MACH_GETTIME_ERROR;
+			spl_err("SPL_LOG_MACH_GETTIME_ERROR.");
+			break;
+		}
+		mach_port_deallocate(mach_task_self(), cclock);
+		nanosec.tv_sec = mts.tv_sec;
+		nanosec.tv_nsec = mts.tv_nsec;
+
 		ret = spl_local_time_now(&stt);
 		if (ret) {
 			spl_err("ret: %d", ret);
 		}
 		thid = (LLU)spl_get_threadid();
 		p->r = SPL_RAND_FORM(thid, stt.nn);
+		p->header.timestamp = nanosec.tv_sec * SPL_MILLION + nanosec.tv_nsec;
 #else
 		ret = clock_gettime(CLOCK_REALTIME, &nanosec);
 		if (ret) {
