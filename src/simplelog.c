@@ -986,7 +986,11 @@ spl_written_thread_routine(void *lpParam)
 					spl_console_log("--spl_gen_topics, ret: %d --\n", ret);
 					continue;
 				}
-
+				ret = spl_gen_topics(1);
+				if (ret) {
+					spl_console_log("--binary spl_gen_topics, ret: %d --\n", ret);
+					continue;
+				}
 				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				if (!is_off) {
 					spl_mutex_lock(t->mtx_off);
@@ -2045,9 +2049,6 @@ spl_calculate_size()
 #endif
 	SIMPLE_LOG_ST *t = &__simple_log_static__;
 	size_arr_mtx = t->ncpu * sizeof(void *);
-	/*k: For buffer.*/
-	/*k = t->buff_size * t->ncpu * (t->n_topic + 1);*/
-	/*k = t->buff_size * t->ncpu + t->buff_size * t->ncpu * t->n_topic;*/
 	do {
 		if (!t->arr_mtx) {
 			spl_malloc(size_arr_mtx, t->arr_mtx, void *);
@@ -2256,7 +2257,7 @@ spl_win_totalcores()
 		return (int)sysInfo.dwNumberOfProcessors;
 	}
 }
-
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_win32_sync_create()
 {
