@@ -24,7 +24,7 @@
  *		<2025-Jun-01>
  *		<2025-Jun-11>
  *		<2025-Oct-04>
- *		<2026-Jun-14>
+ *		<2026-Jun-30>
  * Decription:
  *		The (only) main header file to export 4 APIs: [spl_init_log_ext, spllog, spllogtopic, spl_finish_log].
  */
