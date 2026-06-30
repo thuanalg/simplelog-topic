@@ -1067,7 +1067,16 @@ spl_written_thread_routine(void *lpParam)
 							spl_mutex_unlock(t->arr_mtx[j]);
 						}
 						if (fwbuf->pl > 0) {
+							k = (int)fwrite(
+							    fwbuf->data, 1, fwbuf->pl, (FILE *)(t->arr_bintopic[i].fp));
+							t->arr_bintopic[i].fizize += k;
 							fwbuf->pl = 0;
+							SPL_FFLUSH((t->arr_bintopic[i].fp), err);
+							if (err) {
+								spl_err("--fflush, ret: %d --\n", err);
+								ret = SPL_LOG_TOPIC_FLUSH;
+								break;
+							}
 						}
 					}
 				}

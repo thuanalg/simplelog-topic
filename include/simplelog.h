@@ -538,50 +538,38 @@ typedef struct __SPL_HD_PARAM__ {
 #define __spl_binlog_buf_topic_level__(__lv__, __tpic__, ___type___, __data__, __sz__)                                      \
 	{                                                                                                                   \
 		if (SPL_CTRL_OBJ->llevel <= (__lv__) && SPL_CTRL_OBJ->bintopics && (__sz__ > 0)) {                          \
-			; /*                                                                                                \
-			int __len__ = 0;                                                                                    \
-			;                                                                                                   \
-			const char *__pfn__ = 0;                                                                            \
-			;                                                                                                   \
-			__FILLE__(__pfn__);                                                                                 \
 			;                                                                                                   \
 			{                                                                                                   \
+				SPL_HD_PARAM __pr__ = {0};                                                                  \
+				char __len__ = 0;                                                                           \
+				__pr__.header.total = sizeof(SPL_HEADER) + __sz__;                                          \
+				__pr__.header.type_id = ___type___;                                                         \
 				;                                                                                           \
-				SPL_FMT_PARAM __pr__ = {0};                                                                 \
-				__pr__.filename = __pfn__;                                                                  \
-				__pr__.funcname = __FUNCTION__;                                                             \
-				__pr__.line = __LINE__;                                                                     \
-				__pr__.lv = (__lv__);                                                                       \
-				;                                                                                           \
-				spl_fmt_now_ext(&__pr__);                                                                   \
+				spl_bin_now_ext(&__pr__);                                                                   \
 				;                                                                                           \
 				do {                                                                                        \
 					;                                                                                   \
-					spl_gen_data_st *const __lane__ = SPL_TT_LANE(__tpic__, __pr__.r);                  \
+					spl_gen_data_st *const __lane__ = SPL_TB_LANE(__tpic__, __pr__.r);                  \
 					;                                                                                   \
 					spl_mutex_lock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                    \
 					;                                                                                   \
-					if (SPL_CTRL_OBJ->range > __lane__->pl) {                                           \
+					if (SPL_CTRL_OBJ->krange > (__lane__->pl + __pr__.header.total)) {                  \
 						;                                                                           \
-						memcpy(__lane__->data + __lane__->pl, __pr__.fmtt, __pr__.outlen);          \
+						memcpy(                                                                     \
+						    __lane__->data + __lane__->pl, &(__pr__.header), sizeof(SPL_HEADER));   \
 						;                                                                           \
-						__lane__->pl += __pr__.outlen;                                              \
+						__lane__->pl += sizeof(SPL_HEADER);                                         \
 						;                                                                           \
-						__len__ = snprintf(__lane__->data + __lane__->pl,                           \
-						    SPL_CTRL_OBJ->krange - __lane__->pl, ___fmttt___, ##__VA_ARGS__);       \
+						memcpy(__lane__->data + __lane__->pl, __data__, __sz__);                    \
 						;                                                                           \
-						if (__len__ > 0) {                                                          \
-							;                                                                   \
-							__lane__->pl +=                                                     \
-							    SPL_MIN_AB(__len__, SPL_CTRL_OBJ->krange - __lane__->pl);       \
-							;                                                                   \
-							;                                                                   \
-						}                                                                           \
+						__lane__->pl += __sz__;                                                     \
+						__len__ = 1;                                                                \
 					};                                                                                  \
 					spl_mutex_unlock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                  \
-					if (__len__ > 0)                                                                    \
-						break;                                                                      \
 					;                                                                                   \
+					if (__len__) {                                                                      \
+						break;                                                                      \
+					}                                                                                   \
 					(__pr__.r)++;                                                                       \
 					;                                                                                   \
 					(__pr__.r) %= SPL_CTRL_OBJ->ncpu;                                                   \
@@ -591,7 +579,7 @@ typedef struct __SPL_HD_PARAM__ {
 				if (!SPL_CTRL_OBJ->trigger_thread)                                                          \
 					spl_rel_sem(SPL_CTRL_OBJ->sem_rwfile);                                              \
 				;                                                                                           \
-			}     */                                                                                            \
+			}                                                                                                   \
 		}                                                                                                           \
 	}
 
