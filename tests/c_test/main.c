@@ -150,6 +150,9 @@ posix_thread_routine(void *lpParam)
 {
 #endif 
 	int count = 0;
+	if(lpParam) {
+		spl_console_log("%p\n", lpParam);
+	}
 	/*#define SPL_TEST_FMT			"test log test log test log: %d"*/
 #define SPL_TEST_FMT "My test log : %d"
 	if (topicindex < 1) {
@@ -159,9 +162,13 @@ posix_thread_routine(void *lpParam)
 		}
 	} else {
 		while (count < loop_count) {
+		#if 1
 			spllogtopic(SPL_LOG_INFO, topicindex - 1, SPL_TEST_FMT, count);
+		#else	
 			char data[32];
+			snprintf(data, 32, "Hello");
 			spllogbintopic(0, 0, 0, data, 32);
+		#endif
 			++count;
 		}
 	}

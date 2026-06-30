@@ -525,7 +525,7 @@ typedef struct __SPL_FMT_PARAM__ {
 
 #define __spl_binlog_buf_topic_level__(__lv__, __tpic__, ___type___, __data__, __sz__)                                                     \
 	{                                                                                                                   \
-		if (SPL_CTRL_OBJ->llevel <= (__lv__) && SPL_CTRL_OBJ->bintopics && __data__) {                        \
+		if (SPL_CTRL_OBJ->llevel <= (__lv__) && SPL_CTRL_OBJ->bintopics && (__sz__ > 0)) {                        \
 			; /*                                                                                                   \
 			int __len__ = 0;                                                                                    \
 			;                                                                                                   \

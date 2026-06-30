@@ -244,7 +244,7 @@ static int
 spl_init_log_parse(char *buff, char *key, char *);
 
 static int
-spl_verify_folder(char *folder);
+spl_verify_folder();
 static int
 spl_simple_log_thread(SIMPLE_LOG_ST *t);
 static int
@@ -589,7 +589,7 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 			cores = spl_win_totalcores();
 #else
 	#if defined(_GNU_SOURCE) && defined(__LINUX__)
-			core = sysconf(_SC_NPROCESSORS_ONLN);
+			cores = sysconf(_SC_NPROCESSORS_ONLN);
 	#endif
 #endif
 			n = SPL_MAX_AB(cores, n);
@@ -747,7 +747,7 @@ spl_init_log(char *pathcfg)
 			break;
 		}
 
-		ret = spl_verify_folder(__simple_log_static__.folder);
+		ret = spl_verify_folder();
 		if (ret) {
 			break;
 		}
@@ -861,7 +861,7 @@ spl_mutex_unlock(void *obj)
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
-spl_verify_folder(char *folder)
+spl_verify_folder()
 {
 	int ret = 0;
 	do {
@@ -1668,7 +1668,7 @@ spl_gen_topics(char isBin)
 	int ret = 0;
 	char path[SPL_FULLPATH_LEN + 1];
 	SIMPLE_LOG_ST *const t = SPL_CTRL_OBJ;
-	LLU cszize = 0;
+	int cszize = 0;
 	int const num_top = isBin ? t->n_bintopic : t->n_topic;
 	SIMPLE_LOG_TOPIC_ST *const arr_target = isBin ? t->arr_bintopic : t->arr_topic;
 	const char *const fext = isBin ? "%s-%s-%.7d.bin" : "%s-%s-%.7d.log";
@@ -1947,15 +1947,13 @@ spl_create_memory(void **output, char *shared_key, int size_shared, char isCreat
 	int ret = 0;
 	char *p = 0;
 	do {
+		spl_console_log("%s", isCreating ? "isCreating" : "refer");
 #ifndef UNIX_LINUX
 		HANDLE hMapFile = 0;
-
-		/* char *p = 0;*/
-
 		if (!output) {
 			ret = SPL_LOG_SHM_CREATE_NULL;
 			break;
-		}
+		}		
 		if (isCreating) {
 			hMapFile = CreateFileMappingA(INVALID_HANDLE_VALUE, /* use paging file */
 			    NULL, /* // default security */
