@@ -1271,9 +1271,9 @@ spl_bin_now_ext(SPL_HD_PARAM *const p)
 		}
 		thid = (LLU)spl_get_threadid();
 #if defined(_OPTIMZE_MORE_64CORE_)
-		p->r = (SPL_CTRL_OBJ->mode_straight ? thid : stt.nn) % SPL_CTRL_OBJ->ncpu;
+		p->r = SPL_RAND_FORM(thid, stt.nn);
 #else
-		p->r = (SPL_CTRL_OBJ->mode_straight ? thid : stt.nn) % SPL_CTRL_OBJ->ncpu;
+		p->r = SPL_RAND_FORM(thid, stt.nn);
 #endif
 #endif
 #else
@@ -1285,7 +1285,6 @@ spl_bin_now_ext(SPL_HD_PARAM *const p)
 			spl_err("ret: %d", ret);
 		}
 		thid = (LLU)spl_get_threadid();
-#define SPL_RAND_FORM(__tid__, __nn__)
 		p->r = SPL_RAND_FORM(thid, stt.nn);
 #else
 		ret = clock_gettime(CLOCK_REALTIME, &nanosec);
@@ -1297,17 +1296,15 @@ spl_bin_now_ext(SPL_HD_PARAM *const p)
 		p->header.timestamp = nanosec.tv_sec * SPL_MILLION + nanosec.tv_nsec;
 #if defined(_GNU_SOURCE) && defined(__LINUX__)
 		p->r = sched_getcpu();
-#else
-		{
-			LLU thid = 0;
-			spl_local_time_st stt = {0};
-			ret = spl_local_time_now(&stt);
-			if (ret) {
-				spl_err("ret: %d", ret);
-			}
-			thid = (LLU)spl_get_threadid();
-			p->r = SPL_RAND_FORM(thid, stt.nn);
+#else		
+		LLU thid = 0;
+		spl_local_time_st stt = {0};
+		ret = spl_local_time_now(&stt);
+		if (ret) {
+			spl_err("ret: %d", ret);
 		}
+		thid = (LLU)spl_get_threadid();
+		p->r = SPL_RAND_FORM(thid, stt.nn);		
 #endif
 #endif
 #endif
