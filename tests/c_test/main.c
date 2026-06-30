@@ -162,12 +162,12 @@ posix_thread_routine(void *lpParam)
 		}
 	} else {
 		while (count < loop_count) {
-		#if 1
+		#if 0
 			spllogtopic(SPL_LOG_INFO, topicindex - 1, SPL_TEST_FMT, count);
 		#else	
-			char data[32];
+			char data[32] = {0};
 			snprintf(data, 32, "Hello");
-			spllogbintopic(0, 0, 0, data, 32);
+			spllogbintopic(0, 1, 0, data, 32);
 		#endif
 			++count;
 		}
