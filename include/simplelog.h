@@ -309,7 +309,6 @@ typedef struct __SPL_HEADER__ {
 	int total;
 	int type_id;
 	LLU timestamp;
-	char data[0];
 } SPL_HEADER;
 
 typedef struct __SPL_HD_PARAM__ {
