@@ -97,6 +97,7 @@ extern "C" {
 #define SPL_TEMPLATE_LEN                (SPL_PATH_FOLDER + SPL_FNAME_LEN + 32)
 #define SPL_FULLPATH_LEN                (SPL_TEMPLATE_LEN + 32 + 16)
 #define SPL_MILLION                     (1000000)
+#define SPL_BILLION                     (1000000000)
 #define SPL_RANGE_YEAR                  (10000)
 #define SPL_RANGE_MONTH                 (13)
 #define SPL_RANGE_DAY                   (32)

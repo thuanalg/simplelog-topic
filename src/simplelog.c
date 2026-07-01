@@ -1177,6 +1177,9 @@ spl_bin_now_ext(SPL_HD_PARAM *const p)
 	int ret = 0;
 #ifndef UNIX_LINUX
 	SYSTEMTIME lt = {0};
+	LARGE_INTEGER counter = {0};
+	LLU thid = 0;
+	spl_local_time_st stt = {0};
 #else
 #ifdef __MACH__
 	clock_serv_t cclock;
@@ -1193,22 +1196,27 @@ spl_bin_now_ext(SPL_HD_PARAM *const p)
 		return;
 	}
 	do {
-#ifndef UNIX_LINUX
+#ifndef UNIX_LINUX		
+		GetLocalTime(&lt);
+		QueryPerformanceCounter(&counter);
+		p->header.timestamp = time(0) * SPL_BILLION;
+		p->header.timestamp += (LLU)lt.wMilliseconds * SPL_MILLION;
+		p->header.timestamp += counter.QuadPart % SPL_MILLION;
 #if defined(__OPTIMZE_64CORE__)
 		p->r = (unsigned short)GetCurrentProcessorNumber();
 #else
-		LLU thid = 0;
-		spl_local_time_st stt = {0};
+
 		ret = spl_local_time_now(&stt);
 		if (ret) {
 			spl_err("ret: %d", ret);
 		}
 		thid = (LLU)spl_get_threadid();
-#if defined(__OPTIMZE_MORE_64CORE__)
+	#if defined(__OPTIMZE_MORE_64CORE__)
 		p->r = SPL_RAND_FORM(thid, stt.nn);
-#else
+	#else
 		p->r = SPL_RAND_FORM(thid, stt.nn);
-#endif
+	#endif
+
 #endif
 #else
 #ifdef __MACH__
@@ -1237,7 +1245,7 @@ spl_bin_now_ext(SPL_HD_PARAM *const p)
 		}
 		thid = (LLU)spl_get_threadid();
 		p->r = SPL_RAND_FORM(thid, stt.nn);
-		p->header.timestamp = nanosec.tv_sec * SPL_MILLION + nanosec.tv_nsec;
+		p->header.timestamp = nanosec.tv_sec * SPL_BILLION + nanosec.tv_nsec;
 #else
 		ret = clock_gettime(CLOCK_REALTIME, &nanosec);
 		if (ret) {
@@ -1245,7 +1253,7 @@ spl_bin_now_ext(SPL_HD_PARAM *const p)
 			spl_err("SPL_LOG_TIME_NANO_NULL_ERROR");
 			break;
 		}
-		p->header.timestamp = nanosec.tv_sec * SPL_MILLION + nanosec.tv_nsec;
+		p->header.timestamp = nanosec.tv_sec * SPL_BILLION + nanosec.tv_nsec;
 #if defined(_GNU_SOURCE) && defined(__LINUX__)
 		p->r = sched_getcpu();
 #else
