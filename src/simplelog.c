@@ -237,6 +237,7 @@ static const char *__splog_pathfolder[] = {SPL_LOG_PATHFOLDR, SPL_LOG_LEVEL, SPL
 
 static SIMPLE_LOG_ST __simple_log_static__;
 SIMPLE_LOG_ST *const __spl_ctr_obj__ = &__simple_log_static__;
+unsigned char __spl_bin_flag__;
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
@@ -1775,6 +1776,17 @@ spl_stdz_topics(char *buff, int *inoutlen, int *ntopics, char **pchar)
 	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+/*
+	0b0 0: 64 bit/little endian
+	0b0 1: 64 bit/big endian
+	0b1 0: 32 bit/little endian
+	0b1 1: 32 bit/big endian
+*/
+#define SPL_ADD_BIN_FLAG(__fp__)                                                                                            \
+	{                                                                                                                   \
+		fwrite(&__spl_bin_flag__, 1, 1, (__fp__));                                                                                                                  \
+	}
+
 int
 spl_gen_topics(char isBin)
 {
@@ -1808,6 +1820,10 @@ spl_gen_topics(char isBin)
 				FFSEEK(arr_target[i].fp, 0, SEEK_END);
 				cszize = (LLU)FFTELL(arr_target[i].fp);
 				if (cszize < t->file_limit_size) {
+					if ((!cszize) && isBin) {
+						SPL_ADD_BIN_FLAG(arr_target[i].fp);
+						++cszize;
+					}
 					arr_target[i].fizize = (int)cszize;
 					break;
 				}
@@ -1881,6 +1897,10 @@ spl_gen_topics(char isBin)
 				FFSEEK(arr_target[i].fp, 0, SEEK_END);
 				cszize = (LLU)FFTELL(arr_target[i].fp);
 				if (cszize < t->file_limit_size) {
+					if ((!cszize) && isBin) {
+						SPL_ADD_BIN_FLAG(arr_target[i].fp);
+						++cszize;
+					}
 					break;
 				}
 				SPL_FCLOSE(arr_target[i].fp, err);
