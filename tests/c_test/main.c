@@ -167,7 +167,7 @@ posix_thread_routine(void *lpParam)
 		#else	
 			char data[32] = {0};
 			snprintf(data, 32, "Hello");
-			spllogbintopic(0, 1, 0, data, 32);
+			spllogbintopic(0, topicindex - 1, 0, data, 32);
 		#endif
 			++count;
 		}

@@ -242,9 +242,10 @@ SIMPLE_LOG_ST *const __spl_ctr_obj__ = &__simple_log_static__;
 
 static int
 spl_init_log_parse(char *buff, char *key, char *);
-
+#if 0
 static int
 spl_verify_folder();
+#endif
 static int
 spl_simple_log_thread(SIMPLE_LOG_ST *t);
 static int
@@ -263,7 +264,7 @@ spl_stdz_topics(char *buff, int *inoutlen, int *, char **);
 
 #ifndef UNIX_LINUX
 
-#ifdef _OPTIMZE_MORE_64CORE_
+#ifdef __OPTIMZE_MORE_64CORE__
 
 #define SPL_GROUP_CORES           64
 
@@ -594,6 +595,7 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 #endif
 			n = SPL_MAX_AB(cores, n);
 			t->ncpu = n;
+			spl_console_log("cores: %d.\n", n);
 			break;
 		}
 		if (strcmp(key, SPL_LOG_TRIGGER) == 0) {
@@ -746,11 +748,12 @@ spl_init_log(char *pathcfg)
 		if (ret) {
 			break;
 		}
-
+#if 0
 		ret = spl_verify_folder();
 		if (ret) {
 			break;
 		}
+#endif
 		ret = spl_gen_sync_tool();
 		if (ret) {
 			break;
@@ -860,6 +863,7 @@ spl_mutex_unlock(void *obj)
 	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+#if 0
 int
 spl_verify_folder()
 {
@@ -883,6 +887,7 @@ spl_verify_folder()
 	} while (0);
 	return ret;
 }
+#endif
 /*https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsystemtime*/
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
@@ -1188,7 +1193,7 @@ spl_bin_now_ext(SPL_HD_PARAM *const p)
 	}
 	do {
 #ifndef UNIX_LINUX
-#if defined(_OPTIMZE_64CORE_)
+#if defined(__OPTIMZE_64CORE__)
 		p->r = (unsigned short)GetCurrentProcessorNumber();
 #else
 		LLU thid = 0;
@@ -1198,7 +1203,7 @@ spl_bin_now_ext(SPL_HD_PARAM *const p)
 			spl_err("ret: %d", ret);
 		}
 		thid = (LLU)spl_get_threadid();
-#if defined(_OPTIMZE_MORE_64CORE_)
+#if defined(__OPTIMZE_MORE_64CORE__)
 		p->r = SPL_RAND_FORM(thid, stt.nn);
 #else
 		p->r = SPL_RAND_FORM(thid, stt.nn);
@@ -1275,10 +1280,10 @@ spl_fmt_now_ext(SPL_FMT_PARAM *const p)
 	}
 #if 1
 #ifndef UNIX_LINUX
-#if defined(_OPTIMZE_64CORE_)
+#if defined(__OPTIMZE_64CORE__)
 	p->r = (unsigned short)GetCurrentProcessorNumber();
 #else
-#if defined(_OPTIMZE_MORE_64CORE_)
+#if defined(__OPTIMZE_MORE_64CORE__)
 	p->r = SPL_RAND_FORM(threadiid, stt.nn);
 #else
 	p->r = SPL_RAND_FORM(threadiid, stt.nn);
