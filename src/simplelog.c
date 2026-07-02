@@ -243,10 +243,6 @@ unsigned char __spl_bin_flag__;
 
 static int
 spl_init_log_parse(char *buff, char *key, char *);
-#if 0
-static int
-spl_verify_folder();
-#endif
 static int
 spl_simple_log_thread(SIMPLE_LOG_ST *t);
 static int
@@ -647,9 +643,9 @@ int
 spl_init_log_ext(SPL_INPUT_ARG *input)
 {
 	int ret = 0;
-#if 0	
-	spl_err_txt_init();
-#endif
+	SPL_SET_ENDIAN(__spl_bin_flag__);
+	SPL_SET_ARCH(__spl_bin_flag__);
+	spl_console_log("-----------------__spl_bin_flag__: %d ", (int)__spl_bin_flag__);
 	do {
 		memcpy(__simple_log_static__.id_name, input->id_name, SPL_IDD_NAME);
 		ret = spl_init_log(input->folder);
@@ -1776,23 +1772,17 @@ spl_stdz_topics(char *buff, int *inoutlen, int *ntopics, char **pchar)
 		*ntopics = count;
 
 	} while (0);
-	/*
-	//if (p) {
-	//	spl_free(p);
-	//}
-	*/
+
 	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 /*
-	0b0 0: 64 bit/little endian
-	0b0 1: 64 bit/big endian
-	0b1 0: 32 bit/little endian
-	0b1 1: 32 bit/big endian
+	First bit, [0:1] -->> [little:big] endian
+	Second bit, [0:1] -->> [64-bit:32-bit]
 */
 #define SPL_ADD_BIN_FLAG(__fp__)                                                                                            \
 	{                                                                                                                   \
-		fwrite(&__spl_bin_flag__, 1, 1, (__fp__));                                                                                                                  \
+		fwrite(&__spl_bin_flag__, 1, 1, (FILE*)(__fp__));                                                                                                                  \
 	}
 
 int

@@ -38,9 +38,13 @@
 #define SPL_MIN_AB(a, b) ((a) < (b)) ? (a) : (b)
 #define SPL_MAX_AB(a, b) ((a) > (b)) ? (a) : (b)
 
-#if 0
+#if 1
 #ifndef UNIX_LINUX
-#define UNIX_LINUX                      
+#define UNIX_LINUX   
+#if 1
+	#define __LINUX__
+	#define _GNU_SOURCE
+#endif                   
 #endif
 #endif
 
@@ -316,6 +320,34 @@ typedef struct __SPL_HD_PARAM__ {
 	unsigned short r; /* Random slot. */
 	SPL_HEADER header; /* Header like UTF-8 */
 } SPL_HD_PARAM;
+
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+/*
+	First bit,  [0:1] -->> [little:big] endian
+	Second bit, [0:1] -->> [64-bit:32-bit]
+	Other (6) bits: reserved
+*/
+
+#define SPL_SET_ENDIAN(__a__) \
+    do { \
+        unsigned short __en__ = 1; \
+        char *__p__ = (char *)&__en__; \
+        if (__p__[0] == 0) { \
+            (__a__) |= 0x01;  \
+        } \
+    } while(0)
+
+#define SPL_GET_ENDIAN(__a__)    ((__a__) & 0x01)
+
+#define SPL_SET_ARCH(__a__) \
+    do { \
+        if (sizeof(void*) < 8) { \
+            (__a__) |= 0x02; \
+        } \
+    } while(0)
+
+#define SPL_GET_ARCH(__a__)      ((__a__) & 0x02)
+
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
