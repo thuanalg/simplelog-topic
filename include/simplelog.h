@@ -23,6 +23,8 @@
  *		<2025-Apr-22>
  *		<2025-Jun-01>
  *		<2025-Jun-11>
+ *		<2025-Oct-04>
+ *		<2026-Jun-30>
  * Decription:
  *		The (only) main header file to export 4 APIs: [spl_init_log_ext, spllog, spllogtopic, spl_finish_log].
  */
@@ -36,9 +38,13 @@
 #define SPL_MIN_AB(a, b) ((a) < (b)) ? (a) : (b)
 #define SPL_MAX_AB(a, b) ((a) > (b)) ? (a) : (b)
 
-#if 0
+#if 1
 #ifndef UNIX_LINUX
-#define UNIX_LINUX                      
+#define UNIX_LINUX   
+#if 1
+	#define __LINUX__
+	#define _GNU_SOURCE
+#endif                   
 #endif
 #endif
 
@@ -94,10 +100,11 @@ extern "C" {
 #define SPL_FNAME_LEN                   (SPL_IDD_NAME + 32)
 #define SPL_TEMPLATE_LEN                (SPL_PATH_FOLDER + SPL_FNAME_LEN + 32)
 #define SPL_FULLPATH_LEN                (SPL_TEMPLATE_LEN + 32 + 16)
-#define SPL_MILLION                     1000000
-#define SPL_RANGE_YEAR                  10000
-#define SPL_RANGE_MONTH                 13
-#define SPL_RANGE_DAY                   32
+#define SPL_MILLION                     (1000000)
+#define SPL_BILLION                     (1000000000)
+#define SPL_RANGE_YEAR                  (10000)
+#define SPL_RANGE_MONTH                 (13)
+#define SPL_RANGE_DAY                   (32)
 
 #ifndef UNIX_LINUX
 #ifndef __SIMPLE_STATIC_LOG__
@@ -228,7 +235,9 @@ typedef struct __spl_local_time_st__ {
 typedef struct __SIMPLE_LOG_TOPIC_ST__ {
 	int index; /*Index of a topic*/
 	char topic[SPL_TOPIC_SIZE]; /*Name of topic*/
+#if 0	
 	spl_gen_data_st *buf; /*Buff for writing*/
+#endif
 	int fizize; /*Size of file.*/
 	void *fp; /*File stream.*/
 } SIMPLE_LOG_TOPIC_ST;
@@ -244,15 +253,22 @@ typedef struct __SIMPLE_LOG_ST__ {
 	int index; /*Index of default log, not in a topic. No nead SYNC.*/
 	char folder[SPL_PATH_FOLDER]; /*Path of genera folder. No nead SYNC.*/
 	char off; /*Must be sync*/
-	void *mtx_rw; /*mtx: Need to close handle*/
+	void *mtx_off; /*mtx: Need to close handle*/
 	void *sem_rwfile; /*sem_rwfile: Need to close handle*/
 	void *sem_off; /*sem_off: Need to close handle*/
 	spl_local_time_st lc_time_now; /*Current time.*/
 	FILE *fp; /*fp: Need to close*/
 	spl_gen_data_st *buf; /*buf: Must be synchoronized. Must be freed.*/
+
 	char *topics; /*topics: topics string. Must be freed */
 	int n_topic; /*Number of topics, SIMPLE_LOG_TOPIC_ST.*/
-	SIMPLE_LOG_TOPIC_ST *arr_topic; /*List od topics: SIMPLE_LOG_TOPIC_ST. Must be freed*/
+	SIMPLE_LOG_TOPIC_ST *arr_topic; /*List of topics: SIMPLE_LOG_TOPIC_ST. Must be freed*/
+
+	/*Binary logging inspired by UTF-8. https://en.wikipedia.org/wiki/UTF-8 */
+	char *bintopics; /*btopics: binary topics string. Must be freed */
+	int n_bintopic; /*Number of binary topics, SIMPLE_LOG_TOPIC_ST.*/
+	SIMPLE_LOG_TOPIC_ST *arr_bintopic; /*List of binary topics: SIMPLE_LOG_TOPIC_ST. Must be freed*/
+
 	int renew; /*In a thread of logger, NO NEED SYNC.*/
 	char path_template[SPL_TEMPLATE_LEN]; /*In a thread of logger, NO NEED SYNC.*/
 	int ncpu; /*Number of CPU.*/
@@ -283,6 +299,56 @@ typedef struct __SPL_INPUT_ARG__ {
 	SPL_CALLBACL_FUNCTION fn; /* Callback function pointer (fn(obj)). */
 	SPL_CALLBACL_DATA *obj; /* Data pointer passed to the callback function (fn(obj)). */
 } SPL_INPUT_ARG;
+
+typedef struct __SPL_FMT_PARAM__ {
+	char fmtt[SPL_RL_BUF]; /* In/Output format. */
+	const char *filename;
+	const char *funcname;
+	int line; /* Current line. */
+	int lv; /* Log level. */
+	unsigned short r; /* Random slot. */
+	int outlen; /* Real length of fmtt. */
+} SPL_FMT_PARAM;
+
+typedef struct __SPL_HEADER__ {
+	int total;
+	int type_id;
+	LLU timestamp;
+} SPL_HEADER;
+
+typedef struct __SPL_HD_PARAM__ {
+	unsigned short r; /* Random slot. */
+	SPL_HEADER header; /* Header like UTF-8 */
+} SPL_HD_PARAM;
+
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+/*
+	First bit,  [0:1] -->> [little:big] endian
+	Second bit, [0:1] -->> [64-bit:32-bit]
+	Other (6) bits: reserved
+*/
+
+#define SPL_SET_ENDIAN(__a__) \
+    do { \
+        unsigned short __en__ = 1; \
+        char *__p__ = (char *)&__en__; \
+        if (__p__[0] == 0) { \
+            (__a__) |= 0x01;  \
+        } \
+    } while(0)
+
+#define SPL_GET_ENDIAN(__a__)    ((__a__) & 0x01)
+
+#define SPL_SET_ARCH(__a__) \
+    do { \
+        if (sizeof(void*) < 8) { \
+            (__a__) |= 0x02; \
+        } \
+    } while(0)
+
+#define SPL_GET_ARCH(__a__)      ((__a__) & 0x02)
+
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 #define __FILLE__(__p__)                                                                                                    \
@@ -327,7 +393,7 @@ typedef struct __SPL_INPUT_ARG__ {
 		    spl_get_threadid(), ##__VA_ARGS__);                                                                     \
 	}
 #endif
-
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #define spl_malloc(__nn__, __obj__, __type__)                                                                               \
 	{                                                                                                                   \
 		(__obj__) = (__type__ *)malloc(__nn__);                                                                     \
@@ -348,173 +414,203 @@ typedef struct __SPL_INPUT_ARG__ {
 	}
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+#define SPL_CTRL_OBJ                    __spl_ctr_obj__
+#define SPL_SEG_SZ                      (SPL_CTRL_OBJ->buff_size * SPL_CTRL_OBJ->ncpu)
+#define SPL_BUF_TOTAL                   ((1 + SPL_CTRL_OBJ->n_topic + SPL_CTRL_OBJ->n_bintopic + 1) * (SPL_SEG_SZ))
 
-#define SPL_KEYBUF(__t__, __i__) ((spl_gen_data_st *)((char *)__t__->buf + (__t__->buff_size * __i__)))
+#define SPL_FW_INDEX                    (1 + SPL_CTRL_OBJ->n_topic + SPL_CTRL_OBJ->n_bintopic)
+#define SPL_FW_BUF_CHAR                 ((char *)(SPL_CTRL_OBJ->buf) + (SPL_FW_INDEX * SPL_SEG_SZ))
+#define SPL_FW_BUF                      ((spl_gen_data_st *)SPL_FW_BUF_CHAR)
+
+#define SPL_KEYBUF(__i__) ((spl_gen_data_st *)((char *)(SPL_CTRL_OBJ->buf) + (SPL_CTRL_OBJ->buff_size * __i__)))
+
 #define __spl_log_buf_level__(__lv__, ___fmttt___, ...)                                                                     \
 	{                                                                                                                   \
 		;                                                                                                           \
-		SIMPLE_LOG_ST *__t__ = spl_control_obj();                                                                   \
-		if (__t__->llevel <= (__lv__) && ___fmttt___[0]) {                                                          \
+		if (SPL_CTRL_OBJ->llevel <= (__lv__) && ___fmttt___[0]) {                                                   \
 			;                                                                                                   \
-			;                                                                                                   \
-			int __outlen__ = 0;                                                                                 \
 			;                                                                                                   \
 			const char *__pfn__ = 0; /*char __isOof = 0;*/                                                      \
 			;                                                                                                   \
-			;                                                                                                   \
-			unsigned short __r__ = 0;                                                                           \
-			;                                                                                                   \
-			char __tnow__[SPL_RL_BUF];                                                                          \
-			char *__pprefmt__ = 0;                                                                              \
-			;                                                                                                   \
-			;                                                                                                   \
-			;                                                                                                   \
 			__FILLE__(__pfn__);                                                                                 \
-			__pprefmt__ = spl_fmt_now_ext(                                                                      \
-			    __tnow__, SPL_RL_BUF, __lv__, __pfn__, __FUNCTION__, __LINE__, &__r__, &__outlen__);            \
 			;                                                                                                   \
 			{                                                                                                   \
+				;                                                                                           \
+				SPL_FMT_PARAM __pr__ = {0};                                                                 \
+				__pr__.filename = __pfn__;                                                                  \
+				__pr__.funcname = __FUNCTION__;                                                             \
+				__pr__.line = __LINE__;                                                                     \
+				__pr__.lv = (__lv__);                                                                       \
+				;                                                                                           \
+				spl_fmt_now_ext(&__pr__);                                                                   \
+				;                                                                                           \
 				do {                                                                                        \
 					;                                                                                   \
 					int __len__ = 0;                                                                    \
 					;                                                                                   \
-                                                                                                                            \
+					spl_gen_data_st *const __lane__ = SPL_KEYBUF(__pr__.r);                             \
 					;                                                                                   \
+					spl_mutex_lock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                    \
 					;                                                                                   \
-					;                                                                                   \
-					spl_mutex_lock(__t__->arr_mtx[__r__]);                                              \
-					;                                                                                   \
-					if (__t__->range > SPL_KEYBUF(__t__, __r__)->pl) {                                  \
+					if (SPL_CTRL_OBJ->range > __lane__->pl) {                                           \
 						;                                                                           \
-						memcpy(SPL_KEYBUF(__t__, __r__)->data + SPL_KEYBUF(__t__, __r__)->pl,       \
-						    __pprefmt__, __outlen__);                                               \
+						memcpy(__lane__->data + __lane__->pl, __pr__.fmtt, __pr__.outlen);          \
 						;                                                                           \
-						SPL_KEYBUF(__t__, __r__)->pl += __outlen__;                                 \
+						__lane__->pl += __pr__.outlen;                                              \
 						;                                                                           \
-						__len__ =                                                                   \
-						    snprintf(SPL_KEYBUF(__t__, __r__)->data + SPL_KEYBUF(__t__, __r__)->pl, \
-							__t__->krange - SPL_KEYBUF(__t__, __r__)->pl, ___fmttt___,          \
-							##__VA_ARGS__);                                                     \
+						__len__ = snprintf(__lane__->data + __lane__->pl,                           \
+						    SPL_CTRL_OBJ->krange - __lane__->pl, ___fmttt___, ##__VA_ARGS__);       \
 						;                                                                           \
 						if (__len__ > 0) {                                                          \
 							;                                                                   \
-							__outlen__ = SPL_MIN_AB(                                            \
-							    __len__, __t__->krange - SPL_KEYBUF(__t__, __r__)->pl);         \
-							;                                                                   \
-							SPL_KEYBUF(__t__, __r__)->pl += __outlen__;                         \
+							__lane__->pl +=                                                     \
+							    SPL_MIN_AB(__len__, SPL_CTRL_OBJ->krange - __lane__->pl);       \
 							;                                                                   \
 						};                                                                          \
 					}                                                                                   \
                                                                                                                             \
-					spl_mutex_unlock(__t__->arr_mtx[__r__]);                                            \
+					spl_mutex_unlock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                  \
                                                                                                                             \
 					if (__len__ > 0)                                                                    \
 						break;                                                                      \
-					; /*spl_console_log("--OVER ===                                                     \
-					     r: %d", (int)r);*/                                                             \
 					;                                                                                   \
-					__r__++;                                                                            \
-					__r__ %= __t__->ncpu;                                                               \
+					(__pr__.r)++;                                                                       \
 					;                                                                                   \
+					(__pr__.r) %= SPL_CTRL_OBJ->ncpu;                                                   \
 					;                                                                                   \
 					continue;                                                                           \
 				} while (1);                                                                                \
-				if (!__t__->trigger_thread)                                                                 \
-					spl_rel_sem(__t__->sem_rwfile);                                                     \
-				if (__pprefmt__ != __tnow__) {                                                              \
-					spl_free(__pprefmt__);                                                              \
-				}                                                                                           \
+				if (!SPL_CTRL_OBJ->trigger_thread)                                                          \
+					spl_rel_sem(SPL_CTRL_OBJ->sem_rwfile);                                              \
+				;                                                                                           \
 			}                                                                                                   \
 		}                                                                                                           \
 	}
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
-#define SPL_ST_LOGBUFTOPIC(__t__, __i__) (&(__t__->arr_topic[__i__]))->buf
-#define SPL_ST_LOGBUFTOPIC_RANGE(__t__, __i__, __r__)                                                                       \
-	((spl_gen_data_st *)((char *)SPL_ST_LOGBUFTOPIC(__t__, __i__) + __t__->buff_size * __r__))
+#define SPL_ST_LOGBUFTOPIC(__i__) (((char *)(SPL_CTRL_OBJ->buf)) + (1 + __i__) * SPL_SEG_SZ)
+
+#define SPL_ST_LOGBUFTOPIC_RANGE(__i__, __r__)                                                                              \
+	((spl_gen_data_st *)((char *)SPL_ST_LOGBUFTOPIC(__i__) + SPL_CTRL_OBJ->buff_size * __r__))
+
+#define SPL_TTOPIC_BUF                  SPL_ST_LOGBUFTOPIC_RANGE
+#define SPL_TT_INDEX(__t__) ((__t__ < SPL_CTRL_OBJ->n_topic) ? (__t__ < 0 ? 0 : __t__) : 0)
+#define SPL_TT_LANE(__tpic__, __r__) SPL_TTOPIC_BUF(SPL_TT_INDEX(__tpic__), __r__)
 
 #define __spl_log_buf_topic_level__(__lv__, __tpic__, ___fmttt___, ...)                                                     \
 	{                                                                                                                   \
 		;                                                                                                           \
-		SIMPLE_LOG_ST *__t__ = spl_control_obj();                                                                   \
-		;                                                                                                           \
-		if (__t__->llevel <= (__lv__) && ___fmttt___[0] && __t__->arr_topic) {                                      \
+		if (SPL_CTRL_OBJ->llevel <= (__lv__) && ___fmttt___[0] && SPL_CTRL_OBJ->arr_topic) {                        \
 			;                                                                                                   \
-			short __tpp__ = 0;                                                                                  \
 			int __len__ = 0;                                                                                    \
-			unsigned short __r__ = 0;                                                                           \
 			;                                                                                                   \
 			const char *__pfn__ = 0;                                                                            \
 			;                                                                                                   \
-			;                                                                                                   \
-			int __outlen__ = 0;                                                                                 \
-			;                                                                                                   \
-			char *__pprefmt__ = 0;                                                                              \
-			;                                                                                                   \
-			char __tnow__[SPL_RL_BUF];                                                                          \
-			;                                                                                                   \
-			__tpp__ = __tpic__ % __t__->n_topic;                                                                \
-			;                                                                                                   \
-			;                                                                                                   \
-			;                                                                                                   \
 			__FILLE__(__pfn__);                                                                                 \
 			;                                                                                                   \
+			{                                                                                                   \
+				;                                                                                           \
+				SPL_FMT_PARAM __pr__ = {0};                                                                 \
+				__pr__.filename = __pfn__;                                                                  \
+				__pr__.funcname = __FUNCTION__;                                                             \
+				__pr__.line = __LINE__;                                                                     \
+				__pr__.lv = (__lv__);                                                                       \
+				;                                                                                           \
+				spl_fmt_now_ext(&__pr__);                                                                   \
+				;                                                                                           \
+				do {                                                                                        \
+					;                                                                                   \
+					spl_gen_data_st *const __lane__ = SPL_TT_LANE(__tpic__, __pr__.r);                  \
+					;                                                                                   \
+					spl_mutex_lock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                    \
+					;                                                                                   \
+					if (SPL_CTRL_OBJ->range > __lane__->pl) {                                           \
+						;                                                                           \
+						memcpy(__lane__->data + __lane__->pl, __pr__.fmtt, __pr__.outlen);          \
+						;                                                                           \
+						__lane__->pl += __pr__.outlen;                                              \
+						;                                                                           \
+						__len__ = snprintf(__lane__->data + __lane__->pl,                           \
+						    SPL_CTRL_OBJ->krange - __lane__->pl, ___fmttt___, ##__VA_ARGS__);       \
+						;                                                                           \
+						if (__len__ > 0) {                                                          \
+							;                                                                   \
+							__lane__->pl +=                                                     \
+							    SPL_MIN_AB(__len__, SPL_CTRL_OBJ->krange - __lane__->pl);       \
+							;                                                                   \
+							;                                                                   \
+						}                                                                           \
+					};                                                                                  \
+					spl_mutex_unlock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                  \
+					if (__len__ > 0)                                                                    \
+						break;                                                                      \
+					;                                                                                   \
+					(__pr__.r)++;                                                                       \
+					;                                                                                   \
+					(__pr__.r) %= SPL_CTRL_OBJ->ncpu;                                                   \
+					;                                                                                   \
+					continue;                                                                           \
+				} while (1);                                                                                \
+				if (!SPL_CTRL_OBJ->trigger_thread)                                                          \
+					spl_rel_sem(SPL_CTRL_OBJ->sem_rwfile);                                              \
+				;                                                                                           \
+			}                                                                                                   \
+		}                                                                                                           \
+	}
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+#define SPL_ST_BUFBINTOPIC(__i__) (((char *)(SPL_CTRL_OBJ->buf)) + (1 + SPL_CTRL_OBJ->n_topic + __i__) * SPL_SEG_SZ)
+
+#define SPL_ST_BUFBINTOPIC_RANGE(__i__, __r__)                                                                              \
+	((spl_gen_data_st *)((char *)SPL_ST_BUFBINTOPIC(__i__) + SPL_CTRL_OBJ->buff_size * __r__))
+
+#define SPL_TTOPIC_BINBUF               SPL_ST_BUFBINTOPIC_RANGE
+#define SPL_TB_INDEX(__t__) ((__t__ < SPL_CTRL_OBJ->n_bintopic) ? (__t__ < 0 ? 0 : __t__) : 0)
+#define SPL_TB_LANE(__tpic__, __r__) SPL_TTOPIC_BINBUF(SPL_TB_INDEX(__tpic__), __r__)
+
+#define __spl_binlog_buf_topic_level__(__lv__, __tpic__, ___type___, __data__, __sz__)                                      \
+	{                                                                                                                   \
+		if (SPL_CTRL_OBJ->llevel <= (__lv__) && SPL_CTRL_OBJ->bintopics && (__sz__ > 0)) {                          \
 			;                                                                                                   \
-			__pprefmt__ = spl_fmt_now_ext(                                                                      \
-			    __tnow__, SPL_RL_BUF, __lv__, __pfn__, __FUNCTION__, __LINE__, &__r__, &__outlen__);            \
-			;                                                                                                   \
-			do {                                                                                                \
+			{                                                                                                   \
+				SPL_HD_PARAM __pr__ = {0};                                                                  \
+				char __len__ = 0;                                                                           \
+				__pr__.header.total = sizeof(SPL_HEADER) + __sz__;                                          \
+				__pr__.header.type_id = ___type___;                                                         \
 				;                                                                                           \
+				spl_bin_now_ext(&__pr__);                                                                   \
 				;                                                                                           \
-				spl_mutex_lock(__t__->arr_mtx[__r__]);                                                      \
-				/*do                                                                                        \
-				{*/                                                                                         \
-				/*if(__t__->arr_topic){*/;                                                                  \
-				;                                                                                           \
-				;                                                                                           \
-				;                                                                                           \
-				if (__t__->range > SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->pl) {                   \
+				do {                                                                                        \
 					;                                                                                   \
-					memcpy(SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->data +                      \
-						   SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->pl,                     \
-					    __pprefmt__, __outlen__);                                                       \
+					spl_gen_data_st *const __lane__ = SPL_TB_LANE(__tpic__, __pr__.r);                  \
 					;                                                                                   \
-					SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->pl += __outlen__;                  \
+					spl_mutex_lock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                    \
 					;                                                                                   \
-					;                                                                                   \
-					__len__ = snprintf(SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->data +          \
-							       SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->pl,         \
-					    __t__->krange - SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->pl,            \
-					    ___fmttt___, ##__VA_ARGS__);                                                    \
-					; /*spl_console_log("--------------lllllllennnnnnnnnnnnnnnnn---r: %d, len: %d",     \
-					     (int)r, len);*/                                                                \
-					;                                                                                   \
-					if (__len__ > 0) {                                                                  \
+					if (SPL_CTRL_OBJ->krange > (__lane__->pl + __pr__.header.total)) {                  \
 						;                                                                           \
-						__outlen__ = SPL_MIN_AB(__len__,                                            \
-						    __t__->krange - SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->pl);   \
+						memcpy(                                                                     \
+						    __lane__->data + __lane__->pl, &(__pr__.header), sizeof(SPL_HEADER));   \
 						;                                                                           \
+						__lane__->pl += sizeof(SPL_HEADER);                                         \
 						;                                                                           \
-						SPL_ST_LOGBUFTOPIC_RANGE(__t__, __tpp__, __r__)->pl += __outlen__;          \
+						memcpy(__lane__->data + __lane__->pl, __data__, __sz__);                    \
+						;                                                                           \
+						__lane__->pl += __sz__;                                                     \
+						__len__ = 1;                                                                \
+					};                                                                                  \
+					spl_mutex_unlock(SPL_CTRL_OBJ->arr_mtx[__pr__.r]);                                  \
+					;                                                                                   \
+					if (__len__) {                                                                      \
+						break;                                                                      \
 					}                                                                                   \
-				}                                                                                           \
-				/*}*/                                                                                       \
-				/*}                                                                                         \
-				while(0);*/                                                                                 \
-				spl_mutex_unlock(__t__->arr_mtx[__r__]);                                                    \
-				if (__len__ > 0)                                                                            \
-					break;                                                                              \
+					(__pr__.r)++;                                                                       \
+					;                                                                                   \
+					(__pr__.r) %= SPL_CTRL_OBJ->ncpu;                                                   \
+					;                                                                                   \
+					continue;                                                                           \
+				} while (1);                                                                                \
+				if (!SPL_CTRL_OBJ->trigger_thread)                                                          \
+					spl_rel_sem(SPL_CTRL_OBJ->sem_rwfile);                                              \
 				;                                                                                           \
-				;                                                                                           \
-				__r__++;                                                                                    \
-				__r__ %= __t__->ncpu;                                                                       \
-				;                                                                                           \
-				continue;                                                                                   \
-			} while (1);                                                                                        \
-			if (!__t__->trigger_thread)                                                                         \
-				spl_rel_sem(__t__->sem_rwfile);                                                             \
-			;                                                                                                   \
-			if (__pprefmt__ != __tnow__) {                                                                      \
-				spl_free(__pprefmt__);                                                                      \
 			}                                                                                                   \
 		}                                                                                                           \
 	}
@@ -541,17 +637,19 @@ spl_init_log_ext(SPL_INPUT_ARG *input);
  */
 #define spllogtopic                     __spl_log_buf_topic_level__
 
+#define spllogbintopic                  __spl_binlog_buf_topic_level__
+
 /* Please demo with spl_finish_log */
 DLL_API_SIMPLE_LOG int
 spl_finish_log();
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
-DLL_API_SIMPLE_LOG char *
-spl_fmt_now_ext(char *fmtt, int len, int lv, 
-	const char *filename, 
-	const char *funcname, 
-	int line, unsigned short *r, int *);
+DLL_API_SIMPLE_LOG void
+spl_fmt_now_ext(SPL_FMT_PARAM *const p);
+
+DLL_API_SIMPLE_LOG void
+spl_bin_now_ext(SPL_HD_PARAM *const p);
 
 DLL_API_SIMPLE_LOG int
 spl_mutex_lock(void *mtx);
@@ -579,15 +677,10 @@ DLL_API_SIMPLE_LOG
 LLU
 spl_milli_now();
 
-DLL_API_SIMPLE_LOG
-SIMPLE_LOG_ST *
-spl_control_obj();
-
-DLL_API_SIMPLE_LOG const char *
-spl_err_txt(int i);
-
 DLL_API_SIMPLE_LOG int
 spl_local_time_now(spl_local_time_st *st_time);
+
+extern DLL_API_SIMPLE_LOG SIMPLE_LOG_ST *const __spl_ctr_obj__;
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 #ifdef __cplusplus

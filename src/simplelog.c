@@ -24,6 +24,9 @@
  *		<2025-Jun-01>
  *		<2025-Jun-11>
  *		<2025-Jun-14>
+ *		<2025-Oct-06>
+ *		<2026-Jun-13>
+ *		<2026-Jun-30>
  * Decription:
  *		The (only) main file to implement simple log.
  */
@@ -67,7 +70,9 @@
 #define SPL_LOG_UNIX_OPEN_MODE    (O_RDWR | O_EXCL)
 #define SPL_LOG_UNIX_PROT_FLAGS   (PROT_READ | PROT_WRITE | PROT_EXEC)
 #endif
-
+#if defined(_GNU_SOURCE) && defined(__LINUX__)
+#include <sched.h>
+#endif
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 #ifndef UNIX_LINUX
@@ -163,7 +168,6 @@
 #define SPL_SEM_NAME_RW           "_SEM_RW"
 #define SPL_SEM_NAME_OFF          "_SEM_OFF"
 
-#define SPL_MTX_NAME_RW           "_MTX_RW"
 #define SPL_MTX_NAME_OFF          "_MTX_OFF"
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
@@ -173,9 +177,11 @@
 #define SPL_MAX_SZ_MSG            "max_sz_msg="
 #define SPL_LOG_ROT_SIZE          "rotation_size="
 #define SPL_LOG_TOPIC             "topic="
+#define SPL_LOG_TOPIC_BIN         "topic_bin="
 #define SPL_LOG_NCPU              "ncpu="
 #define SPL_LOG_TRIGGER           "trigger="
 #define SPL_LOG_SHARED_KEY        "shared_key="
+#define SPL_LOG_MODE_STRAIGHT     "mode_straight="
 #define SPL_LOG_END_CFG           "end_configuring="
 
 #define SPL_FILE_NAME_FMT         "%s\\%s\\%s_%.8d.log"
@@ -194,7 +200,6 @@
 #define SPL_TEXT_ERROR            "E"
 #define SPL_TEXT_FATAL            "F"
 
-#define SPL_CASTGEN(__t__) ((spl_gen_data_st *)__t__)
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #ifndef UNIX_LINUX
 // DLL_API_SIMPLE_LOG
@@ -227,25 +232,23 @@ typedef enum __CHANGE_NAME_E__ {
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 static const char *__splog_pathfolder[] = {SPL_LOG_PATHFOLDR, SPL_LOG_LEVEL, SPL_LOG_BUFF_SIZE, SPL_MAX_SZ_MSG,
-    SPL_LOG_ROT_SIZE, SPL_LOG_TOPIC, SPL_LOG_NCPU, SPL_LOG_TRIGGER, SPL_LOG_SHARED_KEY, SPL_LOG_END_CFG, 0};
+    SPL_LOG_ROT_SIZE, SPL_LOG_TOPIC, SPL_LOG_TOPIC_BIN, SPL_LOG_NCPU, SPL_LOG_TRIGGER, SPL_LOG_SHARED_KEY,
+    SPL_LOG_MODE_STRAIGHT, SPL_LOG_END_CFG, 0};
 
 static SIMPLE_LOG_ST __simple_log_static__;
-;
-void
-spl_err_txt_init();
+SIMPLE_LOG_ST *const __spl_ctr_obj__ = &__simple_log_static__;
+unsigned char __spl_bin_flag__;
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 static int
 spl_init_log_parse(char *buff, char *key, char *);
-
-static int
-spl_verify_folder(char *folder);
 static int
 spl_simple_log_thread(SIMPLE_LOG_ST *t);
 static int
 spl_gen_file(SIMPLE_LOG_ST *t, int *n, int limit, int *);
 static int
-spl_gen_topics(SIMPLE_LOG_ST *t);
+spl_gen_topics(char);
 static int
 spl_get_fname_now(char *name);
 static int
@@ -257,20 +260,28 @@ static int
 spl_stdz_topics(char *buff, int *inoutlen, int *, char **);
 
 #ifndef UNIX_LINUX
+
+#ifdef __OPTIMZE_MORE_64CORE__
+
+#define SPL_GROUP_CORES           64
+
+typedef struct __SPL_WIN_GROUP_CORES__ {
+	int group;
+	int ncores;
+} SPL_WIN_GROUP_CORES;
+
+static SPL_WIN_GROUP_CORES __spl_group_core__[SPL_GROUP_CORES];
+
+#endif
+
 static DWORD WINAPI
 spl_written_thread_routine(LPVOID lpParam);
+
+static int
+spl_win_totalcores();
 #else
 static void *
 spl_written_thread_routine(void *);
-#endif
-
-#if 0
-static int
-spl_fclose_err(int t, void *fpp);
-
-
-static int
-spl_fflush_err(int t, void *fpp);
 #endif
 
 #ifndef UNIX_LINUX
@@ -308,7 +319,7 @@ spl_calculate_size();
 static int
 spl_init_segments();
 static int
-spl_allocate_topics();
+spl_allocate_topics(char);
 static int
 spl_gen_sync_tool();
 static int
@@ -317,12 +328,7 @@ static int
 spl_set_off(int);
 static int
 spl_standardize_path(char *fname);
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-SIMPLE_LOG_ST *
-spl_control_obj()
-{
-	return (SIMPLE_LOG_ST *)&__simple_log_static__;
-}
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 static const char spl_text_gb_c[SPL_LOG_PEAK] = {
@@ -426,11 +432,11 @@ spl_set_off(int isoff)
 	SIMPLE_LOG_ST *t = &__simple_log_static__;
 	int shouldWait = 0;
 
-	spl_mutex_lock(t->mtx_rw);
+	spl_mutex_lock(t->mtx_off);
 	do {
 		t->off = isoff;
 	} while (0);
-	spl_mutex_unlock(t->mtx_rw);
+	spl_mutex_unlock(t->mtx_off);
 
 	spl_rel_sem(t->sem_rwfile);
 	shouldWait = (!t->isProcessMode) ? 1 : (!!t->is_master);
@@ -471,7 +477,7 @@ int
 spl_init_log_parse(char *buff, char *key, char *isEnd)
 {
 	int ret = SPL_NO_ERROR;
-	SIMPLE_LOG_ST *t = (SIMPLE_LOG_ST *)&__simple_log_static__;
+	SIMPLE_LOG_ST *const t = (SIMPLE_LOG_ST *)&__simple_log_static__;
 	do {
 		if (strcmp(key, SPL_LOG_PATHFOLDR) == 0) {
 			if (!buff[0]) {
@@ -539,23 +545,54 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 			if (n < 1) {
 				break;
 			}
+
 			ret = spl_stdz_topics(buff, &n, &count, &p);
 			if (ret) {
 				break;
 			}
 			t->n_topic = count;
+
 			t->topics = p;
+			spl_console_log("n Topic: %d.\n", t->n_topic);
+			break;
+		}
+		if (strcmp(key, SPL_LOG_TOPIC_BIN) == 0) {
+			int n = 0, count = 0;
+			char *p = 0;
+			n = (int)strlen(buff);
+			if (n < 1) {
+				break;
+			}
+
+			ret = spl_stdz_topics(buff, &n, &count, &p);
+			if (ret) {
+				break;
+			}
+			t->n_bintopic = count;
+
+			t->bintopics = p;
+			spl_console_log("n Topic BIN: %d.\n", t->n_bintopic);
 			break;
 		}
 		if (strcmp(key, SPL_LOG_NCPU) == 0) {
 			int sz = 0;
 			int n = 0;
+			int cores = 1;
 			sz = sscanf(buff, "%d", &n);
 			if (sz < 1) {
-				t->ncpu = 1;
+				n = 1;
 				break;
 			}
+#ifndef UNIX_LINUX
+			cores = spl_win_totalcores();
+#else
+#if defined(_GNU_SOURCE) && defined(__LINUX__)
+			cores = sysconf(_SC_NPROCESSORS_ONLN);
+#endif
+#endif
+			n = SPL_MAX_AB(cores, n);
 			t->ncpu = n;
+			spl_console_log("cores: %d.\n", n);
 			break;
 		}
 		if (strcmp(key, SPL_LOG_TRIGGER) == 0) {
@@ -580,6 +617,13 @@ spl_init_log_parse(char *buff, char *key, char *isEnd)
 #endif
 			break;
 		}
+		if (strcmp(key, SPL_LOG_MODE_STRAIGHT) == 0) {
+			int n = 0, sz = 0;
+			sz = sscanf(buff, "%d", &n);
+			t->mode_straight = n ? 1 : 0;
+			spl_console_log("buff %s, t->mode_straight: %d, sz: %d.", buff, t->mode_straight, sz);
+			break;
+		}
 		if (strcmp(key, SPL_LOG_END_CFG) == 0) {
 #ifdef SPL_SHOW_CONSOLE
 			spl_console_log("End configuration.\n");
@@ -599,7 +643,9 @@ int
 spl_init_log_ext(SPL_INPUT_ARG *input)
 {
 	int ret = 0;
-	spl_err_txt_init();
+	SPL_SET_ENDIAN(__spl_bin_flag__);
+	SPL_SET_ARCH(__spl_bin_flag__);
+	spl_console_log("-----------------__spl_bin_flag__: %d ", (int)__spl_bin_flag__);
 	do {
 		memcpy(__simple_log_static__.id_name, input->id_name, SPL_IDD_NAME);
 		ret = spl_init_log(input->folder);
@@ -622,9 +668,7 @@ spl_init_log(char *pathcfg)
 	char c = 0;
 	int count = 0;
 	char buf[1024];
-	/*void* obj = 0;*/
 	char isEnd = 0;
-	__simple_log_static__.ncpu = 1;
 	do {
 		memset(buf, 0, sizeof(buf));
 		/*
@@ -701,11 +745,12 @@ spl_init_log(char *pathcfg)
 		if (ret) {
 			break;
 		}
-
-		ret = spl_verify_folder(__simple_log_static__.folder);
+#if 0
+		ret = spl_verify_folder();
 		if (ret) {
 			break;
 		}
+#endif
 		ret = spl_gen_sync_tool();
 		if (ret) {
 			break;
@@ -815,8 +860,9 @@ spl_mutex_unlock(void *obj)
 	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+#if 0
 int
-spl_verify_folder(char *folder)
+spl_verify_folder()
 {
 	int ret = 0;
 	do {
@@ -838,6 +884,7 @@ spl_verify_folder(char *folder)
 	} while (0);
 	return ret;
 }
+#endif
 /*https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsystemtime*/
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
@@ -859,6 +906,9 @@ spl_get_fname_now(char *name)
 }
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+
+#define SPL_IO_BUF(__t__) (__t__->data + __t__->pl)
+
 #ifndef UNIX_LINUX
 DWORD WINAPI
 spl_written_thread_routine(LPVOID lpParam)
@@ -868,15 +918,13 @@ spl_written_thread_routine(void *lpParam)
 #endif
 {
 	int k = 0;
-	SIMPLE_LOG_ST *t = (SIMPLE_LOG_ST *)lpParam;
+	SIMPLE_LOG_ST *const t = (SIMPLE_LOG_ST *)lpParam;
 	int ret = 0, sz = 0, err = 0;
 	int werr = 0;
 
-	register char is_off = 0;
-	register int i = 0, j = 0;
-
-	char **main_src_thrd_buf = 0;
-	char ***src_topic_thrd_buf = 0;
+	char is_off = 0;
+	int i = 0, j = 0;
+	spl_gen_data_st *lane = 0;
 
 #ifndef UNIX_LINUX
 	HANDLE trigger_handle_id = 0;
@@ -884,41 +932,16 @@ spl_written_thread_routine(void *lpParam)
 	pthread_t trigger_handle_id = 0;
 #endif
 
-	char *only_buf = 0;
-	spl_gen_data_st *only_cast = 0;
-	spl_malloc((t->buff_size * t->ncpu), only_buf, char);
-	/*
-	//spl_malloc((t->buff_size * 3), only_buf, char);
-	//spl_create_memory((void**)&only_buf, "thread_buff_123", (t->buff_size * t->ncpu), 1);
-	*/
-	only_cast = SPL_CASTGEN(only_buf);
-	only_cast->total = (t->buff_size * t->ncpu);
-	only_cast->range = only_cast->total - sizeof(spl_gen_data_st);
-	only_cast->pl = only_cast->pc = 0;
-
-	spl_malloc(t->ncpu * sizeof(char *), main_src_thrd_buf, char *);
-	for (i = 0; i < t->ncpu; ++i) {
-		char *p = (char *)t->buf;
-		main_src_thrd_buf[i] = p + t->buff_size * i;
-	}
+	spl_gen_data_st *const fwbuf = SPL_FW_BUF;
 
 	/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
-	if (t->arr_topic) {
-		spl_malloc(t->n_topic * sizeof(char *), src_topic_thrd_buf, char **);
-		for (i = 0; i < t->n_topic; ++i) {
-			char *p = (char *)t->arr_topic[i].buf;
-			spl_malloc(t->ncpu * sizeof(char *), src_topic_thrd_buf[i], char *);
-			for (j = 0; j < t->ncpu; ++j) {
-				src_topic_thrd_buf[i][j] = p + t->buff_size * j;
-			}
-		}
-	}
-
-	/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 	if (t->trigger_thread > 0) {
 		spl_create_thread(spl_trigger_routine, t, &trigger_handle_id);
 	}
+
+	/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+
 	do {
 		if (is_off) {
 			break;
@@ -932,11 +955,10 @@ spl_written_thread_routine(void *lpParam)
 		/*
 		//spl_console_log("Semaphore: 0x%p.\n", t->sem_rwfile);
 		*/
-		if (!t->mtx_rw) {
+		if (!t->mtx_off) {
 			exit(1);
 		}
 		while (1) {
-			
 			if (is_off) {
 				break;
 			}
@@ -961,36 +983,39 @@ spl_written_thread_routine(void *lpParam)
 					spl_console_log("--spl_gen_file, ret: %d --\n", ret);
 					continue;
 				}
-				ret = spl_gen_topics(t);
+				ret = spl_gen_topics(0);
 				if (ret) {
 					spl_console_log("--spl_gen_topics, ret: %d --\n", ret);
 					continue;
 				}
-
+				ret = spl_gen_topics(1);
+				if (ret) {
+					spl_console_log("--binary spl_gen_topics, ret: %d --\n", ret);
+					continue;
+				}
 				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				if (!is_off) {
-					spl_mutex_lock(t->mtx_rw);
+					spl_mutex_lock(t->mtx_off);
 					is_off = t->off;
-					spl_mutex_unlock(t->mtx_rw);
+					spl_mutex_unlock(t->mtx_off);
 				}
 				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				for (i = 0; i < t->ncpu; ++i) {
+					lane = SPL_KEYBUF(i);
 					spl_mutex_lock(t->arr_mtx[i]);
 					/* //do { */
-					if (SPL_CASTGEN(main_src_thrd_buf[i])->pl > 0) {
-						memcpy(only_cast->data + only_cast->pl,
-						    SPL_CASTGEN(main_src_thrd_buf[i])->data,
-						    SPL_CASTGEN(main_src_thrd_buf[i])->pl);
-						only_cast->pl += SPL_CASTGEN(main_src_thrd_buf[i])->pl;
-						SPL_CASTGEN(main_src_thrd_buf[i])->pl = 0;
+					if (lane->pl > 0) {
+						memcpy(SPL_IO_BUF(fwbuf), lane->data, lane->pl);
+						fwbuf->pl += lane->pl;
+						lane->pl = 0;
 					}
 					/* //} while (0); */
 					spl_mutex_unlock(t->arr_mtx[i]);
 				}
 				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-				if (only_cast->pl > 0) {
-					k = (int)fwrite(only_cast->data, 1, only_cast->pl, t->fp);
-					only_cast->pl = 0;
+				if (fwbuf->pl > 0) {
+					k = (int)fwrite(fwbuf->data, 1, fwbuf->pl, t->fp);
+					fwbuf->pl = 0;
 					sz += k;
 					SPL_FFLUSH((t->fp), err);
 				}
@@ -1001,29 +1026,56 @@ spl_written_thread_routine(void *lpParam)
 				}
 				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 				if (t->n_topic > 0) {
-					char *src = 0;
 					for (i = 0; i < t->n_topic; ++i) {
 						for (j = 0; j < t->ncpu; ++j) {
-							src = src_topic_thrd_buf[i][j];
+							lane = SPL_TTOPIC_BUF(i, j);
 							spl_mutex_lock(t->arr_mtx[j]);
 							/*//do */
-							if (SPL_CASTGEN(src)->pl > 0) {
-								memcpy(only_cast->data + only_cast->pl,
-								    SPL_CASTGEN(src)->data, SPL_CASTGEN(src)->pl);
-								only_cast->pl += SPL_CASTGEN(src)->pl;
-								SPL_CASTGEN(src)->pl = 0;
+							if (lane->pl > 0) {
+								memcpy(SPL_IO_BUF(fwbuf), lane->data, lane->pl);
+								fwbuf->pl += lane->pl;
+								lane->pl = 0;
 							}
 							/*//} while (0);*/
 							spl_mutex_unlock(t->arr_mtx[j]);
 						}
-						if (only_cast->pl > 0) {
+						if (fwbuf->pl > 0) {
 							k = (int)fwrite(
-							    only_cast->data, 1, only_cast->pl, (FILE *)(t->arr_topic[i].fp));
+							    fwbuf->data, 1, fwbuf->pl, (FILE *)(t->arr_topic[i].fp));
 							t->arr_topic[i].fizize += k;
-							only_cast->pl = 0;
+							fwbuf->pl = 0;
 							SPL_FFLUSH((t->arr_topic[i].fp), err);
 							if (err) {
 								spl_console_log("--fflush, ret: %d --\n", err);
+								ret = SPL_LOG_TOPIC_FLUSH;
+								break;
+							}
+						}
+					}
+				}
+				/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+				if (t->n_bintopic > 0) {
+					for (i = 0; i < t->n_bintopic; ++i) {
+						for (j = 0; j < t->ncpu; ++j) {
+							lane = SPL_TB_LANE(i, j);
+							spl_mutex_lock(t->arr_mtx[j]);
+							/*//do */
+							if (lane->pl > 0) {
+								memcpy(SPL_IO_BUF(fwbuf), lane->data, lane->pl);
+								fwbuf->pl += lane->pl;
+								lane->pl = 0;
+							}
+							/*//} while (0);*/
+							spl_mutex_unlock(t->arr_mtx[j]);
+						}
+						if (fwbuf->pl > 0) {
+							k = (int)fwrite(
+							    fwbuf->data, 1, fwbuf->pl, (FILE *)(t->arr_bintopic[i].fp));
+							t->arr_bintopic[i].fizize += k;
+							fwbuf->pl = 0;
+							SPL_FFLUSH((t->arr_bintopic[i].fp), err);
+							if (err) {
+								spl_err("--fflush, ret: %d --\n", err);
 								ret = SPL_LOG_TOPIC_FLUSH;
 								break;
 							}
@@ -1044,30 +1096,12 @@ spl_written_thread_routine(void *lpParam)
 					SPL_FCLOSE(t->arr_topic[i].fp, werr);
 				}
 			}
-			spl_mutex_lock(t->mtx_rw);
-			/*
-			if (t->buf) {
-				spl_free(t->buf);
-			}
-			*/
-			for (i = 0; i < t->n_topic; ++i) {
-				if (t->arr_topic[i].buf) {
-					t->arr_topic[i].buf = 0;
-				}
-			}
-			spl_mutex_unlock(t->mtx_rw);
 		}
 
 	} while (0);
-	/* spl_free(thrd_buffer); */
-	spl_free(main_src_thrd_buf);
-	if (t->arr_topic) {
-		for (i = 0; i < t->n_topic; ++i) {
-			spl_free(src_topic_thrd_buf[i]);
-		}
-		spl_free(src_topic_thrd_buf);
-	}
-	spl_free(only_buf);
+#if 0
+	spl_free(fwbuf);
+#endif
 	/* spl_del_memory((void *) only_buf); */
 	/* Send a signal to the waiting thread. */
 	if (t->trigger_thread) {
@@ -1128,63 +1162,166 @@ spl_simple_log_thread(SIMPLE_LOG_ST *t)
 	} while (0);
 	return ret;
 }
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-char *
-spl_fmt_now_ext(
-    char *fmtt, int len, int lv, const char *filename, const char *funcname, int line, unsigned short *r, int *outlen)
+#define SPL_RAND_FORM(__tid__, __nn__)                                                                                      \
+	((unsigned short)(SPL_CTRL_OBJ->mode_straight ? __tid__ : __nn__) % SPL_CTRL_OBJ->ncpu)
+
+DLL_API_SIMPLE_LOG void
+spl_bin_now_ext(SPL_HD_PARAM *const p)
 {
-	char *p = fmtt;
 	int ret = 0;
-	spl_local_time_st stt;
+#ifndef UNIX_LINUX
+	SYSTEMTIME lt = {0};
+	LARGE_INTEGER counter = {0};
+	LLU thid = 0;
+	spl_local_time_st stt = {0};
+#else
+#ifdef __MACH__
+	clock_serv_t cclock;
+	mach_timespec_t mts;
+	kern_return_t result;
+	struct timespec nanosec = {0};
+#else
+	struct timespec nanosec = {0};
+#endif
+#endif
+	if (!p) {
+		ret = SPL_LOG_ST_NAME_NULL_ERROR;
+		spl_err("SPL_LOG_ST_NAME_NULL_ERROR");
+		return;
+	}
+	do {
+#ifndef UNIX_LINUX		
+		GetLocalTime(&lt);
+		QueryPerformanceCounter(&counter);
+		p->header.timestamp = time(0) * SPL_BILLION;
+		p->header.timestamp += (LLU)lt.wMilliseconds * SPL_MILLION;
+		p->header.timestamp += counter.QuadPart % SPL_MILLION;
+#if defined(__OPTIMZE_64CORE__)
+		p->r = (unsigned short)GetCurrentProcessorNumber();
+#else
+
+		ret = spl_local_time_now(&stt);
+		if (ret) {
+			spl_err("ret: %d", ret);
+		}
+		thid = (LLU)spl_get_threadid();
+	#if defined(__OPTIMZE_MORE_64CORE__)
+		p->r = SPL_RAND_FORM(thid, stt.nn);
+	#else
+		p->r = SPL_RAND_FORM(thid, stt.nn);
+	#endif
+
+#endif
+#else
+#ifdef __MACH__
+		LLU thid = 0;
+		spl_local_time_st stt = {0};
+
+		result = host_get_clock_service(mach_host_self(), REALTIME_CLOCK, &cclock);
+		if (result != KERN_SUCCESS) {
+			ret = SPL_LOG_MACH_CLOCK_SERVICE_ERROR;
+			spl_err("SPL_LOG_MACH_CLOCK_SERVICE_ERROR.");
+			break;
+		}
+		result = clock_get_time(cclock, &mts);
+		if (result != KERN_SUCCESS) {
+			ret = SPL_LOG_MACH_GETTIME_ERROR;
+			spl_err("SPL_LOG_MACH_GETTIME_ERROR.");
+			break;
+		}
+		mach_port_deallocate(mach_task_self(), cclock);
+		nanosec.tv_sec = mts.tv_sec;
+		nanosec.tv_nsec = mts.tv_nsec;
+
+		ret = spl_local_time_now(&stt);
+		if (ret) {
+			spl_err("ret: %d", ret);
+		}
+		thid = (LLU)spl_get_threadid();
+		p->r = SPL_RAND_FORM(thid, stt.nn);
+		p->header.timestamp = nanosec.tv_sec * SPL_BILLION + nanosec.tv_nsec;
+#else
+		ret = clock_gettime(CLOCK_REALTIME, &nanosec);
+		if (ret) {
+			ret = SPL_LOG_TIME_NANO_NULL_ERROR;
+			spl_err("SPL_LOG_TIME_NANO_NULL_ERROR");
+			break;
+		}
+		p->header.timestamp = nanosec.tv_sec * SPL_BILLION + nanosec.tv_nsec;
+#if defined(_GNU_SOURCE) && defined(__LINUX__)
+		p->r = sched_getcpu();
+#else
+		LLU thid = 0;
+		spl_local_time_st stt = {0};
+		ret = spl_local_time_now(&stt);
+		if (ret) {
+			spl_err("ret: %d", ret);
+		}
+		thid = (LLU)spl_get_threadid();
+		p->r = SPL_RAND_FORM(thid, stt.nn);
+#endif
+#endif
+#endif
+
+	} while (0);
+}
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+
+void
+spl_fmt_now_ext(SPL_FMT_PARAM *const p)
+{
+	int ret = 0;
+	spl_local_time_st stt = {0};
 	int n = 0;
 	LLU threadiid = 0;
 
 	threadiid = (LLU)spl_get_threadid();
-	*outlen = 0;
+	p->outlen = 0;
 	ret = spl_local_time_now(&stt);
 	if (ret) {
-		return p;
+		return;
 	}
-#if 0	
-	*r = (__simple_log_static__.mode_straight ? 
-		threadiid : stt.nn ) 
-		% __simple_log_static__.ncpu;
+#if 1
+#ifndef UNIX_LINUX
+#if defined(__OPTIMZE_64CORE__)
+	p->r = (unsigned short)GetCurrentProcessorNumber();
 #else
-	#ifndef __MODE_STRAIGHT__
-		*r = (stt.nn % __simple_log_static__.ncpu);
-	#else
-		*r = (threadiid % __simple_log_static__.ncpu);
-	#endif
+#if defined(__OPTIMZE_MORE_64CORE__)
+	p->r = SPL_RAND_FORM(threadiid, stt.nn);
+#else
+	p->r = SPL_RAND_FORM(threadiid, stt.nn);
 #endif
-	n = sprintf(fmtt, SPL_FMT_DATE_ADDING_X "[%c] [tid\t%llu]\t", stt.year + YEAR_PADDING, stt.month + MONTH_PADDING,
-	    stt.day, stt.hour, stt.minute, stt.sec, (int)stt.nn, spl_text_gb_c[lv % SPL_LOG_PEAK], threadiid);
+#endif
+#else
+#if defined(_GNU_SOURCE) && defined(__LINUX__)
+	p->r = sched_getcpu();
+#else
+	p->r = SPL_RAND_FORM(threadiid, stt.nn);
+#endif
+
+#endif
+#else
+#ifndef __MODE_STRAIGHT__
+	*r = (stt.nn % SPL_CTRL_OBJ->ncpu);
+#else
+	*r = (threadiid % SPL_CTRL_OBJ->ncpu);
+#endif
+#endif
+	n = sprintf(p->fmtt, SPL_FMT_DATE_ADDING_X "[%c] [tid\t%llu]\t", stt.year + YEAR_PADDING, stt.month + MONTH_PADDING,
+	    stt.day, stt.hour, stt.minute, stt.sec, (int)stt.nn, spl_text_gb_c[p->lv % SPL_LOG_PEAK], threadiid);
 	if (n < 1) {
 		ret = SPL_LOG_PRINTF_ERROR;
-		return p;
+		return;
 	}
-	*outlen = n;
+	p->outlen = n;
 
-	/*
-	*outlen += snprintf(fmtt + n, len - n, "[%s:%s:%d] [r: %d]\t",
-		filename, funcname, line, (int)*r); */
-	*outlen += snprintf(fmtt + n, SPL_RL_BUF - n, "[%s:%s:%d] ", filename, funcname, line);
-	if (*outlen > len) {
-		spl_malloc((*outlen + 1), p, char);
-		if (!p) {
-			exit(1);
-		}
-		memcpy(p, fmtt, n);
-		*outlen = n;
-		/*
-			*outlen += sprintf(p + n, "[%s:%s:%d] [r: %d]\t",
-			filename, funcname, line, (int)*r);
-		*/
-		*outlen += snprintf(fmtt + n, SPL_RL_BUF - n, "[%s:%s:%d] ", filename, funcname, line);
-	}
+	p->outlen += snprintf(p->fmtt + n, SPL_RL_BUF - n, "[%s:%s:%d] ", p->filename, p->funcname, p->line);
+	p->outlen = (p->outlen < SPL_RL_BUF) ? (p->outlen) : (SPL_RL_BUF - 1);
 
-	return p;
+	return;
 }
-
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_fmmt_now(char *fmtt, int len)
@@ -1242,7 +1379,7 @@ spl_gen_file(SIMPLE_LOG_ST *t, int *sz, int limit, int *index)
 			spl_console_log("spl_local_time_now: ret: %d.\n", ret);
 			break;
 		}
-		
+
 		if (!t->fp) {
 			/*Fix at v1.0.8 - 2025-Jun-14*/
 			memcpy(&(t->lc_time_now), &lt, sizeof(spl_local_time_st));
@@ -1320,7 +1457,7 @@ spl_gen_file(SIMPLE_LOG_ST *t, int *sz, int limit, int *index)
 		if (!t->renew) {
 			break;
 		}
-		
+
 		spl_get_fname_now(fmt_file_name);
 		ret = spl_folder_sup(t->folder, &(t->lc_time_now), yearmonth);
 		if (ret) {
@@ -1394,7 +1531,7 @@ spl_rel_sem(void *sem)
 			spl_err("SPL_sem_post");
 		}
 #else
-	#if 0
+#if 0
 		int val = 0;
 		int err = sem_getvalue((sem_t *)sem, &val);
 		if (!err) {
@@ -1402,7 +1539,7 @@ spl_rel_sem(void *sem)
 				SPL_sem_post(sem);
 			}
 		}
-	#endif
+#endif
 		err = SPL_sem_post(sem);
 		if (err) {
 			ret = SPL_LOG_PX_SEM_REL_OBJECT;
@@ -1633,62 +1770,68 @@ spl_stdz_topics(char *buff, int *inoutlen, int *ntopics, char **pchar)
 		}
 		(*pchar) = p;
 		*ntopics = count;
-		spl_console_log("Topic.\n");
 
 	} while (0);
-	/*
-	//if (p) {
-	//	spl_free(p);
-	//}
-	*/
+
 	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+/*
+	First bit, [0:1] -->> [little:big] endian
+	Second bit, [0:1] -->> [64-bit:32-bit]
+*/
+#define SPL_ADD_BIN_FLAG(__fp__)                                                                                            \
+	{                                                                                                                   \
+		fwrite(&__spl_bin_flag__, 1, 1, (FILE*)(__fp__));                                                                                                                  \
+	}
+
 int
-spl_gen_topics(SIMPLE_LOG_ST *t)
+spl_gen_topics(char isBin)
 {
 	int ret = 0;
 	char path[SPL_FULLPATH_LEN + 1];
-	/*
-	//int renew = 0;
-	*/
-	LLU cszize = 0;
+	SIMPLE_LOG_ST *const t = SPL_CTRL_OBJ;
+	int cszize = 0;
+	int const num_top = isBin ? t->n_bintopic : t->n_topic;
+	SIMPLE_LOG_TOPIC_ST *const arr_target = isBin ? t->arr_bintopic : t->arr_topic;
+	const char *const fext = isBin ? "%s-%s-%.7d.bin" : "%s-%s-%.7d.log";
+	const char *const fmode = isBin ? "a+" : "a+";
 	do {
 		int i = 0;
-		if (t->n_topic < 1) {
-			/*
-			//ret = SPL_LOG_TOPIC_ZERO;
-			*/
+		if (num_top < 1) {
 			break;
 		}
-		for (i = 0; i < t->n_topic; ++i) {
-			if (t->arr_topic[i].fp) {
+		for (i = 0; i < num_top; ++i) {
+			if (arr_target[i].fp) {
 				continue;
 			}
 			do {
 				int err = 0;
-				snprintf(path, SPL_FULLPATH_LEN, "%s-%s-%.7d.log", 
-					t->path_template, 
-					t->arr_topic[i].topic, t->arr_topic[i].index);
+				snprintf(path, SPL_FULLPATH_LEN, fext, t->path_template, arr_target[i].topic,
+				    arr_target[i].index);
 
-				FFOPEN(t->arr_topic[i].fp, path, "a+");
-				if (!t->arr_topic[i].fp) {
+				FFOPEN(arr_target[i].fp, path, fmode);
+				if (!arr_target[i].fp) {
 					ret = SPL_LOG_TOPIC_FOPEN;
 					break;
 				}
-				FFSEEK(t->arr_topic[i].fp, 0, SEEK_END);
-				cszize = (LLU)FFTELL(t->arr_topic[i].fp);
+				FFSEEK(arr_target[i].fp, 0, SEEK_END);
+				cszize = (LLU)FFTELL(arr_target[i].fp);
 				if (cszize < t->file_limit_size) {
-					t->arr_topic[i].fizize = (int)cszize;
+					if ((!cszize) && isBin) {
+						SPL_ADD_BIN_FLAG(arr_target[i].fp);
+						++cszize;
+					}
+					arr_target[i].fizize = (int)cszize;
 					break;
 				}
-				t->arr_topic[i].fizize = (int)cszize;
-				SPL_FCLOSE(t->arr_topic[i].fp, err);
+				arr_target[i].fizize = (int)cszize;
+				SPL_FCLOSE(arr_target[i].fp, err);
 				if (err) {
 					ret = SPL_LOG_CLOSE_FILE_ERROR;
 					break;
 				}
-				t->arr_topic[i].index++;
+				arr_target[i].index++;
 			} while (1);
 		}
 		if (ret) {
@@ -1700,24 +1843,21 @@ spl_gen_topics(SIMPLE_LOG_ST *t)
 		}
 		/*--------------*/
 		if (t->renew > SPL_CHANGE_FILE_SIZE) {
-			for (i = 0; i < t->n_topic; ++i) {
+			for (i = 0; i < num_top; ++i) {
 				do {
 					int err = 0;
-					SPL_FCLOSE(t->arr_topic[i].fp, err);
+					SPL_FCLOSE(arr_target[i].fp, err);
 					if (err) {
 						ret = SPL_LOG_CLOSE_FILE_ERROR;
 						break;
 					}
-					t->arr_topic[i].index = 0;
-					t->arr_topic[i].fizize = 0;
-					snprintf(path, SPL_FULLPATH_LEN, 
-						"%s-%s-%.7d.log", t->path_template,
-					    t->arr_topic[i].topic, t->arr_topic[i].index);
-					/*
-					//t->arr_topic[i].fp = fopen(path, "a+");
-					*/
-					FFOPEN(t->arr_topic[i].fp, path, "a+");
-					if (!t->arr_topic[i].fp) {
+					arr_target[i].index = 0;
+					arr_target[i].fizize = 0;
+					snprintf(path, SPL_FULLPATH_LEN, fext, t->path_template, arr_target[i].topic,
+					    arr_target[i].index);
+
+					FFOPEN(arr_target[i].fp, path, fmode);
+					if (!arr_target[i].fp) {
 						ret = SPL_LOG_TOPIC_FOPEN;
 						break;
 					}
@@ -1728,45 +1868,45 @@ spl_gen_topics(SIMPLE_LOG_ST *t)
 			}
 			break;
 		}
-		for (i = 0; i < t->n_topic;) {
-			if ((t->arr_topic[i].fizize) < t->file_limit_size) {
+		for (i = 0; i < num_top;) {
+			if ((arr_target[i].fizize) < t->file_limit_size) {
 				++i;
 				continue;
 			}
 			do {
 				int err = 0;
 
-				SPL_FCLOSE(t->arr_topic[i].fp, err);
+				SPL_FCLOSE(arr_target[i].fp, err);
 				if (err) {
 					ret = SPL_LOG_CLOSE_FILE_ERROR;
 					break;
 				}
 
-				t->arr_topic[i].fizize = 0;
+				arr_target[i].fizize = 0;
 
-				snprintf(path, SPL_FULLPATH_LEN, 
-					"%s-%s-%.7d.log", 
-					t->path_template, t->arr_topic[i].topic,
-				    t->arr_topic[i].index);
-				/*
-				//t->arr_topic[i].fp = fopen(path, "a+");
-				*/
-				FFOPEN(t->arr_topic[i].fp, path, "a+");
-				if (!t->arr_topic[i].fp) {
+				snprintf(path, SPL_FULLPATH_LEN, fext, t->path_template, arr_target[i].topic,
+				    arr_target[i].index);
+
+				FFOPEN(arr_target[i].fp, path, fmode);
+				if (!arr_target[i].fp) {
 					ret = SPL_LOG_TOPIC_FOPEN;
 					break;
 				}
-				FFSEEK(t->arr_topic[i].fp, 0, SEEK_END);
-				cszize = (LLU)FFTELL(t->arr_topic[i].fp);
+				FFSEEK(arr_target[i].fp, 0, SEEK_END);
+				cszize = (LLU)FFTELL(arr_target[i].fp);
 				if (cszize < t->file_limit_size) {
+					if ((!cszize) && isBin) {
+						SPL_ADD_BIN_FLAG(arr_target[i].fp);
+						++cszize;
+					}
 					break;
 				}
-				SPL_FCLOSE(t->arr_topic[i].fp, err);
+				SPL_FCLOSE(arr_target[i].fp, err);
 				if (err) {
 					ret = SPL_LOG_CLOSE_FILE_ERROR;
 					break;
 				}
-				t->arr_topic[i].index++;
+				arr_target[i].index++;
 			} while (1);
 			++i;
 			if (ret) {
@@ -1817,45 +1957,7 @@ spl_milli_now()
 	} while (0);
 	return ret;
 }
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-#if 0
-int
-spl_fclose_err(int terr, void *ffp)
-{
-	int ret = 0;
-	do {
-#ifndef UNIX_LINUX
-		spl_console_log("ffp: %p, terr: %d, GetLastError: 0x%x,", ffp, terr, (int)GetLastError());
-#else
-		char buf[64];
-		/* https://linux.die.net/man/3/strerror_r , */
-		/* - The strerror_r() function is similar to strerror(), but is thread safe */
-		strerror_r(errno, buf, 64);
-		spl_console_log("ffp: %p,terr: %d, errno: %d, strerror_r: %s", ffp, terr, (int)errno, buf);
-#endif
-	} while (0);
-	return ret;
-}
 
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-int
-spl_fflush_err(int terr, void *ffp)
-{
-	int ret = 0;
-	do {
-#ifndef UNIX_LINUX
-		spl_console_log("ffp: %p, terr: %d, GetLastError: 0x%x,", ffp, terr, (int)GetLastError());
-#else
-		char buf[64];
-		/* https://linux.die.net/man/3/strerror_r , */
-		/* - The strerror_r() function is similar to strerror(), but is thread safe */
-		strerror_r(errno, buf, 64);
-		spl_console_log("ffp: %p,terr: %d, errno: %d, strerror_r: %s", ffp, terr, (int)errno, buf);
-#endif
-	} while (0);
-	return ret;
-}
-#endif
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #ifndef UNIX_LINUX
 void
@@ -1976,11 +2078,9 @@ spl_create_memory(void **output, char *shared_key, int size_shared, char isCreat
 	int ret = 0;
 	char *p = 0;
 	do {
+		spl_console_log("%s", isCreating ? "isCreating" : "refer");
 #ifndef UNIX_LINUX
 		HANDLE hMapFile = 0;
-
-		/* char *p = 0;*/
-
 		if (!output) {
 			ret = SPL_LOG_SHM_CREATE_NULL;
 			break;
@@ -2055,7 +2155,7 @@ int
 spl_calculate_size()
 {
 	int ret = 0;
-	int k = 0;
+	int const k = SPL_BUF_TOTAL;
 	int n = 0;
 	int mtxsize = 0;
 	int semsize = 0;
@@ -2076,9 +2176,6 @@ spl_calculate_size()
 #endif
 	SIMPLE_LOG_ST *t = &__simple_log_static__;
 	size_arr_mtx = t->ncpu * sizeof(void *);
-	/*k: For buffer.*/
-	k = t->buff_size * t->ncpu * (t->n_topic + 1);
-	/*k = t->buff_size * t->ncpu + t->buff_size * t->ncpu * t->n_topic;*/
 	do {
 		if (!t->arr_mtx) {
 			spl_malloc(size_arr_mtx, t->arr_mtx, void *);
@@ -2094,7 +2191,7 @@ spl_calculate_size()
 		mtxsize = (1 + t->ncpu) * step_size;
 		semsize = 0;
 #else
-		/*t->mtx_rw: is NamedMutex*/
+		/*t->mtx_off: is NamedMutex*/
 		mtxsize = 0;
 		/*semsize*/
 		semsize = 0;
@@ -2159,7 +2256,7 @@ spl_calculate_size()
 #ifndef UNIX_LINUX
 #ifdef SPL_USING_SPIN_LOCK
 
-		t->mtx_rw = (void *)(buff + k);
+		t->mtx_off = (void *)(buff + k);
 
 		step_size = sizeof(volatile long);
 		p = (buff + k) + step_size;
@@ -2167,15 +2264,15 @@ spl_calculate_size()
 			t->arr_mtx[i] = (void *)(p + i * step_size);
 		}
 #else
-		/*t->mtx_rw: is NamedMutex*/
-		/*t->mtx_rw: is NamedSem*/
+		/*t->mtx_off: is NamedMutex*/
+		/*t->mtx_off: is NamedSem*/
 #endif
 		ret = spl_win32_sync_create();
 #else
-		t->mtx_rw = (void *)(buff + k);
+		t->mtx_off = (void *)(buff + k);
 #ifdef SPL_USING_SPIN_LOCK
-		if (t->mtx_rw) {
-			pthread_spinlock_t *mtx = (pthread_spinlock_t *)t->mtx_rw;
+		if (t->mtx_off) {
+			pthread_spinlock_t *mtx = (pthread_spinlock_t *)t->mtx_off;
 			if (t->isProcessMode) {
 				int err = 0;
 				err = pthread_spin_init(mtx, PTHREAD_PROCESS_SHARED);
@@ -2205,8 +2302,8 @@ spl_calculate_size()
 			}
 		}
 #else
-		if (t->mtx_rw) {
-			pthread_mutex_t *mtx = (pthread_mutex_t *)t->mtx_rw;
+		if (t->mtx_off) {
+			pthread_mutex_t *mtx = (pthread_mutex_t *)t->mtx_off;
 			ret = spl_mtx_init(mtx, t->isProcessMode);
 		}
 		step_size = sizeof(pthread_mutex_t);
@@ -2257,6 +2354,37 @@ spl_calculate_size()
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 #ifndef UNIX_LINUX
+
+/**
+ * Dynamically retrieves the exact total number of active logical processors.
+ * Works perfectly for systems with < 64 cores and > 64 cores alike.
+ * Refer Google GemInI
+ */
+int
+spl_win_totalcores()
+{
+	/* Function pointer type for GetActiveProcessorCount */
+	typedef DWORD(WINAPI * PFN_GAPC)(WORD);
+
+	HMODULE hKernel32 = GetModuleHandleA("kernel32.dll");
+	if (hKernel32) {
+		PFN_GAPC pGetActiveProcessorCount = (PFN_GAPC)GetProcAddress(hKernel32, "GetActiveProcessorCount");
+
+		if (pGetActiveProcessorCount != 0) {
+			/*
+			// 0xFFFF is the value for ALL_PROCESSOR_GROUPS.
+			// This forces Windows to sum up cores across every single processor group.
+			*/
+			return (int)pGetActiveProcessorCount(0xFFFF);
+		}
+	}
+	{
+		SYSTEM_INFO sysInfo;
+		GetSystemInfo(&sysInfo);
+		return (int)sysInfo.dwNumberOfProcessors;
+	}
+}
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 int
 spl_win32_sync_create()
 {
@@ -2285,7 +2413,7 @@ spl_win32_sync_create()
 				spl_err("CreateMutexA");
 				break;
 			}
-			t->mtx_rw = hd;
+			t->mtx_off = hd;
 
 			for (i = 0; i < t->ncpu; ++i) {
 				snprintf(nameobj, SPL_SHARED_NAME_LEN, "%s_%s_%0.2d", SPL_MTX_NAME_OFF, t->shared_key, i);
@@ -2306,7 +2434,7 @@ spl_win32_sync_create()
 				spl_err("CreateMutexA");
 				break;
 			}
-			t->mtx_rw = hd;
+			t->mtx_off = hd;
 
 			for (i = 0; i < t->ncpu; ++i) {
 				hd = CreateMutexA(0, 0, 0);
@@ -2552,50 +2680,38 @@ spl_mtx_init(void *obj, char shared)
 static void
 spl_fmt_segment(spl_gen_data_st *sgment)
 {
-	SIMPLE_LOG_ST *t = &__simple_log_static__;
-	sgment->total = t->buff_size;
+	sgment->total = SPL_CTRL_OBJ->buff_size;
 	sgment->pl = 0;
 	sgment->pc = 0;
 }
+
 int
 spl_init_segments()
 {
 	int ret = 0;
-	char *p = 0;
-	char *seg = 0;
 	int i = 0;
 	int k = 0;
-	int step = 0;
-	spl_gen_data_st *sgment = 0;
-	SIMPLE_LOG_ST *t = &__simple_log_static__;
-	p = (char *)t->buf;
-	if (!t->range) {
-		t->range = t->buff_size - (sizeof(spl_gen_data_st) + t->max_sz_msg + SPL_RL_BUF);
-		t->krange = t->range + t->max_sz_msg;
+
+	k = sizeof(spl_gen_data_st) + SPL_CTRL_OBJ->max_sz_msg + SPL_RL_BUF;
+	SPL_CTRL_OBJ->range = SPL_CTRL_OBJ->buff_size - k;
+	SPL_CTRL_OBJ->krange = SPL_CTRL_OBJ->range + SPL_CTRL_OBJ->max_sz_msg;
+
+	for (i = 0; i < SPL_CTRL_OBJ->ncpu; ++i) {
+		spl_fmt_segment(SPL_KEYBUF(i));
 	}
-	do {
-		for (i = 0; i < t->ncpu; ++i) {
-			seg = p + i * t->buff_size;
-			sgment = (spl_gen_data_st *)seg;
-			spl_fmt_segment(sgment);
+	for (k = 0; k < SPL_CTRL_OBJ->n_topic; ++k) {
+		for (i = 0; i < SPL_CTRL_OBJ->ncpu; ++i) {
+			spl_fmt_segment(SPL_TTOPIC_BUF(k, i));
 		}
-		step = t->buff_size * t->ncpu;
-		for (k = 0; k < t->n_topic; ++k) {
-			p += step;
-			t->arr_topic[k].buf = (spl_gen_data_st *)p;
-			for (i = 0; i < t->ncpu; ++i) {
-				seg = p + i * t->buff_size;
-				sgment = (spl_gen_data_st *)seg;
-				spl_fmt_segment(sgment);
-			}
-		}
-	} while (0);
+	}
+	spl_console_log("n_topic: %d", SPL_CTRL_OBJ->n_topic);
 	return ret;
 }
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 int
-spl_allocate_topics()
+spl_allocate_topics(char isbin)
 {
 	int ret = 0;
 	int i = 0;
@@ -2603,30 +2719,39 @@ spl_allocate_topics()
 	char *p1 = 0;
 	int n = 0;
 	int szitopics = 0;
+	SIMPLE_LOG_TOPIC_ST *tmp = 0;
 	SIMPLE_LOG_ST *t = &__simple_log_static__;
+	int num_top = 0;
+
 	do {
-		if (!t->n_topic) {
+		num_top = isbin ? t->n_bintopic : t->n_topic;
+		if (!num_top) {
 			break;
 		}
-		szitopics = sizeof(SIMPLE_LOG_TOPIC_ST) * t->n_topic;
-		spl_malloc(szitopics, t->arr_topic, SIMPLE_LOG_TOPIC_ST);
-		if (!t->arr_topic) {
+		szitopics = sizeof(SIMPLE_LOG_TOPIC_ST) * num_top;
+		spl_malloc(szitopics, tmp, SIMPLE_LOG_TOPIC_ST);
+		if (!tmp) {
 			ret = SPL_LOG_TOPIC_MEMORY;
 			break;
 		}
-		p0 = t->topics;
-		for (i = 0; i < t->n_topic; ++i) {
+		p0 = isbin ? t->bintopics : t->topics;
+		for (i = 0; i < num_top; ++i) {
 			p1 = strstr(p0, ",");
 			if (!p1) {
-				snprintf(t->arr_topic[i].topic, SPL_TOPIC_SIZE, "%s", p0);
+				snprintf(tmp[i].topic, SPL_TOPIC_SIZE, "%s", p0);
 				continue;
 			}
 			n = (int)(p1 - p0);
 			if (n > 0) {
-				snprintf(t->arr_topic[i].topic, SPL_MIN_AB(SPL_TOPIC_SIZE, n + 1), "%s", p0);
+				snprintf(tmp[i].topic, SPL_MIN_AB(SPL_TOPIC_SIZE, n + 1), "%s", p0);
 			}
 			p1++;
 			p0 = p1;
+		}
+		if (isbin) {
+			t->arr_bintopic = tmp;
+		} else {
+			t->arr_topic = tmp;
 		}
 	} while (0);
 	return ret;
@@ -2637,7 +2762,11 @@ spl_gen_sync_tool()
 {
 	int ret = 0;
 	do {
-		ret = spl_allocate_topics();
+		ret = spl_allocate_topics(0);
+		if (ret) {
+			break;
+		}
+		ret = spl_allocate_topics(1);
 		if (ret) {
 			break;
 		}
@@ -2668,7 +2797,7 @@ spl_clean_sync_tool()
 #ifdef SPL_USING_SPIN_LOCK
 #else
 		int i = 0;
-		SPL_CloseHandle(t->mtx_rw);
+		SPL_CloseHandle(t->mtx_off);
 		for (i = 0; i < t->ncpu; ++i) {
 			SPL_CloseHandle(t->arr_mtx[i]);
 		}
@@ -2691,104 +2820,7 @@ spl_clean_sync_tool()
 	return ret;
 }
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-static const char *__spl_err_text__[SPL_END_ERROR + 1];
-
-void
-spl_err_txt_init()
-{
-	__spl_err_text__[SPL_NO_ERROR] = "SPL_NO_ERROR";
-	__spl_err_text__[SPL_INIT_PATH_FOLDER_EMPTY_ERROR] = "SPL_INIT_PATH_FOLDER_EMPTY_ERROR";
-	__spl_err_text__[SPL_LOG_LEVEL_ERROR] = "SPL_LOG_LEVEL_ERROR";
-	__spl_err_text__[SPL_ERROR_CREATE_MUTEX] = "SPL_ERROR_CREATE_MUTEX";
-	__spl_err_text__[SPL_ERROR_CREATE_SEM] = "SPL_ERROR_CREATE_SEM";
-	__spl_err_text__[SPL_LOG_BUFF_SIZE_ERROR] = "SPL_LOG_BUFF_SIZE_ERROR";
-	__spl_err_text__[SPL_LOG_BUFF_MALLOC_ERROR] = "SPL_LOG_BUFF_MALLOC_ERROR";
-	__spl_err_text__[SPL_LOG_MAX_SZ_MSG_ERROR] = "SPL_LOG_MAX_SZ_MSG_ERROR";
-	__spl_err_text__[SPL_LOG_FOLDER_ERROR] = "SPL_LOG_FOLDER_ERROR";
-	__spl_err_text__[SPL_LOG_CREATE_THREAD_ERROR] = "SPL_LOG_CREATE_THREAD_ERROR";
-	__spl_err_text__[SPL_LOG_FMT_NULL_ERROR] = "SPL_LOG_FMT_NULL_ERROR";
-	__spl_err_text__[SPL_LOG_MEM_GEN_FILE_ERROR] = "SPL_LOG_MEM_GEN_FILE_ERROR";
-	__spl_err_text__[SPL_LOG_MEM_MALLOC_ERROR] = "SPL_LOG_MEM_MALLOC_ERROR";
-	__spl_err_text__[SPL_LOG_OPEN_FILE_ERROR] = "SPL_LOG_OPEN_FILE_ERROR";
-	__spl_err_text__[SPL_LOG_OPEN1_FILE_ERROR] = "SPL_LOG_OPEN1_FILE_ERROR";
-	__spl_err_text__[SPL_LOG_CLOSE_FILE_ERROR] = "SPL_LOG_CLOSE_FILE_ERROR";
-	__spl_err_text__[SPL_LOG_SEM_NULL_ERROR] = "SPL_LOG_SEM_NULL_ERROR";
-	__spl_err_text__[SPL_LOG_SEM_WIN32_CREATED_ERROR] = "SPL_LOG_SEM_WIN32_CREATED_ERROR";
-	__spl_err_text__[SPL_LOG_MTX_WIN32_CREATED_ERROR] = "SPL_LOG_MTX_WIN32_CREATED_ERROR";
-	__spl_err_text__[SPL_LOG_ROT_SIZE_ERROR] = "SPL_LOG_ROT_SIZE_ERROR";
-	__spl_err_text__[SPL_LOG_TOPIC_EMPTY] = "SPL_LOG_TOPIC_EMPTY";
-	__spl_err_text__[SPL_LOG_TOPIC_NULL] = "SPL_LOG_TOPIC_NULL";
-	__spl_err_text__[SPL_LOG_MEM_FILE_MALLOC_ERROR] = "SPL_LOG_MEM_FILE_MALLOC_ERROR";
-	__spl_err_text__[SPL_LOG_CHECK_FOLDER_ERROR] = "SPL_LOG_CHECK_FOLDER_ERROR";
-	__spl_err_text__[SPL_LOG_CHECK_FOLDER_YEAR_ERROR] = "SPL_LOG_CHECK_FOLDER_YEAR_ERROR";
-	__spl_err_text__[SPL_LOG_CHECK_FILE_YEAR_ERROR] = "SPL_LOG_CHECK_FILE_YEAR_ERROR";
-	__spl_err_text__[SPL_LOG_CHECK_FOLDER_NULL_ERROR] = "SPL_LOG_CHECK_FOLDER_NULL_ERROR";
-	__spl_err_text__[SPL_LOG_MUTEX_NULL_ERROR] = "SPL_LOG_MUTEX_NULL_ERROR";
-	__spl_err_text__[SPL_LOG_ST_NAME_NULL_ERROR] = "SPL_LOG_ST_NAME_NULL_ERROR";
-	__spl_err_text__[SPL_LOG_TIME_NULL_ERROR] = "SPL_LOG_TIME_NULL_ERROR";
-	__spl_err_text__[SPL_LOG_TIME_NANO_NULL_ERROR] = "SPL_LOG_TIME_NANO_NULL_ERROR";
-	__spl_err_text__[SPL_LOG_STAT_FOLDER_ERROR] = "SPL_LOG_STAT_FOLDER_ERROR";
-	__spl_err_text__[SPL_LOG_PRINTF_ERROR] = "SPL_LOG_PRINTF_ERROR";
-	__spl_err_text__[SPL_LOG_TOPIC_ZERO] = "SPL_LOG_TOPIC_ZERO";
-	__spl_err_text__[SPL_LOG_TOPIC_MEMORY] = "SPL_LOG_TOPIC_MEMORY";
-	__spl_err_text__[SPL_LOG_TOPIC_FOPEN] = "SPL_LOG_TOPIC_FOPEN";
-	__spl_err_text__[SPL_LOG_TOPIC_FLUSH] = "SPL_LOG_TOPIC_FLUSH";
-	__spl_err_text__[SPL_LOG_TOPIC_BUFF_MEM] = "SPL_LOG_TOPIC_BUFF_MEM";
-	__spl_err_text__[SPL_LOG_ALOCK_NUM] = "SPL_LOG_ALOCK_NUM";
-	__spl_err_text__[SPL_LOG_ALOCK_NULL] = "SPL_LOG_ALOCK_NULL";
-	__spl_err_text__[SPL_LOG_SHM_CREATE_NULL] = "SPL_LOG_SHM_CREATE_NULL";
-	__spl_err_text__[SPL_LOG_SHM_WIN_UNMAP] = "SPL_LOG_SHM_WIN_UNMAP";
-	__spl_err_text__[SPL_LOG_SHM_UNIX_OPEN] = "SPL_LOG_SHM_UNIX_OPEN";
-	__spl_err_text__[SPL_LOG_SHM_UNIX_TRUNC] = "SPL_LOG_SHM_UNIX_TRUNC";
-	__spl_err_text__[SPL_LOG_SHM_UNIX_MAP_FAILED] = "SPL_LOG_SHM_UNIX_MAP_FAILED";
-	__spl_err_text__[SPL_LOG_WIN_SHM_CLOSE] = "SPL_LOG_WIN_SHM_CLOSE";
-	__spl_err_text__[SPL_LOG_SHM_UNIX_UNMAP] = "SPL_LOG_SHM_UNIX_UNMAP";
-	__spl_err_text__[SPL_LOG_VAR_NULL] = "SPL_LOG_VAR_NULL";
-	__spl_err_text__[SPL_LOG_ARR_MTX_NULL] = "SPL_LOG_ARR_MTX_NULL";
-	__spl_err_text__[SPL_LOG_ARR_BUFF_NULL] = "SPL_LOG_ARR_BUFF_NULL";
-	__spl_err_text__[SPL_LOG_MTX_ATT_SHARED_MODE] = "SPL_LOG_MTX_ATT_SHARED_MODE";
-	__spl_err_text__[SPL_LOG_MTX_ATT_SHARED_MODE_SET] = "SPL_LOG_MTX_ATT_SHARED_MODE_SET";
-	__spl_err_text__[SPL_LOG_MTX_INIT_ERR] = "SPL_LOG_MTX_INIT_ERR";
-	__spl_err_text__[SPL_LOG_SHM_UNIX_INIT_MUTEX] = "SPL_LOG_SHM_UNIX_INIT_MUTEX";
-	__spl_err_text__[SPL_LOG_SPINLOCK_INIT_SHARED] = "SPL_LOG_SPINLOCK_INIT_SHARED";
-	__spl_err_text__[SPL_LOG_SPINLOCK_INIT_PRIVATE] = "SPL_LOG_SPINLOCK_INIT_PRIVATE";
-	__spl_err_text__[SPL_LOG_SEM_INIT_UNIX] = "SPL_LOG_SEM_INIT_UNIX";
-	__spl_err_text__[SPL_LOG_THREAD_W32_CREATE] = "SPL_LOG_THREAD_W32_CREATE";
-	__spl_err_text__[SPL_LOG_THREAD_PX_CREATE] = "SPL_LOG_THREAD_PX_CREATE";
-	__spl_err_text__[SPL_LOG_MACH_GETTIME_ERROR] = "SPL_LOG_MACH_GETTIME_ERROR";
-	__spl_err_text__[SPL_LOG_MACH_CLOCK_SERVICE_ERROR] = "SPL_LOG_MACH_CLOCK_SERVICE_ERROR";
-	__spl_err_text__[SPL_LOG_OSX_SEM_CLOSE] = "SPL_LOG_OSX_SEM_CLOSE";
-	__spl_err_text__[SPL_LOG_OSX_SEM_UNLINK] = "SPL_LOG_OSX_SEM_UNLINK";
-	__spl_err_text__[SPL_LOG_SEM_OSX_CREATED_ERROR] = "SPL_LOG_SEM_OSX_CREATED_ERROR";
-	__spl_err_text__[SPL_LOG_SEM_INIT_OSX] = "SPL_LOG_SEM_INIT_OSX";
-	__spl_err_text__[SPL_LOG_SEM_OSX_UNLINK_ERROR] = "SPL_LOG_SEM_OSX_UNLINK_ERROR";
-	__spl_err_text__[SPL_LOG_OPEN_CFG] = "SPL_LOG_OPEN_CFG";
-	__spl_err_text__[SPL_LOG_WIN32_WAIT_OBJECT] = "SPL_LOG_WIN32_WAIT_OBJECT";
-	__spl_err_text__[SPL_LOG_WIN32_MUTEX_RELEASE] = "SPL_LOG_WIN32_MUTEX_RELEASE";
-	__spl_err_text__[SPL_LOG_WIN32_MAP_FILE] = "SPL_LOG_WIN32_MAP_FILE";
-	__spl_err_text__[SPL_LOG_PX_SEM_WAIT_OBJECT] = "SPL_LOG_PX_SEM_WAIT_OBJECT";
-	__spl_err_text__[SPL_LOG_PX_MUTEX_LOCK] = "SPL_LOG_PX_MUTEX_LOCK";
-	__spl_err_text__[SPL_LOG_PX_SPIN_LOCK] = "SPL_LOG_PX_SPIN_LOCK";
-	__spl_err_text__[SPL_LOG_PX_MUTEX_RELEASE] = "SPL_LOG_PX_MUTEX_RELEASE";
-	__spl_err_text__[SPL_LOG_PX_SPIN_RELEASE] = "SPL_LOG_PX_SPIN_RELEASE";
-	__spl_err_text__[SPL_LOG_WIN32_SEM_REL_OBJECT] = "SPL_LOG_WIN32_SEM_REL_OBJECT";
-	__spl_err_text__[SPL_LOG_PX_SEM_REL_OBJECT] = "SPL_LOG_PX_SEM_REL_OBJECT";
-
-
-	__spl_err_text__[SPL_END_ERROR] = "SPL_END_ERROR";
-}
-/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
-const char *
-spl_err_txt(int i)
-{
-	if (i < 0) {
-		return "UNKNOW - less than 0.";
-	}
-	if (i > SPL_END_ERROR) {
-		return "UNKNOW - greater than SPL_END_ERROR.";
-	}
-	return __spl_err_text__[i];
-}
+#if 0
 #ifndef UNIX_LINUX
 #else
 #endif
@@ -2802,4 +2834,6 @@ spl_err_txt(int i)
 #else
 #endif
 #endif
+#endif
+
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/

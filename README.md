@@ -84,7 +84,7 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 **Thanks a lot to:**
 
 1. My family, friends.
-2. My colleagues: Lê Duy Cường, Bùi Khánh Duy, Nguyễn Công Đức , ... .
+2. My colleagues: [Lê Duy Cường](https://www.linkedin.com/in/le-duy-cuong-1212a743/), [Bùi Khánh Duy](https://www.linkedin.com/in/ethanbui92/), Nguyễn Công Đức , ... .
 3. [Jan Flik](https://www.linkedin.com/in/jan-flik/) from [Intel Corp.](https://www.intel.com)
 
 ---
@@ -97,7 +97,7 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 - [Email](mailto:nguyenthaithuanalg@gmail.com)
 
 ### Contributed to / Used by:  
-- [meta-openembedded](https://layers.openembedded.org/layerindex/recipe/448479/)  
-- [openBMC](https://gerrit.openbmc.org/plugins/gitiles/openbmc/openbmc/+/bda8fae3b5b5789ddeb9f9bb99de0cd48affd481/meta-openembedded/meta-oe/recipes-support/libsimplelog/libsimplelog_1.0.7.bb)
-- [Google](https://gbmc.googlesource.com/openbmc/+/refs/heads/master/meta-openembedded/meta-oe/recipes-support/libsimplelog/libsimplelog_1.0.7.bb)
-- [meta-voltumna](https://layers.openembedded.org/layerindex/branch/master/layer/meta-voltumna/) from [Elettra-Sincrotrone Trieste](https://www.elettra.eu/)
+- [meta-openembedded/LTS Wrynose/Yocto](https://layers.openembedded.org/layerindex/recipe/499762/)  
+- [openBMC( Meta, Google, IBM, Intel, Microsoft)](https://github.com/openbmc/openbmc/tree/master/upstream-layers/meta-openembedded/meta-oe/recipes-support/libsimplelog)
+- [Google's gBMC](https://gbmc.googlesource.com/openbmc/+/refs/heads/master/upstream-layers/meta-openembedded/meta-oe/recipes-support/libsimplelog/)
+- [meta-voltumna](https://layers.openembedded.org/layerindex/branch/master/layer/meta-voltumna/) from [Elettra-Sincrotrone Trieste - Scientific research institution - Operation of Synchrotron particle accelerator](https://www.elettra.eu/)
