@@ -3,7 +3,7 @@
 	- Install **cmake**.     
 	- Come to root folder, **mkdir build && cd build**.  
 	- For windows-32: `cmake .. -G "Visual Studio 17 2022" -A win32`.  
-	- For windows-32: `cmake .. -G "Visual Studio 17 2022" -A win32 -D__OPTIMZE_64CORE__=1`.1-64 cores, recommend.  	
+	- For windows-32: `cmake .. -G "Visual Studio 17 2022" -A win32 -D__OPTIMZE_64CORE__=1`.1-64 cores, recommend.  
 	- For windows-64: `cmake .. -G "Visual Studio 17 2022" `. 1-64 cores.  
 	- For windows-64: `cmake .. -G "Visual Studio 17 2022" -D__OPTIMZE_64CORE__=1`. 1-64 cores, recommend.  	
 	- For windows-64: `cmake .. -G "Visual Studio 17 2022" -D__OPTIMZE_MORE_64CORE__=1`. More 64 cores, not check b/c have environment.  
