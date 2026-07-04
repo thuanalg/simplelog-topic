@@ -22,7 +22,7 @@ extern "C" {
 #endif
 
 typedef struct __SPL_BIN_GEO__{
-    double lontitute;
+    double longitute;
     double latitude;
     float speed; 
     unsigned char satellites_used;

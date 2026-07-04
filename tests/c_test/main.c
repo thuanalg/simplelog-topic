@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "simplelog_bin_parser.h"
 #ifndef UNIX_LINUX
 
 #include <Windows.h>
@@ -20,12 +21,14 @@ dotest();
 int num_threads = 10;
 int loop_count = 1000 * 1000;
 int topicindex = 0;
+int topicBindex = 0;
 
 #define TNUMBEER_OF_THREADS "--nthread="
 #define TCONFIG_FILE "--cfg="
 #define TLOOP_COUNT "--loopcount="
 #define TMASTER_MODE "--is_master="
 #define TTOPIC_INDEX "--topic_index="
+#define TTOPIC_BINDEX "--topic_Bindex="
 
 int
 main(int argc, char *argv[])
@@ -51,6 +54,10 @@ main(int argc, char *argv[])
 			ret = sscanf(argv[i], TTOPIC_INDEX"%d", &topicindex);
 			continue;
 		}
+		if (strstr(argv[i], TTOPIC_BINDEX) == argv[i]) {
+			ret = sscanf(argv[i], TTOPIC_BINDEX"%d", &topicBindex);
+			continue;
+		}		
 
 		if (strstr(argv[i], TCONFIG_FILE) == argv[i]) {
 			memset(cfgpath, 0, sizeof(cfgpath));
@@ -155,22 +162,46 @@ posix_thread_routine(void *lpParam)
 	}
 	/*#define SPL_TEST_FMT			"test log test log test log: %d"*/
 #define SPL_TEST_FMT "My test log : %d"
-	if (topicindex < 1) {
+	if (topicindex < 1 && topicBindex < 1) {
 		while (count < loop_count) {
 			spllog(SPL_LOG_INFO, SPL_TEST_FMT, count);
 			++count;
 		}
 	} else {
-		while (count < loop_count) {
-		#if 0
-			spllogtopic(SPL_LOG_INFO, topicindex - 1, SPL_TEST_FMT, count);
-		#else	
-			char data[32] = {0};
-			snprintf(data, 32, "Hello");
-			spllogbintopic(0, topicindex - 1, 0, data, 32);
-		#endif
-			++count;
+		count = 0;
+		if(topicindex > 0) {
+			while (count < loop_count) {
+			#if 1
+				spllogtopic(SPL_LOG_INFO, topicindex - 1, SPL_TEST_FMT, count);
+			#else	
+				char data[32] = {0};
+				SPL_BIN_GEO loc = {0};
+				loc.longitute = 106.37026;
+				loc.latitude = 10.53447;
+				snprintf(data, 32, "Hello binary simplelog.");
+				spllogbintopic(0, topicindex - 1, 0, data, 32);
+				spllogbintopic(0, topicindex - 1, 0, &loc, sizeof(loc));
+			#endif
+				++count;
+			}
 		}
+		count = 0;
+		if(topicBindex > 0) {
+			while (count < loop_count) {
+			#if 0
+				spllogtopic(SPL_LOG_INFO, topicindex - 1, SPL_TEST_FMT, count);
+			#else	
+				char data[32] = {0};
+				SPL_BIN_GEO loc = {0};
+				loc.longitute = 106.37026;
+				loc.latitude = 10.53447;
+				snprintf(data, 32, "Hello binary simplelog.");
+				spllogbintopic(0, topicindex - 1, 0, data, 32);
+				spllogbintopic(0, topicindex - 1, 0, &loc, sizeof(loc));
+			#endif
+				++count;
+			}
+		}		
 	}
 	return 0;
 }
