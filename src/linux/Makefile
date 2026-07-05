@@ -31,4 +31,4 @@ release:
 	gcc -g -o simplelog_bin_parser ${src_bin_parser} ${INC} ${CFLAGS} ${releaseFlag} 
 
 clean:
-	rm -rf ${target} libsimple* simple_c*
+	rm -rf ${target} libsimple* simple_c* simplelog_bin_parser verify_tool
