@@ -2793,6 +2793,10 @@ spl_clean_sync_tool()
 			spl_free(t->topics);
 			spl_free(t->arr_topic);
 		}
+		if (t->n_bintopic > 0) {
+			spl_free(t->bintopics);
+			spl_free(t->arr_bintopic);
+		}		
 #ifndef UNIX_LINUX
 #ifdef SPL_USING_SPIN_LOCK
 #else
