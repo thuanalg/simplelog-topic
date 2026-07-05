@@ -25,8 +25,8 @@
  *		<2025-Jun-11>
  *		<2025-Jun-14>
  *		<2025-Oct-06>
- *		<2026-Jun-13>
  *		<2026-Jun-30>
+ *		<2026-Jul-05>
  * Decription:
  *		The (only) main file to implement simple log.
  */
@@ -39,8 +39,8 @@
 #include <time.h>
 #ifndef UNIX_LINUX
 #include <Windows.h>
-#define YEAR_PADDING 0
-#define MONTH_PADDING 0
+#define YEAR_PADDING              0
+#define MONTH_PADDING             0
 #else
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -62,13 +62,13 @@
 #include <mach/clock.h>
 #include <mach/clock_types.h>
 #endif
-#define YEAR_PADDING 1900
-#define MONTH_PADDING 1
+#define YEAR_PADDING              1900
+#define MONTH_PADDING             1
 
 #define SPL_LOG_UNIX__SHARED_MODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
-#define SPL_LOG_UNIX_CREATE_MODE (O_CREAT | O_RDWR | O_EXCL)
-#define SPL_LOG_UNIX_OPEN_MODE (O_RDWR | O_EXCL)
-#define SPL_LOG_UNIX_PROT_FLAGS (PROT_READ | PROT_WRITE | PROT_EXEC)
+#define SPL_LOG_UNIX_CREATE_MODE  (O_CREAT | O_RDWR | O_EXCL)
+#define SPL_LOG_UNIX_OPEN_MODE    (O_RDWR | O_EXCL)
+#define SPL_LOG_UNIX_PROT_FLAGS   (PROT_READ | PROT_WRITE | PROT_EXEC)
 #endif
 #if defined(_GNU_SOURCE) && defined(__LINUX__)
 #include <sched.h>
@@ -165,40 +165,40 @@
 	}
 #endif
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-#define SPL_SEM_NAME_RW "_SEM_RW"
-#define SPL_SEM_NAME_OFF "_SEM_OFF"
+#define SPL_SEM_NAME_RW           "_SEM_RW"
+#define SPL_SEM_NAME_OFF          "_SEM_OFF"
 
-#define SPL_MTX_NAME_OFF "_MTX_OFF"
+#define SPL_MTX_NAME_OFF          "_MTX_OFF"
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
-#define SPL_LOG_PATHFOLDR "pathfoder="
-#define SPL_LOG_LEVEL "level="
-#define SPL_LOG_BUFF_SIZE "buffsize="
-#define SPL_MAX_SZ_MSG "max_sz_msg="
-#define SPL_LOG_ROT_SIZE "rotation_size="
-#define SPL_LOG_TOPIC "topic="
-#define SPL_LOG_TOPIC_BIN "topic_bin="
-#define SPL_LOG_NCPU "ncpu="
-#define SPL_LOG_TRIGGER "trigger="
-#define SPL_LOG_SHARED_KEY "shared_key="
-#define SPL_LOG_MODE_STRAIGHT "mode_straight="
-#define SPL_LOG_END_CFG "end_configuring="
+#define SPL_LOG_PATHFOLDR         "pathfoder="
+#define SPL_LOG_LEVEL             "level="
+#define SPL_LOG_BUFF_SIZE         "buffsize="
+#define SPL_MAX_SZ_MSG            "max_sz_msg="
+#define SPL_LOG_ROT_SIZE          "rotation_size="
+#define SPL_LOG_TOPIC             "topic="
+#define SPL_LOG_TOPIC_BIN         "topic_bin="
+#define SPL_LOG_NCPU              "ncpu="
+#define SPL_LOG_TRIGGER           "trigger="
+#define SPL_LOG_SHARED_KEY        "shared_key="
+#define SPL_LOG_MODE_STRAIGHT     "mode_straight="
+#define SPL_LOG_END_CFG           "end_configuring="
 
-#define SPL_FILE_NAME_FMT "%s\\%s\\%s_%.8d.log"
-#define SPL_FILE_NAME_FMT_TOPIC "%s\\%s\\%s"
-#define SPL_FMT_DATE_ADDING "%.4d-%.2d-%.2d"
-#define SPL_FMT_HOUR_ADDING "%.2d:%.2d:%.2d"
-#define SPL_FMT_DELT_ADDING "%s %s.%.9u"
-#define SPL_FMT_MILL_ADDING "%s %s.%.9d"
-#define SPL_FMT_DATE_ADDING_X "\n[%.4d-%.2d-%.2d %.2d:%.2d:%.2d.%.9d] "
-#define HHHHHHHHHHH "%llu]\t"
+#define SPL_FILE_NAME_FMT         "%s\\%s\\%s_%.8d.log"
+#define SPL_FILE_NAME_FMT_TOPIC   "%s\\%s\\%s"
+#define SPL_FMT_DATE_ADDING       "%.4d-%.2d-%.2d"
+#define SPL_FMT_HOUR_ADDING       "%.2d:%.2d:%.2d"
+#define SPL_FMT_DELT_ADDING       "%s %s.%.9u"
+#define SPL_FMT_MILL_ADDING       "%s %s.%.9d"
+#define SPL_FMT_DATE_ADDING_X     "\n[%.4d-%.2d-%.2d %.2d:%.2d:%.2d.%.9d] "
+#define HHHHHHHHHHH               "%llu]\t"
 
-#define SPL_TEXT_UNKNOWN "U"
-#define SPL_TEXT_DEBUG "D"
-#define SPL_TEXT_INFO "I"
-#define SPL_TEXT_WARN "W"
-#define SPL_TEXT_ERROR "E"
-#define SPL_TEXT_FATAL "F"
+#define SPL_TEXT_UNKNOWN          "U"
+#define SPL_TEXT_DEBUG            "D"
+#define SPL_TEXT_INFO             "I"
+#define SPL_TEXT_WARN             "W"
+#define SPL_TEXT_ERROR            "E"
+#define SPL_TEXT_FATAL            "F"
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #ifndef UNIX_LINUX
@@ -213,7 +213,7 @@ splUnlockSpinlock(volatile long *p);
 
 /*static
 	volatile long spl_rw_spin = 0;*/
-#define THREAD_ROUTINE LPTHREAD_START_ROUTINE
+#define THREAD_ROUTINE            LPTHREAD_START_ROUTINE
 #else
 /*pthread_spinlock_t	spl_rw_spin; */
 typedef void *(*THREAD_ROUTINE)(void *);
@@ -263,7 +263,7 @@ spl_stdz_topics(char *buff, int *inoutlen, int *, char **);
 
 #ifdef __OPTIMZE_MORE_64CORE__
 
-#define SPL_GROUP_CORES 64
+#define SPL_GROUP_CORES           64
 
 typedef struct __SPL_WIN_GROUP_CORES__ {
 	int group;
