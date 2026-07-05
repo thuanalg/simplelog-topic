@@ -24,7 +24,7 @@
  *		<2025-Jun-01>
  *		<2025-Jun-11>
  *		<2025-Oct-04>
- *		<2026-Jun-30>
+ *		<2026-Jun-05>
  * Decription:
  *		The (only) main header file to export 4 APIs: [spl_init_log_ext, spllog, spllogtopic, spl_finish_log].
  */
@@ -40,11 +40,11 @@
 
 #if 1
 #ifndef UNIX_LINUX
-#define UNIX_LINUX   
+#define UNIX_LINUX                      
 #if 1
-	#define __LINUX__
-	#define _GNU_SOURCE
-#endif                   
+#define __LINUX__                       
+#define _GNU_SOURCE                     
+#endif
 #endif
 #endif
 
@@ -310,10 +310,15 @@ typedef struct __SPL_FMT_PARAM__ {
 	int outlen; /* Real length of fmtt. */
 } SPL_FMT_PARAM;
 
-typedef struct __SPL_HEADER__ {
-	int total;
-	int type_id;
-	LLU timestamp;
+#define SPL_SPECIAL_KEY                 "hd"
+#define SPL_SPECIAL_KEY_0               (SPL_SPECIAL_KEY[0])
+#define SPL_SPECIAL_KEY_1               (SPL_SPECIAL_KEY[1])
+
+typedef struct SPL_HEADER_TAG {
+	int total; /* Total package size in bytes. */
+	char spec_key[2]; /* Special key to help detect or recover corrupted data. */
+	unsigned short type_id; /* Identifier to determine the data type. */
+	LLU timestamp; /* Timestamp in nanoseconds. */
 } SPL_HEADER;
 
 typedef struct __SPL_HD_PARAM__ {
@@ -328,26 +333,25 @@ typedef struct __SPL_HD_PARAM__ {
 	Other (6) bits: reserved
 */
 
-#define SPL_SET_ENDIAN(__a__) \
-    do { \
-        unsigned short __en__ = 1; \
-        char *__p__ = (char *)&__en__; \
-        if (__p__[0] == 0) { \
-            (__a__) |= 0x01;  \
-        } \
-    } while(0)
+#define SPL_SET_ENDIAN(__a__)                                                                                               \
+	do {                                                                                                                \
+		unsigned short __en__ = 1;                                                                                  \
+		char *__p__ = (char *)&__en__;                                                                              \
+		if (__p__[0] == 0) {                                                                                        \
+			(__a__) |= 0x01;                                                                                    \
+		}                                                                                                           \
+	} while (0)
 
-#define SPL_GET_ENDIAN(__a__)    ((__a__) & 0x01)
+#define SPL_GET_ENDIAN(__a__) ((__a__) & 0x01)
 
-#define SPL_SET_ARCH(__a__) \
-    do { \
-        if (sizeof(void*) < 8) { \
-            (__a__) |= 0x02; \
-        } \
-    } while(0)
+#define SPL_SET_ARCH(__a__)                                                                                                 \
+	do {                                                                                                                \
+		if (sizeof(void *) < 8) {                                                                                   \
+			(__a__) |= 0x02;                                                                                    \
+		}                                                                                                           \
+	} while (0)
 
-#define SPL_GET_ARCH(__a__)      ((__a__) & 0x02)
-
+#define SPL_GET_ARCH(__a__) ((__a__) & 0x02)
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
@@ -397,7 +401,8 @@ typedef struct __SPL_HD_PARAM__ {
 #define spl_malloc(__nn__, __obj__, __type__)                                                                               \
 	{                                                                                                                   \
 		(__obj__) = (__type__ *)malloc(__nn__);                                                                     \
-		if (__obj__) { /*spl_console_log("Malloc: 0x%p\n", (__obj__));*/                                            \
+		if (__obj__) {                                                                                              \
+			; /*spl_console_log("Malloc: 0x%p, sz: %d\n", (__obj__), (__nn__)); */                              \
 			;                                                                                                   \
 			memset((void *)(__obj__), 0, (__nn__));                                                             \
 		} else {                                                                                                    \
@@ -406,8 +411,8 @@ typedef struct __SPL_HD_PARAM__ {
 	}
 
 #define spl_free(__obj__)                                                                                                   \
-	{ /*spl_console_log("Free: 0x%p.\n", (__obj__));*/                                                                  \
-		;                                                                                                           \
+	{                                                                                                                   \
+		; /*spl_console_log("Free: 0x%p.\n", (__obj__)); */                                                         \
 		free(__obj__);                                                                                              \
 		;                                                                                                           \
 		(__obj__) = 0;                                                                                              \
@@ -576,7 +581,8 @@ typedef struct __SPL_HD_PARAM__ {
 				char __len__ = 0;                                                                           \
 				__pr__.header.total = sizeof(SPL_HEADER) + __sz__;                                          \
 				__pr__.header.type_id = ___type___;                                                         \
-				;                                                                                           \
+				__pr__.header.spec_key[0] = SPL_SPECIAL_KEY_0;                                              \
+				__pr__.header.spec_key[1] = SPL_SPECIAL_KEY_1;                                              \
 				spl_bin_now_ext(&__pr__);                                                                   \
 				;                                                                                           \
 				do {                                                                                        \

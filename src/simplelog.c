@@ -25,8 +25,8 @@
  *		<2025-Jun-11>
  *		<2025-Jun-14>
  *		<2025-Oct-06>
- *		<2026-Jun-13>
  *		<2026-Jun-30>
+ *		<2026-Jul-05>
  * Decription:
  *		The (only) main file to implement simple log.
  */
@@ -1192,7 +1192,7 @@ spl_bin_now_ext(SPL_HD_PARAM *const p)
 		return;
 	}
 	do {
-#ifndef UNIX_LINUX		
+#ifndef UNIX_LINUX
 		GetLocalTime(&lt);
 		QueryPerformanceCounter(&counter);
 		p->header.timestamp = time(0) * SPL_BILLION;
@@ -1207,11 +1207,11 @@ spl_bin_now_ext(SPL_HD_PARAM *const p)
 			spl_err("ret: %d", ret);
 		}
 		thid = (LLU)spl_get_threadid();
-	#if defined(__OPTIMZE_MORE_64CORE__)
+#if defined(__OPTIMZE_MORE_64CORE__)
 		p->r = SPL_RAND_FORM(thid, stt.nn);
-	#else
+#else
 		p->r = SPL_RAND_FORM(thid, stt.nn);
-	#endif
+#endif
 
 #endif
 #else
@@ -1782,7 +1782,7 @@ spl_stdz_topics(char *buff, int *inoutlen, int *ntopics, char **pchar)
 */
 #define SPL_ADD_BIN_FLAG(__fp__)                                                                                            \
 	{                                                                                                                   \
-		fwrite(&__spl_bin_flag__, 1, 1, (FILE*)(__fp__));                                                                                                                  \
+		fwrite(&__spl_bin_flag__, 1, 1, (FILE *)(__fp__));                                                          \
 	}
 
 int
@@ -2792,6 +2792,10 @@ spl_clean_sync_tool()
 		if (t->n_topic > 0) {
 			spl_free(t->topics);
 			spl_free(t->arr_topic);
+		}
+		if (t->n_bintopic > 0) {
+			spl_free(t->bintopics);
+			spl_free(t->arr_bintopic);
 		}
 #ifndef UNIX_LINUX
 #ifdef SPL_USING_SPIN_LOCK
