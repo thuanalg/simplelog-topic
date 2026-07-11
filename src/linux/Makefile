@@ -28,7 +28,7 @@ release:
 	gcc -o simple_c_example  ${PREFIX_SRC}/c_test/main.c ${src} ${LIBS} ${INC} ${CFLAGS}
 	g++ -o simple_cpp_example  ${PREFIX_SRC}/cpp_test/main.cpp ${LIBS} ${INC} ${CPPFLAGS} -L./ -lsimplelog
 	g++ -o simple_cpp_example_direct  ${PREFIX_SRC}/cpp_test/main.cpp ${src} ${LIBS} ${INC} ${CPPFLAGS}
-	gcc -g -o simplelog_bin_parser ${src_bin_parser} ${INC} ${CFLAGS} 
+	gcc -o simplelog_bin_parser ${src_bin_parser} ${INC} ${CFLAGS} -s
 
 clean:
 	rm -rf ${target} libsimple* simple_c* simplelog_bin_parser verify_tool
