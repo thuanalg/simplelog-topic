@@ -5,7 +5,7 @@
 
 
 Author: [Thuan Nguyen Thai](mailto:nguyenthaithuanalg@gmail.com)  
-Other contributors: None  
+Other contributors: [@alperak](https://github.com/alperak)  
 Created: April 25, 2025  
 
 
@@ -41,6 +41,7 @@ Created: April 25, 2025
 | `Info` | **[Mandatory]** `[tid] [file:func:line]`|
 | `Number of CPU` | **[Mandatory]** [ncpu=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg)|
 | `topic` | **[Optional]** [topic=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg), can comment this feature.|
+| `topic_bin` | **[Optional]** [topic_bin=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg), can comment this feature.|
 | `Log level` | **[Mandatory]** [level=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg).|
 | `Buffer size` | **[Mandatory]** [buffsize=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg).|
 | `Timer trigger` | **[Mandatory]** [trigger=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg).|
@@ -48,17 +49,6 @@ Created: April 25, 2025
 | `Shared memory key` | **[Optional]** [shared_key=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg).|
   
   
-### 🛠️ Exported APIs
-
-SimpleLog-Topic provides 4 key APIs for initializing, logging, and process control:
-
-| APIs | Description |
-|--------------------|-------------|
-| `int spl_init_log_ext(SPL_INPUT_ARG *input);` | **[Mandatory]** Initialize the logger with extended input settings. |
-| `int spl_finish_log();` | **[Mandatory]** Finalize and clean up the logger. |
-| `spllog(log_level, fmt, ...);` | **[Mandatory]** Log a message with the specified level. |
-| `spllogtopic(log_level, topic_index, fmt, ...);` | **[Optional]** Log by [topics=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg) from 1 to n. |
-
 
 ### Alternatives Considered
 - No. It should be one more option. It should NOT alternate any libraries, but is really worthy to try with new applications.

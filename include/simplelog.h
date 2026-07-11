@@ -27,7 +27,7 @@
  *		<2026-Jun-05>
  *		<2026-Jun-11>
  * Decription:
- *		The (only) main header file to export 5 APIs: 
+ *		The (only) main header file to export 5 APIs:
  *      [spl_init_log_ext, spllog, spllogtopic, spllogbintopic, spl_finish_log].
  */
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
@@ -83,8 +83,9 @@ extern "C" {
 #define SPL_LOG_INFO                    2
 #define SPL_LOG_WARNING                 3
 #define SPL_LOG_ERROR                   4
-#define SPL_LOG_FATAL                   5
-#define SPL_LOG_PEAK                    6
+#define SPL_LOG_BIN                     5
+#define SPL_LOG_FATAL                   6
+#define SPL_LOG_PEAK                    7
 
 #if 0
 #ifndef SPL_RL_BUF
