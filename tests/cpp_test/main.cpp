@@ -203,8 +203,8 @@ posix_thread_routine(void *lpParam)
 				loc.longitute = 106.37026;
 				loc.latitude = 10.53447;
 				snprintf(data, 32, "Hello binary simplelog.");
-				spllogbintopic(0, topicindex, 0, data, 32);
-				spllogbintopic(0, topicindex, 0, &loc, sizeof(loc));
+				spllogbintopic(0, topicindex, SPL_PARSER_TEXT, data, 32);
+				spllogbintopic(0, topicindex, SPL_PARSER_GPS, &loc, sizeof(loc));
 #endif
 				++count;
 			}
