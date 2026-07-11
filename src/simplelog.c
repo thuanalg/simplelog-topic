@@ -1795,7 +1795,7 @@ spl_gen_topics(char isBin)
 	int const num_top = isBin ? t->n_bintopic : t->n_topic;
 	SIMPLE_LOG_TOPIC_ST *const arr_target = isBin ? t->arr_bintopic : t->arr_topic;
 	const char *const fext = isBin ? "%s-%s-%.7d.bin" : "%s-%s-%.7d.log";
-	const char *const fmode = isBin ? "a+" : "a+";
+	const char *const fmode = isBin ? "ab+" : "a+";
 	do {
 		int i = 0;
 		if (num_top < 1) {
