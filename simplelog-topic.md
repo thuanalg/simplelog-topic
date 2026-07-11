@@ -40,8 +40,8 @@ Created: April 25, 2025
 | `Time` | **[Mandatory]** `[yyyy-mm-dd hh-mm-ss.nano]`|
 | `Info` | **[Mandatory]** `[tid] [file:func:line]`|
 | `Number of CPU` | **[Mandatory]** [ncpu=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg)|
-| `topic` | **[Optional]** [topic=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg), can comment this feature.|
-| `topic_bin` | **[Optional]** [topic_bin=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg), can comment this feature.|
+| `topic` | **[Optional]** [topic=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg), can on/off this feature.|
+| `topic_bin` | **[Optional]** [topic_bin=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg), can on/off this feature.|
 | `Log level` | **[Mandatory]** [level=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg).|
 | `Buffer size` | **[Mandatory]** [buffsize=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg).|
 | `Timer trigger` | **[Mandatory]** [trigger=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg).|
