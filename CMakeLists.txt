@@ -5,7 +5,7 @@ project(simplelog_topic_project)
 set(SOURCE_LIB_FILES src/simplelog.c )
 set(SOURCE_BIN_FILES tests/c_test/main.c)
 
-set(SOURCE_BIN_PARSER src/simplelog.c src/simplelog_bin_parser.c)
+set(SOURCE_BIN_PARSER src/simplelog_bin_parser.c)
 
 set(SOURCE_BINCPP_FILES tests/cpp_test/main.cpp)
 set(SOURCE_BINCPP_FILES_DIRECT tests/cpp_test/main.cpp src/simplelog.c)
