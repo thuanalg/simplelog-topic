@@ -18,6 +18,7 @@ spl_parse_binlog(SPL_PARSER_INPUT * const inp)
     SPL_HEADER *p = 0;
     int k = 0;
     int step = 0;
+    int count = 0;
     do {
         if(!inp) {
             ret = 1;
@@ -55,8 +56,10 @@ spl_parse_binlog(SPL_PARSER_INPUT * const inp)
 		    }
 		    /*Now we have binary data.*/
 		    spl_parser_dump((SPL_HEADER *)buf);
+		    ++count;
 	    }
     } while(0);
+    fprintf(stdout, "\ncount: %d.\n", count);
     if(fp) {
         fclose(fp);
     }
@@ -75,11 +78,27 @@ void
 spl_parser_dump(SPL_HEADER *p)
 {
 	char spec_key[3] = {0};
+
 	spec_key[0] = p->spec_key[0];
 	spec_key[1] = p->spec_key[1];
 
+	do {
+		if (SPL_PARSER_TEXT == p->type_id) {
+			char *pt = (char *)p->data;
+			fprintf(stdout, "%s\n", pt);
+			break;
+		}
+		if (SPL_PARSER_GPS == p->type_id) {
+			SPL_BIN_GEO *pt = (SPL_BIN_GEO *)p->data;
+			fprintf(stdout, "longitute: %f\n", pt->longitute);
+			break;
+		}
+	} while (0);
+
+
 	fprintf(stdout, "{total, spec_key, type_id, timestamp} = {%d, %s, %d, %llu},\n", 
         p->total, spec_key, (int)p->type_id, p->timestamp);
+
 }
 /* The parser based on UTF-8 spirit. */
 int main(int argc, char *argv[]) {

@@ -319,6 +319,7 @@ typedef struct SPL_HEADER_TAG {
 	char spec_key[2]; /* Special key to help detect or recover corrupted data. */
 	unsigned short type_id; /* Identifier to determine the data type. */
 	LLU timestamp; /* Timestamp in nanoseconds. */
+	char data[0];
 } SPL_HEADER;
 
 typedef struct __SPL_HD_PARAM__ {
