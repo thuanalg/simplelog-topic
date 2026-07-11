@@ -25,6 +25,7 @@
  *		<2025-Jun-11>
  *		<2025-Oct-04>
  *		<2026-Jun-05>
+ *		<2026-Jun-11>
  * Decription:
  *		The (only) main header file to export 4 APIs: [spl_init_log_ext, spllog, spllogtopic, spl_finish_log].
  */
@@ -38,7 +39,7 @@
 #define SPL_MIN_AB(a, b) ((a) < (b)) ? (a) : (b)
 #define SPL_MAX_AB(a, b) ((a) > (b)) ? (a) : (b)
 
-#if 0
+#if 1
 #ifndef UNIX_LINUX
 #define UNIX_LINUX                      
 #if 1
