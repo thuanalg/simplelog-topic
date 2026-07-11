@@ -1167,7 +1167,7 @@ spl_simple_log_thread(SIMPLE_LOG_ST *t)
 #define SPL_RAND_FORM(__tid__, __nn__)                                                                                      \
 	((unsigned short)(SPL_CTRL_OBJ->mode_straight ? __tid__ : __nn__) % SPL_CTRL_OBJ->ncpu)
 
-DLL_API_SIMPLE_LOG void
+void
 spl_bin_now_ext(SPL_HD_PARAM *const p)
 {
 	int ret = 0;
