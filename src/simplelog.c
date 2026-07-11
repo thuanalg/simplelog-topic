@@ -1167,7 +1167,7 @@ spl_simple_log_thread(SIMPLE_LOG_ST *t)
 #define SPL_RAND_FORM(__tid__, __nn__)                                                                                      \
 	((unsigned short)(SPL_CTRL_OBJ->mode_straight ? __tid__ : __nn__) % SPL_CTRL_OBJ->ncpu)
 
-DLL_API_SIMPLE_LOG void
+void
 spl_bin_now_ext(SPL_HD_PARAM *const p)
 {
 	int ret = 0;
@@ -1795,7 +1795,7 @@ spl_gen_topics(char isBin)
 	int const num_top = isBin ? t->n_bintopic : t->n_topic;
 	SIMPLE_LOG_TOPIC_ST *const arr_target = isBin ? t->arr_bintopic : t->arr_topic;
 	const char *const fext = isBin ? "%s-%s-%.7d.bin" : "%s-%s-%.7d.log";
-	const char *const fmode = isBin ? "a+" : "a+";
+	const char *const fmode = isBin ? "ab+" : "a+";
 	do {
 		int i = 0;
 		if (num_top < 1) {
