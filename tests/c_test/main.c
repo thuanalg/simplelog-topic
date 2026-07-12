@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "simplelog_bin_parser.h"
 #ifndef UNIX_LINUX
 
 #include <Windows.h>
@@ -13,19 +14,23 @@ win32_thread_routine(LPVOID lpParam);
 #include <pthread.h>
 void *
 posix_thread_routine(void *lpParam);
-#endif 
+#endif
 
 void
 dotest();
 int num_threads = 10;
 int loop_count = 1000 * 1000;
-int topicindex = 0;
+int topicindex = -1;
+int topicBindex = -1;
+int mainindex = -1;
 
 #define TNUMBEER_OF_THREADS "--nthread="
-#define TCONFIG_FILE "--cfg="
-#define TLOOP_COUNT "--loopcount="
-#define TMASTER_MODE "--is_master="
-#define TTOPIC_INDEX "--topic_index="
+#define TCONFIG_FILE        "--cfg="
+#define TLOOP_COUNT         "--loopcount="
+#define TMASTER_MODE        "--is_master="
+#define TTOPIC_INDEX        "--topic_index="
+#define TTOPIC_BINDEX       "--topic_Bindex="
+#define MAIN_INDEX          "--mainindex="
 
 int
 main(int argc, char *argv[])
@@ -37,15 +42,26 @@ main(int argc, char *argv[])
 	snprintf(cfgpath, 1024, "simplelog.cfg");
 	for (i = 1; i < argc; ++i) {
 		if (strstr(argv[i], TNUMBEER_OF_THREADS) == argv[i]) {
-			ret = sscanf(argv[i], TNUMBEER_OF_THREADS"%d", &num_threads);
+			ret = sscanf(argv[i], TNUMBEER_OF_THREADS "%d", &num_threads);
+			if (!ret) {
+				return 1;
+			}
 			continue;
 		}
 		if (strstr(argv[i], TLOOP_COUNT) == argv[i]) {
-			ret = sscanf(argv[i], TLOOP_COUNT"%d", &loop_count);
+			ret = sscanf(argv[i], TLOOP_COUNT "%d", &loop_count);
+			continue;
+		}
+		if (strstr(argv[i], MAIN_INDEX) == argv[i]) {
+			ret = sscanf(argv[i], MAIN_INDEX "%d", &mainindex);
 			continue;
 		}
 		if (strstr(argv[i], TTOPIC_INDEX) == argv[i]) {
-			ret = sscanf(argv[i], TTOPIC_INDEX"%d", &topicindex);
+			ret = sscanf(argv[i], TTOPIC_INDEX "%d", &topicindex);
+			continue;
+		}
+		if (strstr(argv[i], TTOPIC_BINDEX) == argv[i]) {
+			ret = sscanf(argv[i], TTOPIC_BINDEX "%d", &topicBindex);
 			continue;
 		}
 
@@ -54,7 +70,6 @@ main(int argc, char *argv[])
 			snprintf(cfgpath, 1024, "%s", argv[i] + sizeof(TCONFIG_FILE) - 1);
 			continue;
 		}
-
 	}
 	len = SPL_MIN_AB(SPL_PATH_FOLDER, strlen(cfgpath) + 1);
 	spl_console_log("cfgpath: %s.\n", cfgpath);
@@ -95,7 +110,7 @@ dotest()
 #if 0	
 	// https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitformultipleobjects
 	// https://learn.microsoft.com/en-us/windows/win32/sync/waiting-for-multiple-objects
-#endif	
+#endif
 	dwEvent = WaitForMultipleObjects(num_threads, // number of objects in array
 	    hpThread, // array of objects
 	    TRUE, // wait for any object
@@ -105,7 +120,7 @@ dotest()
 #else
 #if 0
 	// https://man7.org/linux/man-pages/man3/pthread_create.3.html
-#endif	
+#endif
 	pthread_t *pidds = 0;
 	pidds = (pthread_t *)malloc(num_threads * sizeof(pthread_t));
 	if (!pidds) {
@@ -113,6 +128,9 @@ dotest()
 	}
 	for (i = 0; i < num_threads; ++i) {
 		int err = pthread_create(pidds + i, 0, posix_thread_routine, 0);
+		if (err) {
+			exit(1);
+		}
 	}
 	for (i = 0; i < num_threads; i++) {
 		int s = pthread_join(pidds[i], 0);
@@ -142,19 +160,39 @@ win32_thread_routine(LPVOID lpParam)
 void *
 posix_thread_routine(void *lpParam)
 {
-#endif 
+#endif
 	int count = 0;
+	if (lpParam) {
+		spl_console_log("%p\n", lpParam);
+	}
 	/*#define SPL_TEST_FMT			"test log test log test log: %d"*/
-#define SPL_TEST_FMT "My test log : %d"
-	if (topicindex < 1) {
+#define SPL_TEST_FMT        "My test log : %d"
+	if (mainindex > 0) {
 		while (count < loop_count) {
 			spllog(SPL_LOG_INFO, SPL_TEST_FMT, count);
 			++count;
 		}
-	} else {
-		while (count < loop_count) {
-			spllogtopic(SPL_LOG_INFO, topicindex - 1, SPL_TEST_FMT, count);
-			++count;
+	}
+	if (topicindex > -1 || topicBindex > -1) {
+		count = 0;
+		if (topicindex > -1) {
+			while (count < loop_count) {
+				spllogtopic(SPL_LOG_INFO, topicindex, SPL_TEST_FMT, count);
+				++count;
+			}
+		}
+		count = 0;
+		if (topicBindex > -1) {
+			while (count < loop_count) {
+				char data[32] = {0};
+				SPL_BIN_GEO loc = {0};
+				loc.longitute = 106.37026;
+				loc.latitude = 10.53447;
+				snprintf(data, 32, "Hello binary simplelog.");
+				spllogbintopic(0, topicBindex, SPL_PARSER_TEXT, data, 32);
+				spllogbintopic(0, topicBindex, SPL_PARSER_GPS, &loc, sizeof(loc));
+				++count;
+			}
 		}
 	}
 	return 0;
