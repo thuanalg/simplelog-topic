@@ -4,7 +4,6 @@
 #include <string.h>
 #include <time.h>
 #include "simplelog_bin_parser.h"
-#include <string>
 #ifndef UNIX_LINUX
 
 #include <Windows.h>
@@ -203,8 +202,8 @@ posix_thread_routine(void *lpParam)
 				loc.longitute = 106.37026;
 				loc.latitude = 10.53447;
 				snprintf(data, 32, "Hello binary simplelog.");
-				spllogbintopic(0, topicindex, SPL_PARSER_TEXT, data, 32);
-				spllogbintopic(0, topicindex, SPL_PARSER_GPS, &loc, sizeof(loc));
+				spllogbintopic(0, topicBindex, SPL_PARSER_TEXT, data, 32);
+				spllogbintopic(0, topicBindex, SPL_PARSER_GPS, &loc, sizeof(loc));
 #endif
 				++count;
 			}
