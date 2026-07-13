@@ -69,7 +69,7 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 
 ---
 
-**[APIs](https://github.com/thuanalg/simplelog-topic/blob/main/APIS.md)**  
+**[APIs](https://github.com/thuanalg/simplelog-topic/blob/main/APIs.md)**  
   
 ---
 
