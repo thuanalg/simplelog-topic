@@ -41,6 +41,19 @@ trigger=1
 ncpu=8
 #--------------------------------------------------------------------------------------------------------------------
 
+thuannt@thuannt-Z87M-D3H:~/x/simplelog-topic$ uname -a
+Linux thuannt-Z87M-D3H 6.17.0-35-generic #35~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Tue May 26 19:30:42 UTC 2 x86_64 x86_64 x86_64 GNU/Linux
+thuannt@thuannt-Z87M-D3H:~/x/simplelog-topic$ 
+
+thuannt@thuannt-Z87M-D3H:~/x/simplelog-topic$ cat /etc/os-release
+PRETTY_NAME="Ubuntu 24.04.2 LTS"
+NAME="Ubuntu"
+VERSION_ID="24.04"
+VERSION="24.04.2 LTS (Noble Numbat)"
+
+
+#--------------------------------------------------------------------------------------------------------------------
+
 Command:
 ./simple_c_example --nthread=10 --loopcount=1000000 --mainindex=-1 --topic_index=-1 --topic_Bindex=0 --cfg=z.cfg
 
