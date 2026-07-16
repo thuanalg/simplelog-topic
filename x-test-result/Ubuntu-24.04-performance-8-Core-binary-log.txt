@@ -9,7 +9,7 @@ simplelog-topic: https://github.com/thuanalg/simplelog-topic/blob/main/src/cpp_t
 	Configuration file: src/linux/z.cfg
 	
 Environment for both:
-	- CentOS 09, 8 Cores
+	- Ubuntu 24.04.2 LTS, 8 Cores
 	- 10 threads
 	- 10(ten) million records.
 ------------------
