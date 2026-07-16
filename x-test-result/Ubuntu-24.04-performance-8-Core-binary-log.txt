@@ -55,64 +55,29 @@ VERSION="24.04.2 LTS (Noble Numbat)"
 #--------------------------------------------------------------------------------------------------------------------
 
 Command:
-./simple_c_example --nthread=10 --loopcount=1000000 --mainindex=-1 --topic_index=-1 --topic_Bindex=0 --cfg=z.cfg
+./simple_c_example --nthread=10 --loopcount=100000000 --mainindex=-1 --topic_index=-1 --topic_Bindex=0 --cfg=z.cfg
+
+#100.000.000 * 10 * 2 = 2.000.000.000
 
 #---------------------------------------------------------------------------------------------------------------------
-First round:
-[2026-07-16 22:14:29.340661704] [main.cpp:main:82] [thid: 131133397501760] ====================Start.
-[2026-07-16 22:14:30.026230784] [main.cpp:main:84] [thid: 131133397501760] ==================End.
+[2026-07-16 22:53:19.740511635] [main.cpp:main:77] [thid: 124734694999872] cfgpath: z.cfg.
 
+[2026-07-16 22:53:19.740526537] [main.cpp:main:79] [thid: 124734694999872] input.folder: z.cfg.
 
+[2026-07-16 22:53:19.740529263] [simplelog.c:spl_init_log_ext:649] [thid: 124734694999872] -----------------__spl_bin_flag__: 0 
+[2026-07-16 22:53:19.740567300] [simplelog.c:spl_init_log_parse:575] [thid: 124734694999872] n Topic BIN: 1.
 
+[2026-07-16 22:53:19.740596842] [simplelog.c:spl_init_log_parse:596] [thid: 124734694999872] cores: 8.
 
-thuannt@thuannt-Z87M-D3H:~/x/simplelog-topic/src/linux$ ll log_simple/2026/07/
-total 859388
-drwxrwxr-x 2 thuannt thuannt      4096 Jul 16 22:14 ./
-drwxrwxr-x 3 thuannt thuannt      4096 Jul 16 22:14 ../
--rw-rw-r-- 1 thuannt thuannt         0 Jul 16 22:14 2026-07-16-simplelog_00000000.log
--rw-rw-r-- 1 thuannt thuannt 880000001 Jul 16 22:14 2026-07-16-simplelog-gps-0000000.bin
+[2026-07-16 22:53:19.740603385] [simplelog.c:spl_init_log_parse:625] [thid: 124734694999872] buff 0, t->mode_straight: 0, sz: 1.
+[2026-07-16 22:53:19.740609066] [simplelog.c:spl_calculate_size:2240] [thid: 124734694999872] buf size: 4800000, mtxsize: 360, semsize: 64
+[2026-07-16 22:53:19.742685516] [simplelog.c:spl_init_segments:2708] [thid: 124734694999872] n_topic: 0
+[2026-07-16 22:53:19.742834497] [main.cpp:main:82] [thid: 124734694999872] ====================Start.
 
- 
--->> File size: 880000001, time: 0.686s, speed: 29.15M mgs/s, 1.282798834 GB/s
+[2026-07-16 23:05:56.084878006] [main.cpp:main:84] [thid: 124734694999872] ==================End.
+
+[2026-07-16 23:05:56.099206360] [simplelog.c:spl_written_thread_routine:1124] [thid: 124734682871488] pthread_cancel OK.
+
 #---------------------------------------------------------------------------------------------------------------------
-Ssecond round:
-
-[2026-07-16 22:19:20.704952799] [simplelog.c:spl_calculate_size:2240] [thid: 135230674519872] buf size: 4800000, mtxsize: 360, semsize: 64
-[2026-07-16 22:19:20.706816107] [simplelog.c:spl_init_segments:2708] [thid: 135230674519872] n_topic: 0
-[2026-07-16 22:19:20.706976390] [main.cpp:main:82] [thid: 135230674519872] ====================Start.
-[2026-07-16 22:19:21.395311398] [main.cpp:main:84] [thid: 135230674519872] ==================End.
-
-
-
-
-drwxrwxr-x 2 thuannt thuannt      4096 Jul 16 22:19 ./
-drwxrwxr-x 3 thuannt thuannt      4096 Jul 16 22:19 ../
--rw-rw-r-- 1 thuannt thuannt         0 Jul 16 22:19 2026-07-16-simplelog_00000000.log
--rw-rw-r-- 1 thuannt thuannt 880000001 Jul 16 22:19 2026-07-16-simplelog-gps-0000000.bin
-
-
--->> File size: 880000001, time: 0.689s, speed: 29.15M mgs/s, 1.282798834 GB/s
-#---------------------------------------------------------------------------------------------------------------------
-Third round:
-[2026-07-16 22:22:00.000959485] [simplelog.c:spl_init_log_parse:625] [thid: 130989922498368] buff 0, t->mode_straight: 0, sz: 1.
-[2026-07-16 22:22:00.000973945] [simplelog.c:spl_calculate_size:2240] [thid: 130989922498368] buf size: 4800000, mtxsize: 360, semsize: 64
-[2026-07-16 22:22:00.002964592] [simplelog.c:spl_init_segments:2708] [thid: 130989922498368] n_topic: 0
-[2026-07-16 22:22:00.003111402] [main.cpp:main:82] [thid: 130989922498368] ====================Start.
-
-[2026-07-16 22:22:00.678333475] [main.cpp:main:84] [thid: 130989922498368] ==================End.
-
-
-thuannt@thuannt-Z87M-D3H:~/x/simplelog-topic/src/linux$ ll log_simple/2026/07/
-total 859388
-drwxrwxr-x 2 thuannt thuannt      4096 Jul 16 22:22 ./
-drwxrwxr-x 3 thuannt thuannt      4096 Jul 16 22:22 ../
--rw-rw-r-- 1 thuannt thuannt         0 Jul 16 22:22 2026-07-16-simplelog_00000000.log
--rw-rw-r-- 1 thuannt thuannt 880000001 Jul 16 22:22 2026-07-16-simplelog-gps-0000000.bin
-thuannt@thuannt-Z87M-D3H:~/x/simplelog-topic/src/linux$ 
-
-
-
--->> File size: 880000001, time: 0.675s, speed: 29.15M mgs/s, 1.282798834 GB/s
-#---------------------------------------------------------------------------------------------------------------------
-Conclusion: 10 threads, 20M msg
-- Average time of simplelog-topic: 0.684s, speed: 29.2M msg/s, 1.3 GB/s
+Conclusion: 2 billion records, 12 min + 40 s = 12 x 60 + 40 = 760 (s). Size: 88 GB
+- Speed:  2.631M msg/s, 115.789MB/s
