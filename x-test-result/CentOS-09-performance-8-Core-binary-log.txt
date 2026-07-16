@@ -1,0 +1,105 @@
+#---------------------------------------------------------------------------------------------------------------------
+
+If you have a problem of configuration/running or suspecting about honesty.
+	Please contact me: <nguyenthaithuanalg@gmail.com>/Skype:<nguyenthaithuanalg>/Phone: +084.799.324.179
+
+#---------------------------------------------------------------------------------------------------------------------
+
+simplelog-topic: https://github.com/thuanalg/simplelog-topic/blob/main/src/cpp_test/main.cpp
+	Configuration file: src/linux/z.cfg
+	
+Environment for both:
+	- CentOS 09, 8 Cores
+	- 10 threads
+	- 10(ten) million records.
+------------------
+System Information
+------------------
+      System Manufacturer: Gigabyte Technology Co., Ltd.
+             System Model: Z87M-D3H
+                     BIOS: F9 (type: UEFI)
+                Processor: Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz (8 CPUs), ~3.4GHz
+                   Memory: 16384MB RAM
+      Available OS Memory: 16272MB RAM
+                Page File: 10589MB used, 8113MB available
+	- 10 threads/20(ten) million records. 
+
+#---------------------------------------------------------------------------------------------------------------------
+#topic=sys,lib,exe,nayax,sksgn
+# ------------------------------
+# Split logs into multiple binary topics (each binary topic is a separate file)
+topic_bin=gps,speed
+# ------------------------------
+# Device & System Settings
+# ------------------------------
+# Trigger: Create a separate trigger thread (in milliseconds). 
+# Set it to 0 for real-time logging on embedded devices, which means no trigger thread. 
+# For larger systems with heavy log volumes, set it to 1 or higher. This value represents the time interval (in milliseconds) at which the trigger thread will "tick".
+trigger=1
+# Number of CPU-cores/Threads in your system (e.g., 8 CPU-cores/threads/16 threads on your PC)
+# For embedded devices, ncpu should be 1-2. For mainframes, it could be 24, 32, etc.
+ncpu=8
+#--------------------------------------------------------------------------------------------------------------------
+
+Command:
+./simple_c_example --nthread=10 --loopcount=1000000 --mainindex=-1 --topic_index=-1 --topic_Bindex=0 --cfg=z.cfg
+
+#---------------------------------------------------------------------------------------------------------------------
+First round:
+[2026-07-16 22:14:29.340661704] [main.cpp:main:82] [thid: 131133397501760] ====================Start.
+[2026-07-16 22:14:30.026230784] [main.cpp:main:84] [thid: 131133397501760] ==================End.
+
+
+
+
+thuannt@thuannt-Z87M-D3H:~/x/simplelog-topic/src/linux$ ll log_simple/2026/07/
+total 859388
+drwxrwxr-x 2 thuannt thuannt      4096 Jul 16 22:14 ./
+drwxrwxr-x 3 thuannt thuannt      4096 Jul 16 22:14 ../
+-rw-rw-r-- 1 thuannt thuannt         0 Jul 16 22:14 2026-07-16-simplelog_00000000.log
+-rw-rw-r-- 1 thuannt thuannt 880000001 Jul 16 22:14 2026-07-16-simplelog-gps-0000000.bin
+
+ 
+-->> File size: 880000001, time: 0.686s, speed: 29.15M mgs/s, 1.282798834 GB/s
+#---------------------------------------------------------------------------------------------------------------------
+Ssecond round:
+
+[2026-07-16 22:19:20.704952799] [simplelog.c:spl_calculate_size:2240] [thid: 135230674519872] buf size: 4800000, mtxsize: 360, semsize: 64
+[2026-07-16 22:19:20.706816107] [simplelog.c:spl_init_segments:2708] [thid: 135230674519872] n_topic: 0
+[2026-07-16 22:19:20.706976390] [main.cpp:main:82] [thid: 135230674519872] ====================Start.
+[2026-07-16 22:19:21.395311398] [main.cpp:main:84] [thid: 135230674519872] ==================End.
+
+
+
+
+drwxrwxr-x 2 thuannt thuannt      4096 Jul 16 22:19 ./
+drwxrwxr-x 3 thuannt thuannt      4096 Jul 16 22:19 ../
+-rw-rw-r-- 1 thuannt thuannt         0 Jul 16 22:19 2026-07-16-simplelog_00000000.log
+-rw-rw-r-- 1 thuannt thuannt 880000001 Jul 16 22:19 2026-07-16-simplelog-gps-0000000.bin
+
+
+-->> File size: 880000001, time: 0.689s, speed: 29.15M mgs/s, 1.282798834 GB/s
+#---------------------------------------------------------------------------------------------------------------------
+Third round:
+[2026-07-16 22:22:00.000959485] [simplelog.c:spl_init_log_parse:625] [thid: 130989922498368] buff 0, t->mode_straight: 0, sz: 1.
+[2026-07-16 22:22:00.000973945] [simplelog.c:spl_calculate_size:2240] [thid: 130989922498368] buf size: 4800000, mtxsize: 360, semsize: 64
+[2026-07-16 22:22:00.002964592] [simplelog.c:spl_init_segments:2708] [thid: 130989922498368] n_topic: 0
+[2026-07-16 22:22:00.003111402] [main.cpp:main:82] [thid: 130989922498368] ====================Start.
+
+[2026-07-16 22:22:00.678333475] [main.cpp:main:84] [thid: 130989922498368] ==================End.
+
+
+thuannt@thuannt-Z87M-D3H:~/x/simplelog-topic/src/linux$ ll log_simple/2026/07/
+total 859388
+drwxrwxr-x 2 thuannt thuannt      4096 Jul 16 22:22 ./
+drwxrwxr-x 3 thuannt thuannt      4096 Jul 16 22:22 ../
+-rw-rw-r-- 1 thuannt thuannt         0 Jul 16 22:22 2026-07-16-simplelog_00000000.log
+-rw-rw-r-- 1 thuannt thuannt 880000001 Jul 16 22:22 2026-07-16-simplelog-gps-0000000.bin
+thuannt@thuannt-Z87M-D3H:~/x/simplelog-topic/src/linux$ 
+
+
+
+-->> File size: 880000001, time: 0.675s, speed: 29.15M mgs/s, 1.282798834 GB/s
+#---------------------------------------------------------------------------------------------------------------------
+Conclusion: 10 threads, 20M msg
+- Average time of simplelog-topic: 0.684s, speed: 29.2M msg/s, 1.3 GB/s

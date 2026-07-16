@@ -4,9 +4,10 @@ If you have a problem of configuration/running or suspecting about honesty.
 	Please contact me: <nguyenthaithuanalg@gmail.com>/Skype:<nguyenthaithuanalg>/Phone: +084.799.324.179
 
 #---------------------------------------------------------------------------------------------------------------------
+Spdlog test file: https://github.com/thuanalg/simplelog-topic/blob/main/src/spd_example.cpp
 
 simplelog-topic: https://github.com/thuanalg/simplelog-topic/blob/main/src/cpp_test/main.cpp
-	Configuration file: src/linux/z.cfg
+	Configuration file: src/linux/simplelog.cfg
 	
 Environment for both:
 	- CentOS 09, 8 Cores
@@ -22,84 +23,86 @@ System Information
                    Memory: 16384MB RAM
       Available OS Memory: 16272MB RAM
                 Page File: 10589MB used, 8113MB available
-	- 10 threads/20(ten) million records. 
+	- 10 threads/10(ten) million records.
 
 #---------------------------------------------------------------------------------------------------------------------
-#topic=sys,lib,exe,nayax,sksgn
-# ------------------------------
-# Split logs into multiple binary topics (each binary topic is a separate file)
-topic_bin=gps,speed
-# ------------------------------
-# Device & System Settings
-# ------------------------------
-# Trigger: Create a separate trigger thread (in milliseconds). 
-# Set it to 0 for real-time logging on embedded devices, which means no trigger thread. 
-# For larger systems with heavy log volumes, set it to 1 or higher. This value represents the time interval (in milliseconds) at which the trigger thread will "tick".
-trigger=1
-# Number of CPU-cores/Threads in your system (e.g., 8 CPU-cores/threads/16 threads on your PC)
-# For embedded devices, ncpu should be 1-2. For mainframes, it could be 24, 32, etc.
-ncpu=8
-#--------------------------------------------------------------------------------------------------------------------
+Spdlog 01 (first round)
+[2025-02-17 22:02:54.257] [A] [info] [example.cpp:log_messages:433] [Threadid 139977675503168] test log: 0
+[2025-02-17 22:02:54.257] [A] [info] [example.cpp:log_messages:433] [Threadid 139977675503168] test log: 1
+[2025-02-17 22:02:54.257] [A] [info] [example.cpp:log_messages:433] [Threadid 139977675503168] test log: 2
 
-Command:
-./simple_c_example --nthread=10 --loopcount=1000000 --mainindex=-1 --topic_index=-1 --topic_Bindex=0 --cfg=z.cfg
+[2025-02-17 22:03:01.296] [A] [info] [example.cpp:log_messages:433] [Threadid 139977539184192] test log: 999997
+[2025-02-17 22:03:01.296] [A] [info] [example.cpp:log_messages:433] [Threadid 139977539184192] test log: 999998
+[2025-02-17 22:03:01.296] [A] [info] [example.cpp:log_messages:433] [Threadid 139977539184192] test log: 999999
 
-#---------------------------------------------------------------------------------------------------------------------
-First round:
-[2026-07-16 22:14:29.340661704] [main.cpp:main:82] [thid: 131133397501760] ====================Start.
-[2026-07-16 22:14:30.026230784] [main.cpp:main:84] [thid: 131133397501760] ==================End.
+-->> File size: 1118888900, time: 7.039s
 
 
 
+[2025-02-17 21:58:57.726691800] [I] [tid        140422082074176]        [main.c:posix_thread_routine:122] My test log : 2
+[2025-02-17 21:58:57.726697590] [I] [tid        140422082074176]        [main.c:posix_thread_routine:122] My test log : 7
+[2025-02-17 21:58:57.726705435] [I] [tid        140422073681472]        [main.c:posix_thread_routine:122] My test log : 1
+[2025-02-17 21:58:57.726707220] [I] [tid        140422073681472]        [main.c:posix_thread_routine:122] My test log : 2
 
-thuannt@thuannt-Z87M-D3H:~/x/simplelog-topic/src/linux$ ll log_simple/2026/07/
-total 859388
-drwxrwxr-x 2 thuannt thuannt      4096 Jul 16 22:14 ./
-drwxrwxr-x 3 thuannt thuannt      4096 Jul 16 22:14 ../
--rw-rw-r-- 1 thuannt thuannt         0 Jul 16 22:14 2026-07-16-simplelog_00000000.log
--rw-rw-r-- 1 thuannt thuannt 880000001 Jul 16 22:14 2026-07-16-simplelog-gps-0000000.bin
-
+[2025-02-17 21:59:01.103628399] [I] [tid        140422037108288]        [main.c:posix_thread_routine:122] My test log : 999889
+[2025-02-17 21:59:01.103629764] [I] [tid        140422037108288]        [main.c:posix_thread_routine:122] My test log : 999891
+[2025-02-17 21:59:01.103679099] [I] [tid        140422037108288]        [main.c:posix_thread_routine:122] My test log : 999963
  
--->> File size: 880000001, time: 0.686s, speed: 29.15M mgs/s, 1.282798834 GB/s
+-->> File size: 1128888900, time: 3.378s
 #---------------------------------------------------------------------------------------------------------------------
-Ssecond round:
+Spdlog 02  (second round)
 
-[2026-07-16 22:19:20.704952799] [simplelog.c:spl_calculate_size:2240] [thid: 135230674519872] buf size: 4800000, mtxsize: 360, semsize: 64
-[2026-07-16 22:19:20.706816107] [simplelog.c:spl_init_segments:2708] [thid: 135230674519872] n_topic: 0
-[2026-07-16 22:19:20.706976390] [main.cpp:main:82] [thid: 135230674519872] ====================Start.
-[2026-07-16 22:19:21.395311398] [main.cpp:main:84] [thid: 135230674519872] ==================End.
+[2025-02-17 22:08:05.728] [A] [info] [example.cpp:log_messages:433] [Threadid 140458583914048] test log: 0
+[2025-02-17 22:08:05.728] [A] [info] [example.cpp:log_messages:433] [Threadid 140458583914048] test log: 1
+[2025-02-17 22:08:05.728] [A] [info] [example.cpp:log_messages:433] [Threadid 140458583914048] test log: 2
 
+[2025-02-17 22:08:12.766] [A] [info] [example.cpp:log_messages:433] [Threadid 140458558735936] test log: 999997
+[2025-02-17 22:08:12.766] [A] [info] [example.cpp:log_messages:433] [Threadid 140458558735936] test log: 999998
+[2025-02-17 22:08:12.766] [A] [info] [example.cpp:log_messages:433] [Threadid 140458558735936] test log: 999999
 
-
-
-drwxrwxr-x 2 thuannt thuannt      4096 Jul 16 22:19 ./
-drwxrwxr-x 3 thuannt thuannt      4096 Jul 16 22:19 ../
--rw-rw-r-- 1 thuannt thuannt         0 Jul 16 22:19 2026-07-16-simplelog_00000000.log
--rw-rw-r-- 1 thuannt thuannt 880000001 Jul 16 22:19 2026-07-16-simplelog-gps-0000000.bin
+-->> File size: 1118888900, time: 7.038s
 
 
--->> File size: 880000001, time: 0.689s, speed: 29.15M mgs/s, 1.282798834 GB/s
+
+[2025-02-17 22:06:05.509010375] [I] [tid        140594088384064]        [main.c:posix_thread_routine:122] My test log : 17
+[2025-02-17 22:06:05.509022210] [I] [tid        140594088384064]        [main.c:posix_thread_routine:122] My test log : 28
+[2025-02-17 22:06:05.509055270] [I] [tid        140594088384064]        [main.c:posix_thread_routine:122] My test log : 59
+
+[2025-02-17 22:06:08.821983229] [I] [tid        140593992816192]        [main.c:posix_thread_routine:122] My test log : 999980
+[2025-02-17 22:06:08.821989919] [I] [tid        140593992816192]        [main.c:posix_thread_routine:122] My test log : 999990
+[2025-02-17 22:06:08.821991254] [I] [tid        140593992816192]        [main.c:posix_thread_routine:122] My test log : 999992
+
+-->> File size: 1128888900, time: 3.312s
 #---------------------------------------------------------------------------------------------------------------------
-Third round:
-[2026-07-16 22:22:00.000959485] [simplelog.c:spl_init_log_parse:625] [thid: 130989922498368] buff 0, t->mode_straight: 0, sz: 1.
-[2026-07-16 22:22:00.000973945] [simplelog.c:spl_calculate_size:2240] [thid: 130989922498368] buf size: 4800000, mtxsize: 360, semsize: 64
-[2026-07-16 22:22:00.002964592] [simplelog.c:spl_init_segments:2708] [thid: 130989922498368] n_topic: 0
-[2026-07-16 22:22:00.003111402] [main.cpp:main:82] [thid: 130989922498368] ====================Start.
+Spdlog 03 (third round)
+[2025-02-17 22:12:58.239] [A] [info] [example.cpp:log_messages:433] [Threadid 140659501561408] test log: 0
+[2025-02-17 22:12:58.239] [A] [info] [example.cpp:log_messages:433] [Threadid 140659501561408] test log: 1
+[2025-02-17 22:12:58.239] [A] [info] [example.cpp:log_messages:433] [Threadid 140659501561408] test log: 2
+[2025-02-17 22:12:58.239] [A] [info] [example.cpp:log_messages:433] [Threadid 140659501561408] test log: 3
+[2025-02-17 22:12:58.239] [A] [info] [example.cpp:log_messages:433] [Threadid 140659501561408] test log: 4
 
-[2026-07-16 22:22:00.678333475] [main.cpp:main:84] [thid: 130989922498368] ==================End.
+[2025-02-17 22:13:05.317] [A] [info] [example.cpp:log_messages:433] [Threadid 140659088414272] test log: 999995
+[2025-02-17 22:13:05.317] [A] [info] [example.cpp:log_messages:433] [Threadid 140659088414272] test log: 999996
+[2025-02-17 22:13:05.317] [A] [info] [example.cpp:log_messages:433] [Threadid 140659088414272] test log: 999997
+[2025-02-17 22:13:05.317] [A] [info] [example.cpp:log_messages:433] [Threadid 140659088414272] test log: 999998
+[2025-02-17 22:13:05.317] [A] [info] [example.cpp:log_messages:433] [Threadid 140659088414272] test log: 999999
 
-
-thuannt@thuannt-Z87M-D3H:~/x/simplelog-topic/src/linux$ ll log_simple/2026/07/
-total 859388
-drwxrwxr-x 2 thuannt thuannt      4096 Jul 16 22:22 ./
-drwxrwxr-x 3 thuannt thuannt      4096 Jul 16 22:22 ../
--rw-rw-r-- 1 thuannt thuannt         0 Jul 16 22:22 2026-07-16-simplelog_00000000.log
--rw-rw-r-- 1 thuannt thuannt 880000001 Jul 16 22:22 2026-07-16-simplelog-gps-0000000.bin
-thuannt@thuannt-Z87M-D3H:~/x/simplelog-topic/src/linux$ 
+-->> File size: 1118888900, time: 7.078s
 
 
 
--->> File size: 880000001, time: 0.675s, speed: 29.15M mgs/s, 1.282798834 GB/s
+[2025-02-17 22:10:39.093701310] [I] [tid        139782287136320]        [main.c:posix_thread_routine:122] My test log : 0
+[2025-02-17 22:10:39.093710175] [I] [tid        139782287136320]        [main.c:posix_thread_routine:122] My test log : 2
+[2025-02-17 22:10:39.093717030] [I] [tid        139782287136320]        [main.c:posix_thread_routine:122] My test log : 8
+[2025-02-17 22:10:39.093721500] [I] [tid        139782287136320]        [main.c:posix_thread_routine:122] My test log : 12
+
+[2025-02-17 22:10:42.397996304] [I] [tid        139782160102976]        [main.c:posix_thread_routine:122] My test log : 999981
+[2025-02-17 22:10:42.398001569] [I] [tid        139782160102976]        [main.c:posix_thread_routine:122] My test log : 999989
+[2025-02-17 22:10:42.398004884] [I] [tid        139782160102976]        [main.c:posix_thread_routine:122] My test log : 999994
+
+-->> File size: 1128888900, time: 3.305s
 #---------------------------------------------------------------------------------------------------------------------
-Conclusion: 10 threads, 20M msg
-- Average time of simplelog-topic: 0.684s, speed: 29.2M msg/s, 1.3 GB/s
+Conclusion:
+- Average time of simplelog-topic: 3.331s
+- Average time of spdlog: 7.051s
+	In this environment simplelog-topic is faster at 3.72s (~110%, 2x) than spdlog.
