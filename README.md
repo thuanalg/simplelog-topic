@@ -30,6 +30,9 @@ At its core, SimpleLog-Topic follows the **Unix Philosophy** of **KISS (Keep It 
 - **Log Rotation and Buffering:**  
   With configurable **log rotation** and **buffering** options, SimpleLog-Topic can handle **large volumes of log data** efficiently without causing performance degradation. You can control when log files are rotated or how much data should be kept in memory at any given time.
 
+- **Support text, topics, binary log:**  
+  With one text log is mandatory, multi-text topic, multi-binary topic; then it helps you have many choices.
+
 ### **Why SimpleLog-Topic?**
 
 - **Performance-Focused:** SimpleLog-Topic provides **fast, low-latency logging** without sacrificing efficiency, even under heavy load or in high-concurrency applications.
