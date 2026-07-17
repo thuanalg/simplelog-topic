@@ -45,3 +45,7 @@ One of the core objectives of SimpleLog-Topic is to provide exceptional **perfor
    - [spdlog: 26 seconds](https://github.com/thuanalg/simplelog-topic/blob/main/x-test-result/MacOSX-performance-2-Core.txt) 
 
    In this environment **spdlog** is faster at **11.1s (~43%)** than **simplelog-topic**. However, I shall re-verify with PC with more CPU cores.
+
+4. **Binary log, 20 million records:**
+
+   - **Ubuntu 24.04 LTS. SimpleLog-Topic: 0.684s seconds**, [Ubuntu-24.04-performance-8-Core-binary-log.txt](https://github.com/thuanalg/simplelog-topic/blob/main/x-test-result/Ubuntu-24.04-performance-8-Core-binary-log.txt)
