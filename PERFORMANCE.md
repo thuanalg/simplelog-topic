@@ -46,6 +46,10 @@ One of the core objectives of SimpleLog-Topic is to provide exceptional **perfor
 
    In this environment **spdlog** is faster at **11.1s (~43%)** than **simplelog-topic**. However, I shall re-verify with PC with more CPU cores.
 
-4. **Binary log, 20 million records:**
+5. **Binary log, 20 million records:**
 
-   - **Ubuntu 24.04 LTS. SimpleLog-Topic: 0.684s seconds**, [Ubuntu-24.04-performance-8-Core-binary-log.txt](https://github.com/thuanalg/simplelog-topic/blob/main/x-test-result/Ubuntu-24.04-performance-8-Core-binary-log.txt)
+   - **Ubuntu 24.04 LTS: 0.684 seconds**, [Ubuntu-24.04-performance-8-Core-binary-log.txt](https://github.com/thuanalg/simplelog-topic/blob/main/x-test-result/Ubuntu-24.04-performance-8-Core-binary-log.txt)
+
+5. **Binary log, large scale 2 billion records:**
+
+   - **Ubuntu 24.04 LTS: 760 seconds**, [Ubuntu-24.04-performance-8-Core-binary-log-2-billions.txt](https://github.com/thuanalg/simplelog-topic/blob/main/x-test-result/Ubuntu-24.04-performance-8-Core-binary-log-2-billions.txt)
