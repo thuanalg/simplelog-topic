@@ -1,0 +1,83 @@
+#---------------------------------------------------------------------------------------------------------------------
+
+If you have a problem of configuration/running or suspecting about honesty.
+	Please contact me: <nguyenthaithuanalg@gmail.com>/Skype:<nguyenthaithuanalg>/Phone: +084.799.324.179
+
+#---------------------------------------------------------------------------------------------------------------------
+
+simplelog-topic: https://github.com/thuanalg/simplelog-topic/blob/main/src/cpp_test/main.cpp
+	Configuration file: src/linux/z.cfg
+	
+Environment for both:
+	- Ubuntu 24.04.2 LTS, 8 Cores
+	- 10 threads
+	- 10(ten) million records.
+------------------
+System Information
+------------------
+      System Manufacturer: Gigabyte Technology Co., Ltd.
+             System Model: Z87M-D3H
+                     BIOS: F9 (type: UEFI)
+                Processor: Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz (8 CPUs), ~3.4GHz
+                   Memory: 16384MB RAM
+      Available OS Memory: 16272MB RAM
+                Page File: 10589MB used, 8113MB available
+	- 10 threads/20(ten) million records. 
+
+#---------------------------------------------------------------------------------------------------------------------
+#topic=sys,lib,exe,nayax,sksgn
+# ------------------------------
+# Split logs into multiple binary topics (each binary topic is a separate file)
+topic_bin=gps,speed
+# ------------------------------
+# Device & System Settings
+# ------------------------------
+# Trigger: Create a separate trigger thread (in milliseconds). 
+# Set it to 0 for real-time logging on embedded devices, which means no trigger thread. 
+# For larger systems with heavy log volumes, set it to 1 or higher. This value represents the time interval (in milliseconds) at which the trigger thread will "tick".
+trigger=1
+# Number of CPU-cores/Threads in your system (e.g., 8 CPU-cores/threads/16 threads on your PC)
+# For embedded devices, ncpu should be 1-2. For mainframes, it could be 24, 32, etc.
+ncpu=8
+#--------------------------------------------------------------------------------------------------------------------
+
+thuannt@thuannt-Z87M-D3H:~/x/simplelog-topic$ uname -a
+Linux thuannt-Z87M-D3H 6.17.0-35-generic #35~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Tue May 26 19:30:42 UTC 2 x86_64 x86_64 x86_64 GNU/Linux
+thuannt@thuannt-Z87M-D3H:~/x/simplelog-topic$ 
+
+thuannt@thuannt-Z87M-D3H:~/x/simplelog-topic$ cat /etc/os-release
+PRETTY_NAME="Ubuntu 24.04.2 LTS"
+NAME="Ubuntu"
+VERSION_ID="24.04"
+VERSION="24.04.2 LTS (Noble Numbat)"
+
+
+#--------------------------------------------------------------------------------------------------------------------
+
+Command:
+./simple_c_example --nthread=10 --loopcount=100000000 --mainindex=-1 --topic_index=-1 --topic_Bindex=0 --cfg=z.cfg
+
+#100.000.000 * 10 * 2 = 2.000.000.000
+
+#---------------------------------------------------------------------------------------------------------------------
+[2026-07-16 22:53:19.740511635] [main.cpp:main:77] [thid: 124734694999872] cfgpath: z.cfg.
+
+[2026-07-16 22:53:19.740526537] [main.cpp:main:79] [thid: 124734694999872] input.folder: z.cfg.
+
+[2026-07-16 22:53:19.740529263] [simplelog.c:spl_init_log_ext:649] [thid: 124734694999872] -----------------__spl_bin_flag__: 0 
+[2026-07-16 22:53:19.740567300] [simplelog.c:spl_init_log_parse:575] [thid: 124734694999872] n Topic BIN: 1.
+
+[2026-07-16 22:53:19.740596842] [simplelog.c:spl_init_log_parse:596] [thid: 124734694999872] cores: 8.
+
+[2026-07-16 22:53:19.740603385] [simplelog.c:spl_init_log_parse:625] [thid: 124734694999872] buff 0, t->mode_straight: 0, sz: 1.
+[2026-07-16 22:53:19.740609066] [simplelog.c:spl_calculate_size:2240] [thid: 124734694999872] buf size: 4800000, mtxsize: 360, semsize: 64
+[2026-07-16 22:53:19.742685516] [simplelog.c:spl_init_segments:2708] [thid: 124734694999872] n_topic: 0
+[2026-07-16 22:53:19.742834497] [main.cpp:main:82] [thid: 124734694999872] ====================Start.
+
+[2026-07-16 23:05:56.084878006] [main.cpp:main:84] [thid: 124734694999872] ==================End.
+
+[2026-07-16 23:05:56.099206360] [simplelog.c:spl_written_thread_routine:1124] [thid: 124734682871488] pthread_cancel OK.
+
+#---------------------------------------------------------------------------------------------------------------------
+Conclusion: 2 billion records, 12 min + 40 s = 12 x 60 + 40 = 760 (s). Size: 88 GB
+- Speed:  2.631M msg/s, 115.789MB/s
