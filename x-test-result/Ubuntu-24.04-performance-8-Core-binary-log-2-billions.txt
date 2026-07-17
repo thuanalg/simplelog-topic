@@ -11,7 +11,7 @@ simplelog-topic: https://github.com/thuanalg/simplelog-topic/blob/main/src/cpp_t
 Environment for both:
 	- Ubuntu 24.04.2 LTS, 8 Cores
 	- 10 threads
-	- 10(ten) million records.
+	- 20(twenty) million records.
 ------------------
 System Information
 ------------------
@@ -22,7 +22,7 @@ System Information
                    Memory: 16384MB RAM
       Available OS Memory: 16272MB RAM
                 Page File: 10589MB used, 8113MB available
-	- 10 threads/20(ten) million records. 
+	- 10 threads/20(twenty) million records. 
 
 #---------------------------------------------------------------------------------------------------------------------
 #topic=sys,lib,exe,nayax,sksgn
