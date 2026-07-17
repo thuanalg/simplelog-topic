@@ -7,7 +7,7 @@ Thank you to everyone who has contributed to **simplelog-topic**!
    * GitHub: [@thuanalg](https://github.com/thuanalg)
 
 2. **Alper Ak**  
+   * Email: alperyasinak1@gmail.com  
    * GitHub: [@alperak](https://github.com/alperak)
-
 ---
 *Contributions of all kinds are welcome!*
