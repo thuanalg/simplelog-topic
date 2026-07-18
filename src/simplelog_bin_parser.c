@@ -1,3 +1,22 @@
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+/* Email:
+ *		<nguyenthaithuanalg@gmail.com> - Nguyễn Thái Thuận
+ * Mobile:
+ *		<+084.799.324.179>
+ * Skype:
+ *		<nguyenthaithuanalg>
+ * License: 
+ * 		https://github.com/thuanalg/simplelog-topic/blob/main/LICENSE.txt
+ * Date:
+ *		<2026-July-04>
+ *		<2026-July-18>
+ * The lasted modified date:
+ * Decription:
+ *		This file is to be an example for parsing a binlog file.
+ *		It learnt from UTF-8.
+ *		You have to do for your own, and MAY base on this example.
+ */
+/*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #include "simplelog_bin_parser.h"
 #include <stdlib.h>
 #include <stdio.h>
