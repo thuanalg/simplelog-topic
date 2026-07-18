@@ -1,7 +1,7 @@
 ### **Key Features of SimpleLog-Topic**
 
-1. **Universal Compatibility: From C89 to C++20**  
-   SimpleLog-Topic is compatible with both **C89** (ANSI C) and modern **C++20**, making it an ideal logging solution for a wide range of applications, whether they are legacy C projects or cutting-edge C++ systems.
+1. **Universal Compatibility: From C89 to C++23**  
+   SimpleLog-Topic is compatible with both **C89** (ANSI C) and modern **C++23**, making it an ideal logging solution for a wide range of applications, whether they are legacy C projects or cutting-edge C++ systems.
 
 2. **Cross-Platform Support**  
    SimpleLog-Topic works across multiple platforms, including **Windows**, **Linux**, **macOS**, **Android**, and various **embedded systems**. This ensures your logging infrastructure is consistent regardless of the underlying operating system or hardware architecture.
@@ -23,3 +23,9 @@
 
 8. **Message safety feature**  
    The **message safety feature** in your logger allows users to configure a size limit for each log message (e.g., 10,000 bytes). If a message exceeds this size, it, sometimes, **may be truncated**, but the first 10,000 bytes will still be logged. This ensures that large messages do not cause memory overflow or uncontrolled log writing, while still preserving the beginning of the message for logging. This feature is particularly useful in resource-constrained environments like embedded devices, providing both flexibility and safety in log management. [max_sz_msg=](https://github.com/thuanalg/simplelog-topic/blob/main/src/simplelog.cfg)
+
+9. **Auto daily**  
+   Automatically rotates log files every midnight.
+
+10. **Multi-Format Topics**  
+   Supports text, multi-text, and multi-binary topics alongside a main text log, utilizing the UTF-8 spirit for ultimate flexibility..
