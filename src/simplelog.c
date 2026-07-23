@@ -194,13 +194,6 @@
 #define SPL_FMT_DATE_ADDING_X     "\n[%.4d-%.2d-%.2d %.2d:%.2d:%.2d.%.9d] "
 #define HHHHHHHHHHH               "%llu]\t"
 
-#define SPL_TEXT_UNKNOWN          "U"
-#define SPL_TEXT_DEBUG            "D"
-#define SPL_TEXT_INFO             "I"
-#define SPL_TEXT_WARN             "W"
-#define SPL_TEXT_ERROR            "E"
-#define SPL_TEXT_FATAL            "F"
-
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 #ifndef UNIX_LINUX
 // DLL_API_SIMPLE_LOG
@@ -333,12 +326,13 @@ spl_standardize_path(char *fname);
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
 static const char spl_text_gb_c[SPL_LOG_PEAK] = {
-    'A',
-    'D',
-    'I',
-    'W',
-    'E',
-    'F',
+    'A', /*All*/
+    'D', /*Debug*/
+    'I', /*Info*/
+    'W', /*Warning*/
+    'E', /*Error*/
+    'B', /*Binary*/
+    'F', /*Fatal*/
 };
 
 /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
@@ -2706,6 +2700,13 @@ spl_init_segments()
 		}
 	}
 	spl_console_log("n_topic: %d", SPL_CTRL_OBJ->n_topic);
+
+	for (k = 0; k < SPL_CTRL_OBJ->n_bintopic; ++k) {
+		for (i = 0; i < SPL_CTRL_OBJ->ncpu; ++i) {
+			spl_fmt_segment(SPL_TB_LANE(k, i));
+		}
+	}
+	spl_console_log("n_bintopic: %d", SPL_CTRL_OBJ->n_bintopic);
 	return ret;
 }
 

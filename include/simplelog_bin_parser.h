@@ -5,7 +5,7 @@
  *		<+084.799.324.179>
  * Skype:
  *		<nguyenthaithuanalg>
- * License: 
+ * License:
  * 		https://github.com/thuanalg/simplelog-topic/blob/main/LICENSE.txt
  * Date:
  *		<2026-July-04>
