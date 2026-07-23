@@ -41,7 +41,7 @@ At its core, SimpleLog-Topic follows the **Unix Philosophy** of **KISS (Keep It 
 - **Simple and Easy to Use:** The **minimalistic API** keeps things simple, adhering to the Unix philosophy of **KISS**, making it easy to integrate and maintain.
 
 - **Support text, topics, binary log:**  
-  Supports text, multi-text, and multi-binary topics alongside one mandatory main text log to maximize your logging flexibility. The binary log is based on UTF-8 spirit by  - one of the fathers of UNIX.
+  Supports text, multi-text, and multi-binary topics alongside one mandatory main text log to maximize your logging flexibility. The binary log is based on UTF-8 spirit by Ken Thompson  - one of the fathers of UNIX.
 
 
 ### **A Tribute to W. Richard Stevens (1951 - 1999)**
