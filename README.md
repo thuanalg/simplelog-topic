@@ -100,7 +100,7 @@ By using **SimpleLog-Topic**, you’re not just choosing a powerful logging solu
 ### Contact:
 - [Email](mailto:nguyenthaithuanalg@gmail.com)
 
-### Contributed to / Used by:  
+### Contributed to / Available in:  
 - [meta-openembedded/LTS Wrynose/Yocto](https://layers.openembedded.org/layerindex/recipe/499762/)  
 - [openBMC( Meta, Google, IBM, Intel, Microsoft)](https://github.com/openbmc/openbmc/tree/master/upstream-layers/meta-openembedded/meta-oe/recipes-support/libsimplelog)
 - [Google's gBMC](https://gbmc.googlesource.com/openbmc/+/refs/heads/master/upstream-layers/meta-openembedded/meta-oe/recipes-support/libsimplelog/)
